@@ -35,7 +35,7 @@ function loadQuestions() {
         // Create the question HTML
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return `<input type="text" id="q${index + 1}_${i}">${part}`;
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="Your answer here">${part}`;
             }
             return part; // The first part before the first blank
         }).join('');
