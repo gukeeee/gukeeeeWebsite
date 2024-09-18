@@ -46,9 +46,18 @@ document.getElementById('check-button').addEventListener('click', function() {
     let feedback = '';
 
     questions.forEach((question, index) => {
-        const userAnswers = question.answers.map((_, i) => document.getElementById(`q${index + 1}_${i + 1}`).value.trim());
-        const correctAnswers = question.answers.flatMap(ans => ans.split(' / ')).map(ans => ans.toLowerCase());
+        const userAnswers = [];
+        let correctAnswers = question.answers.flatMap(ans => ans.split(' / ')).map(ans => ans.toLowerCase());
 
+        // Collect user answers
+        for (let i = 0; i < correctAnswers.length; i++) {
+            const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim();
+            if (userAnswer) {
+                userAnswers.push(userAnswer);
+            }
+        }
+
+        // Check answers
         userAnswers.forEach((userAnswer, i) => {
             if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
