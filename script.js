@@ -1,6 +1,6 @@
 const questions = [
     { text: 'Las chicas que están "__" (pararse) en la esquina son mis primas.', answers: ['paradas'] },
-    { text: 'Sra. Hidalgo, su hermana y Ud. "__" más y más a su mamá cada día. (parecerse) (PP)', answers: ['se están pareciendo', 'están pareciéndose'] },
+    { text: 'Sra. Hidalgo, su hermana y Ud. "__" más y más a su mamá cada día. (parecerse) (PP)', answers: ['están pareciéndose'] },
     { text: 'Carmen, ¡ "__" tanto! (destacarse) (M-)', answers: ['no te destaques'] },
     { text: 'Vosotras "__" ayer en el concurso por ser tan creativas. (destacarse)', answers: ['os destacasteis'] },
     { text: '¿Quién de vosotros "__" con ser doctor o ingeniero? (soñar) (presente)', answers: ['sueña'] },
@@ -12,7 +12,7 @@ const questions = [
     { text: 'Mario, ¡ "__" ya! Si no lo haces nunca vas a lograr lo que quieres. (destacarse)', answers: ['destácate'] },
     { text: 'A mí me dicen que yo "__" a mi mamá ahora. Pero, antes cuando era chica, yo "__" más a mi abuelita. (parecerse)', answers: ['me parezco', 'me parecía'] },
     { text: '¿Cuál es el significado de parecerse a? "__" "__"', answers: ['to look like', 'to be like'] },
-    { text: 'Uno de Uds. "__" cada día más y más por ser tan listo. (destacarse) (PP)', answers: ['se está destacando', 'está destacándose'] },
+    { text: 'Uno de Uds. "__" cada día más y más por ser tan listo. (destacarse) (PP)', answers: ['está destacándose'] },
     { text: 'Cuando vuestros padres eran más jóvenes "__" con ser exitosos y ahora lo son. (soñar)', answers: ['soñaban'] },
     { text: 'Si tú "__" para hablar con ese chico nuevo, yo voy a "__" tú para hablar con su amigo? (pararse)', answers: ['te paras', 'pararme'] },
 ];
@@ -62,7 +62,7 @@ document.getElementById('check-button').addEventListener('click', function() {
 
         // Check answers
         userAnswers.forEach((userAnswer, i) => {
-            if (correctAnswers.includes(userAnswer.toLowerCase())) {
+            if (correctAnswers.trimEnd == userAnswer.toLowerCase()) {
                 score++;
                 feedback += `<p>${index + 1}: Answer ${i + 1} Correct!</p>`;
             } else {
