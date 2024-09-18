@@ -27,8 +27,8 @@ h1 {
 input {
     padding: 5px; /* Keep the padding */
     margin-left: 5px;
-    width: 20px; /* Set to a smaller width */
-    max-width: 20px; /* Prevent it from getting too wide */
+    width: 100px; /* Set to a smaller width */
+    max-width: 100px; /* Prevent it from getting too wide */
     box-sizing: border-box; /* Include padding in width calculation */
     display: inline-block; /* Change display to inline-block */
 }
