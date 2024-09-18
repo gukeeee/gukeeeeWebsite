@@ -27,7 +27,8 @@ h1 {
 input {
     padding: 8px; /* Slightly larger input */
     margin-left: 5px;
-    width: 80%; /* Make input field wider */
+    width: 40%; /* Set a more manageable width */
+    max-width: 200px; /* Prevent it from getting too wide */
     box-sizing: border-box; /* Include padding in width calculation */
 }
 
