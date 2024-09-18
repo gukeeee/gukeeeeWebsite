@@ -77,5 +77,4 @@ document.getElementById('check-button').addEventListener('click', function() {
     document.getElementById('result').innerHTML = feedback;
 });
 
-// Load questions on page load
 window.onload = loadQuestions;
