@@ -30,13 +30,16 @@ function loadQuestions() {
     quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
-        const questionHtml = question.text.split('__').map((part, i) => {
+        // Split the question text by the placeholders
+        const parts = question.text.split('__');
+        // Create the question HTML
+        const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return `<input type="text" id="q${index + 1}_${i}" placeholder="your answer">` + part;
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="your answer">${part}`;
             }
-            return part;
+            return part; // The first part before the first blank
         }).join('');
-        
+
         quizForm.insertAdjacentHTML('beforeend', `<p>${index + 1}. ${questionHtml}</p>`);
     });
 }
