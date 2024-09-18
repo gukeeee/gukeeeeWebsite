@@ -51,7 +51,7 @@ document.getElementById('check-button').addEventListener('click', function() {
 
     questions.forEach((question, index) => {
         const userAnswers = [];
-        let correctAnswers = question.answers.flatMap(ans => ans.split(' / ')).map(ans => ans.toLowerCase());
+        let correctAnswers = question.answers.map(ans => ans.toLowerCase());
 
         // Collect user answers
         for (let i = 0; i < correctAnswers.length; i++) {
@@ -63,7 +63,7 @@ document.getElementById('check-button').addEventListener('click', function() {
 
         // Check answers
         userAnswers.forEach((userAnswer, i) => {
-            if (correctAnswers.trimEnd == userAnswer.toLowerCase()) {
+            if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
                 feedback += `<p>${index + 1}: Answer ${i + 1} Correct!</p>`;
             } else {
