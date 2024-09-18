@@ -27,10 +27,17 @@ function shuffleArray(array) {
 function loadQuestions() {
     shuffleArray(questions);
     const quizForm = document.getElementById('quiz-form');
-    
+    quizForm.innerHTML = ''; // Clear any existing questions
+
     questions.forEach((question, index) => {
-        const questionHtml = `<p>${index + 1}. ${question.text.replace('__', `<input type="text" id="q${index + 1}" placeholder="your answer">`)}</p>`;
-        quizForm.insertAdjacentHTML('beforeend', questionHtml);
+        const questionHtml = question.text.split('__').map((part, i) => {
+            if (i > 0) {
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="your answer">` + part;
+            }
+            return part;
+        }).join('');
+        
+        quizForm.insertAdjacentHTML('beforeend', `<p>${index + 1}. ${questionHtml}</p>`);
     });
 }
 
@@ -39,15 +46,17 @@ document.getElementById('check-button').addEventListener('click', function() {
     let feedback = '';
 
     questions.forEach((question, index) => {
-        const userAnswer = document.getElementById(`q${index + 1}`).value.trim();
+        const userAnswers = question.answers.map((_, i) => document.getElementById(`q${index + 1}_${i + 1}`).value.trim());
         const correctAnswers = question.answers.flatMap(ans => ans.split(' / ')).map(ans => ans.toLowerCase());
 
-        if (correctAnswers.includes(userAnswer.toLowerCase())) {
-            score++;
-            feedback += `<p>${index + 1}: Correct!</p>`;
-        } else {
-            feedback += `<p>${index + 1}: Wrong! Correct answer(s): "${question.answers.join(', ')}".</p>`;
-        }
+        userAnswers.forEach((userAnswer, i) => {
+            if (correctAnswers.includes(userAnswer.toLowerCase())) {
+                score++;
+                feedback += `<p>${index + 1}: Answer ${i + 1} Correct!</p>`;
+            } else {
+                feedback += `<p>${index + 1}: Answer ${i + 1} Wrong! Correct answer(s): "${question.answers.join(', ')}".</p>`;
+            }
+        });
     });
 
     feedback += `<p>Your score: ${score} out of ${questions.length}</p>`;
