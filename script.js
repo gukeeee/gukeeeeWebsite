@@ -56,11 +56,7 @@ document.getElementById('check-button').addEventListener('click', function() {
         // Collect user answers
         for (let i = 0; i < correctAnswers.length; i++) {
             const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim();
-            if (userAnswer) {
-                userAnswers.push(userAnswer);
-            }
-            else {
-                userAnswers.push(" ");
+            userAnswers.push(userAnswer);
         }
 
         // Check answers
@@ -70,7 +66,7 @@ document.getElementById('check-button').addEventListener('click', function() {
                 feedback += `<p>${index + 1}: Answer ${i + 1} Correct!</p>`;
             } else {
                 incorrect++;
-                feedback += `<p>${index + 1}: Answer ${i + 1} Wrong!</p>`;
+                feedback += `<p>${index + 1}: Answer ${i + 1} Incorrect!</p>`;
             }
         });
     });
