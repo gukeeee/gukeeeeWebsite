@@ -59,6 +59,8 @@ document.getElementById('check-button').addEventListener('click', function() {
             if (userAnswer) {
                 userAnswers.push(userAnswer);
             }
+            else {
+                userAnswers.push(" ");
         }
 
         // Check answers
@@ -68,7 +70,7 @@ document.getElementById('check-button').addEventListener('click', function() {
                 feedback += `<p>${index + 1}: Answer ${i + 1} Correct!</p>`;
             } else {
                 incorrect++;
-                feedback += `<p>${index + 1}: Answer ${i + 1} Wrong! Correct answer(s): "${question.answers.join(', ')}".</p>`;
+                feedback += `<p>${index + 1}: Answer ${i + 1} Wrong!</p>`;
             }
         });
     });
