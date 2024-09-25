@@ -63,10 +63,10 @@ document.getElementById('check-button').addEventListener('click', function() {
             if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
                 total ++;
-                feedback += `<p style="color: red;">${total}) ¡Correcto!</p>`;
+                feedback += `<p style="color: green;">${total}) ¡Correcto!</p>`;
             } else {
                 total ++;
-                feedback += `<p style="color: green;">${total}) ¡Incorrecto!</p>`;
+                feedback += `<p style="color: red;">${total}) ¡Incorrecto!</p>`;
             }
         });
     });
