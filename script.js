@@ -45,7 +45,7 @@ function loadQuestions() {
 
 document.getElementById('check-button').addEventListener('click', function() {
     let score = 0;
-    let incorrect = 0;
+    let total = 0
     let feedback = '';
 
     questions.forEach((question, index) => {
@@ -62,15 +62,16 @@ document.getElementById('check-button').addEventListener('click', function() {
         userAnswers.forEach((userAnswer, i) => {
             if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
-                feedback += `<p>Pregunta ${score + incorrect} - ¡Correcto!</p>`;
+                total ++;
+                feedback += `<p style="color: red;">${total}) ¡Correcto!</p>`;
             } else {
-                incorrect++;
-                feedback += `<p>Pregunta ${score + incorrect} - ¡Incorrecto!</p>`;
+                total ++;
+                feedback += `<p style="color: green;">${total}) ¡Incorrecto!</p>`;
             }
         });
     });
 
-    feedback += `<p>Tu nota: ${score} de ${score + incorrect}</p>`;
+    feedback += `<p>Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
     document.getElementById('result').innerHTML = feedback;
 });
 
