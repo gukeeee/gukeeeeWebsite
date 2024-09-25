@@ -34,7 +34,7 @@ function loadQuestions() {
         // Create the question HTML
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return `<input type="text" id="q${index + 1}_${i}" placeholder="Your answer here">${part}`;
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
             return part; // The first part before the first blank
         }).join('');
@@ -62,15 +62,15 @@ document.getElementById('check-button').addEventListener('click', function() {
         userAnswers.forEach((userAnswer, i) => {
             if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
-                feedback += `<p>Answer ${i + 1} - Correct!</p>`;
+                feedback += `<p>Answer ${i + 1} - ¡Correcto!</p>`;
             } else {
                 incorrect++;
-                feedback += `<p>Answer ${i + 1} - Incorrect!</p>`;
+                feedback += `<p>Answer ${i + 1} - ¡Incorrecto!</p>`;
             }
         });
     });
 
-    feedback += `<p>Your score: ${score} out of ${score + incorrect}</p>`;
+    feedback += `<p>Tu nota: ${score} de ${score + incorrect}</p>`;
     document.getElementById('result').innerHTML = feedback;
 });
 
