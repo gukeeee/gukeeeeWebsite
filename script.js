@@ -62,10 +62,10 @@ document.getElementById('check-button').addEventListener('click', function() {
         userAnswers.forEach((userAnswer, i) => {
             if (correctAnswers.includes(userAnswer.toLowerCase())) {
                 score++;
-                feedback += `<p>Answer ${i + 1} - ¡Correcto!</p>`;
+                feedback += `<p>Pregunta ${score + incorrect} - ¡Correcto!</p>`;
             } else {
                 incorrect++;
-                feedback += `<p>Answer ${i + 1} - ¡Incorrecto!</p>`;
+                feedback += `<p>Pregunta ${score + incorrect} - ¡Incorrecto!</p>`;
             }
         });
     });
