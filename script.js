@@ -54,10 +54,10 @@ document.getElementById('check-button').addEventListener('click', function() {
 
             // Check answers and append "correct" or "incorrect"
             if (userAnswer === correctAnswers[i]) {
-                feedbackLine += 'correct, ';
+                feedbackLine += `<span style="color: green;">Correct</span>, `;
                 score++;
             } else {
-                feedbackLine += 'incorrect, ';
+                feedbackLine += `<span style="color: red;">Incorrect</span>, `;
             }
             total++;
         }
