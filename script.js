@@ -54,16 +54,16 @@ document.getElementById('check-button').addEventListener('click', function() {
 
             // Check answers and append "correct" or "incorrect"
             if (userAnswer === correctAnswers[i]) {
-                feedbackLine += `<span style="color: green;">Correct,</span> `;
+                feedbackLine += `<span style="color: green;">Correct</span> `;
                 score++;
             } else {
-                feedbackLine += `<span style="color: red;">Incorrect,</span> `;
+                feedbackLine += `<span style="color: red;">Incorrect</span> `;
             }
             total++;
         }
 
         // Trim trailing comma and space from feedback line
-        feedback += `<p>${feedbackLine.slice(0, -2)}</p>`;
+        feedback += `<p>${feedbackLine.slice(0, -1)}</p>`;
     });
 
     feedback += `<p>Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
