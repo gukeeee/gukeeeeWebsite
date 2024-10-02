@@ -1,20 +1,15 @@
 const questions = [
-    { text: 'Javi, ¡ __ a esos chicos allá! (vencer) (M-) ¡ __ a ésos! (vencer) (M+)', answers: ['no venzas', 'Vence'] },
-    { text: 'Alma, __ (alcanzarles) (M-) ese juguete ni a Pablito ni a Lisa. Están castigados por portarse mal. Es que ellos todavía no __ (darse cuenta de) (pretérito perfecto) su error.', answers: ['no les alcances', 'se han dado cuenta de'] },
-    { text: 'Si yo __ mi miedo de alturas, voy a poder escalar El Capitán en Yosemite. (vencer)', answers: ['venzo'] },
-    { text: 'Yo no __ (alcanzar) verte anteayer. ¡Qué pena! ¿ __ tú ver a tus primos?', answers: ['alcancé', 'Alcanzaste'] },
-    { text: 'Ellos no creían que nosotros __ (darse cuenta de) (IMP) lo que estaba pasando, pero no fue así.', answers: ['nos dábamos cuenta de'] },
-    { text: 'Un sueño __ por mi papá fue de tener su propia casa. (realizar)', answers: ['realizado'] },
-    { text: 'Nosotros te __ (alcanzar) por fin. (pretérito perfecto)', answers: ['hemos alcanzado'] },
-    { text: 'El otro día, Lalo __ (darse cuenta de) que para __ (alcanzar) sus sueños, tiene que trabajar duro.', answers: ['se dio cuenta de', 'alcanzar'] },
-    { text: 'Teodoro, ¡ __ a ese jugador en este partido! (vencer)', answers: ['vence'] },
-    { text: 'Valentina, ¡ __ tu error! (darse cuenta de)', answers: ['date cuenta de'] },
-    { text: 'Antes, mis hermanas y yo éramos bajas y no __ (alcanzar) lo que mis padres ponían encima de la refri.', answers: ['alcanzábamos'] },
-    { text: 'Sr. Ávila, ¡ __ sus metas porque vale la pena! (realizar)', answers: ['realice'] },
-    { text: 'Vosotros nos __ (alcanzar), no os canséis. (presente progresivo)', answers: ['estáis alcanzando'] },
-    { text: 'Después de mucho esfuerzo, mi mejor amiga __ (alcanzar) estar en los semi-finales. Tristemente, fue __ (vencer) por otra jugadora más fuerte en el último partido.', answers: ['alcanzó', 'vencida'] },
-    { text: 'Esos chicos os __ a vosotros. ¡Qué vergüenza! (vencer) (presente progresivo)', answers: ['están venciendo'] }
+    { text: 'Las obras de Shakespeare son __ (conocer, saber) por todo el mundo. El año pasado yo __ (saber, conocer) que mi abuelo __ (tener) una colección de muchas de sus obras por décadas. - NOTE SOME ANSWERS MAY BE WRONG, NOT VERIFIED -', answers: ['conocidas', 'supe', 'ha tenido'] },
+    { text: 'Anteanoche, mientras los estudiantes hacían su tarea, hubo un apagón. Desafortunadamente, nadie __ (poder) terminarla porque la luz no volvió hasta muy tarde. El problema es tan grande que hasta hoy hay gente que __ (tener) problemas ahora mismo.', answers: ['pudo', 'está teniendo'] },
+    { text: 'Señores, ¡ __ (tener) más cuidado con lo que dicen, hay niños presentes!', answers: ['tengan'] },
+    { text: 'Desde el momento que entré, yo __ (tener) la sensación que alguien me ha estado mirando. --¿ __ (saber, conocer) tú a quién me refiero? ¿Lo has visto tú? - NOTE SOME ANSWERS MAY BE WRONG, NOT VERIFIED -', answers: ['he tenido', 'Sabes'] },
+    { text: 'Al __ (saber, conocer) la verdad, nosotros __ (tener) que irnos hace un rato. Ahora no __ (tener) dónde quedarnos. ¿Nos __ (poder) ayudar Ud. encontrar alojamiento?', answers: ['saber', 'tuvimos', 'tenemos', 'puede'] },
+    { text: 'Ayer, yo __ (saber, conocer) a la novia de mi hermano por primera vez. Yo no __ (saber, conocer) que ella era ingeniera y que ella __ (tener) una hija de cinco años. Ella la __ (tener) cuando estaba en la universidad.', answers: ['conocí', 'sabía', 'tenía', 'tuvo'] },
+    { text: 'Lila, ¿ __ (poder) (pretérito perfecto) terminar lo que te pedí? ---Lo siento, no lo __ (poder) hacer todavía.', answers: ['has podido', 'he podido'] },
+    { text: 'Las definiciones en inglés de tener son __.', answers: ['to have, to be'] },
+    { text: 'Vosotros lo __ (saber, conocer) (pretérito perfecto) a Tito desde que era chico porque les sorprende verlo hacerse el payaso ahora.', answers: ['habéis conocido'] }
 ];
+
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
