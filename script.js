@@ -1,5 +1,5 @@
 const questions = [
-    { text: 'Las obras de Shakespeare son __ (conocer, saber) por todo el mundo. El año pasado yo __ (saber, conocer) que mi abuelo __ (tener) una colección de muchas de sus obras por décadas. - NOTE SOME ANSWERS MAY BE WRONG, NOT VERIFIED -', answers: ['conocidas', 'supe', 'ha tenido'] },
+    { text: 'Las obras de Shakespeare son __ (conocer, saber) por todo el mundo. El año pasado yo __ (saber, conocer) que mi abuelo __ (tener) una colección de muchas de sus obras por décadas.', answers: ['conocidas', 'supe', 'ha tenido'] },
     { text: 'Anteanoche, mientras los estudiantes hacían su tarea, hubo un apagón. Desafortunadamente, nadie __ (poder) terminarla porque la luz no volvió hasta muy tarde. El problema es tan grande que hasta hoy hay gente que __ (tener) problemas ahora mismo.', answers: ['pudo', 'está teniendo'] },
     { text: 'Señores, ¡ __ (tener) más cuidado con lo que dicen, hay niños presentes!', answers: ['tengan'] },
     { text: 'Desde el momento que entré, yo __ (tener) la sensación que alguien me ha estado mirando. --¿ __ (saber, conocer) tú a quién me refiero? ¿Lo has visto tú? - NOTE SOME ANSWERS MAY BE WRONG, NOT VERIFIED -', answers: ['he tenido', 'Sabes'] },
