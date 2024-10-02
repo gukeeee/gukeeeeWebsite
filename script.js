@@ -41,36 +41,32 @@ document.getElementById('check-button').addEventListener('click', function() {
     let score = 0;
     let total = 0;
     let feedback = '';
-    let answerKey = '';
 
     questions.forEach((question, index) => {
         const userAnswers = [];
-        let correctAnswers = question.answers.map(ans => ans.toLowerCase());
+        const correctAnswers = question.answers.map(ans => ans.toLowerCase());
+        let feedbackLine = `${index + 1}) `; // Start feedback line for each question
 
         // Collect user answers
         for (let i = 0; i < correctAnswers.length; i++) {
-            const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim();
+            const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
             userAnswers.push(userAnswer);
+
+            // Check answers and append "correct" or "incorrect"
+            if (userAnswer === correctAnswers[i]) {
+                feedbackLine += 'correct, ';
+                score++;
+            } else {
+                feedbackLine += 'incorrect, ';
+            }
+            total++;
         }
 
-        // Check answers
-        userAnswers.forEach((userAnswer, i) => {
-            if (correctAnswers.includes(userAnswer.toLowerCase())) {
-                score++;
-                total++;
-                feedback += `<p style="color: green;">${total}) ¡Correcto!</p>`;
-            } else {
-                total++;
-                feedback += `<p style="color: red;">${total}) ¡Incorrecto!</p>`;
-            }
-        });
-
-        // Add to answer key
-        answerKey += `${index + 1}) ${correctAnswers.join(', ')}<br>`;
+        // Trim trailing comma and space from feedback line
+        feedback += `<p>${feedbackLine.slice(0, -2)}</p>`;
     });
 
     feedback += `<p>Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
-    feedback += `<p><strong>Respuestas correctas:</strong><br>${answerKey}</p>`;
     document.getElementById('result').innerHTML = feedback;
 });
 
