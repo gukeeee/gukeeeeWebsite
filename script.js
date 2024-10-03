@@ -28,13 +28,12 @@ function loadQuestions() {
         // Create the question HTML with feedback span next to each input
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">
-                        <span id="feedback-q${index + 1}_${i}" class="feedback"></span>${part}`;
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
             return part; // The first part before the first blank
         }).join('');
 
-        quizForm.insertAdjacentHTML('beforeend', `<p>${index + 1}. ${questionHtml}</p>`);
+        quizForm.insertAdjacentHTML('beforeend', `<p id="question-${index + 1}">${index + 1}. ${questionHtml}</p><div id="feedback-q${index + 1}" class="feedback"></div>`);
     });
 }
 
@@ -44,25 +43,29 @@ document.getElementById('check-button').addEventListener('click', function() {
 
     questions.forEach((question, index) => {
         const correctAnswers = question.answers.map(ans => ans.toLowerCase());
+        let feedbackLine = ''; // Will contain the feedback for each question
 
-        // Collect user answers and provide feedback immediately after each input
+        // Collect user answers and provide feedback after each full question
         correctAnswers.forEach((correctAnswer, i) => {
             const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
-            const feedbackSpan = document.getElementById(`feedback-q${index + 1}_${i + 1}`);
 
-            // Check if the user's answer is correct and update the feedback span
+            // Check if the user's answer is correct
             if (userAnswer === correctAnswer) {
-                feedbackSpan.innerHTML = '<span style="color: green;">Correcto</span>';
+                feedbackLine += '<span style="color: green; font-weight: bold;">Correcto</span> ';
                 score++;
             } else {
-                feedbackSpan.innerHTML = '<span style="color: red;">Incorrecto</span>';
+                feedbackLine += '<span style="color: red; font-weight: bold;">Incorrecto</span> ';
             }
             total++;
         });
+
+        // Display feedback after each question
+        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
+        feedbackElement.innerHTML = feedbackLine.trim(); // Trim to remove trailing spaces
     });
 
     // Display the total score in the result section
-    document.getElementById('result').innerHTML = `Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)`;
+    document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 });
 
 window.onload = loadQuestions;
