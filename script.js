@@ -51,17 +51,17 @@ document.getElementById('check-button').addEventListener('click', function() {
 
             // Check if the user's answer is correct
             if (userAnswer === correctAnswer) {
-                feedbackLine += '<span style="color: green; font-weight: bold;">Correcto</span> ';
+                feedbackLine += `<span style="color: green; font-weight: bold;">Q${index + 1}: Correcto</span>, `;
                 score++;
             } else {
-                feedbackLine += '<span style="color: red; font-weight: bold;">Incorrecto</span> ';
+                feedbackLine += `<span style="color: red; font-weight: bold;">Q${index + 1}: Incorrecto</span>, `;
             }
             total++;
         });
 
         // Display feedback after each question
         const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
-        feedbackElement.innerHTML = feedbackLine.trim(); // Trim to remove trailing spaces
+        feedbackElement.innerHTML = feedbackLine.slice(0, -2); // Trim to remove trailing comma and space
     });
 
     // Display the total score in the result section
