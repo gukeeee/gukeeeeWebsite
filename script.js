@@ -1,22 +1,3 @@
-const questions = [
-    { text: 'Las obras de Shakespeare son __ (conocer, saber) por todo el mundo. El año pasado yo __ (saber, conocer) que mi abuelo __ (tener) una colección de muchas de sus obras por décadas.', answers: ['conocidas', 'supe', 'ha tenido'] },
-    { text: 'Anteanoche, mientras los estudiantes hacían su tarea, hubo un apagón. Desafortunadamente, nadie __ (poder) terminarla porque la luz no volvió hasta muy tarde. El problema es tan grande que hasta hoy hay gente que __ (tener) problemas ahora mismo.', answers: ['pudo', 'está teniendo'] },
-    { text: 'Señores, ¡ __ (tener) más cuidado con lo que dicen, hay niños presentes!', answers: ['tengan'] },
-    { text: 'Desde el momento que entré, yo __ (tener) la sensación que alguien me ha estado mirando. --¿ __ (saber, conocer) tú a quién me refiero? ¿Lo has visto tú?', answers: ['he tenido', 'Sabes'] },
-    { text: 'Al __ (saber, conocer) la verdad, nosotros __ (tener) que irnos hace un rato. Ahora no __ (tener) dónde quedarnos. ¿Nos __ (poder) ayudar Ud. encontrar alojamiento?', answers: ['saber', 'tuvimos', 'tenemos', 'puede'] },
-    { text: 'Ayer, yo __ (saber, conocer) a la novia de mi hermano por primera vez. Yo no __ (saber, conocer) que ella era ingeniera y que ella __ (tener) una hija de cinco años. Ella la __ (tener) cuando estaba en la universidad.', answers: ['conocí', 'sabía', 'tenía', 'tuvo'] },
-    { text: 'Lila, ¿ __ (poder) (pretérito perfecto) terminar lo que te pedí? ---Lo siento, no lo __ (poder) hacer todavía.', answers: ['has podido', 'he podido'] },
-    { text: 'Las definiciones en inglés de tener son __.', answers: ['to have, to be'] },
-    { text: 'Vosotros lo __ (saber, conocer) (pretérito perfecto) a Tito desde que era chico porque les sorprende verlo hacerse el payaso ahora.', answers: ['habéis conocido'] }
-];
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
 function loadQuestions() {
     shuffleArray(questions);
     const quizForm = document.getElementById('quiz-form');
@@ -33,41 +14,39 @@ function loadQuestions() {
             return part; // The first part before the first blank
         }).join('');
 
-        quizForm.insertAdjacentHTML('beforeend', `<p>${index + 1}. ${questionHtml}</p>`);
+        // Add a span for feedback next to each question
+        quizForm.insertAdjacentHTML('beforeend', `<p>${index + 1}. ${questionHtml} <span id="feedback${index + 1}" class="feedback"></span></p>`);
     });
 }
 
 document.getElementById('check-button').addEventListener('click', function() {
     let score = 0;
     let total = 0;
-    let feedback = '';
 
     questions.forEach((question, index) => {
-        const userAnswers = [];
         const correctAnswers = question.answers.map(ans => ans.toLowerCase());
-        let feedbackLine = `${index + 1}) `; // Start feedback line for each question
+        let feedbackText = ''; // Start feedback for each question
 
-        // Collect user answers
+        // Collect and check user answers
         for (let i = 0; i < correctAnswers.length; i++) {
             const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
-            userAnswers.push(userAnswer);
 
-            // Check answers and append "correct" or "incorrect"
+            // Check answers and provide feedback for each input
             if (userAnswer === correctAnswers[i]) {
-                feedbackLine += `<span style="color: green;">Correct</span> `;
+                feedbackText += `<span style="color: green;">Correct</span> `;
                 score++;
             } else {
-                feedbackLine += `<span style="color: red;">Incorrect</span> `;
+                feedbackText += `<span style="color: red;">Incorrect</span> `;
             }
             total++;
         }
 
-        // Trim trailing comma and space from feedback line
-        feedback += `<p>${feedbackLine.slice(0, -1)}</p>`;
+        // Update the feedback span next to each question
+        document.getElementById(`feedback${index + 1}`).innerHTML = feedbackText;
     });
 
-    feedback += `<p>Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
-    document.getElementById('result').innerHTML = feedback;
+    // Show the final score
+    document.getElementById('result').innerHTML = `<p>Tu nota: ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 });
 
 window.onload = loadQuestions;
