@@ -59,7 +59,7 @@ document.getElementById('check-button').addEventListener('click', function() {
 
         // Display feedback after each question
         const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
-        feedbackElement.innerHTML = `Q${index + 1}: ${correctCount === correctAnswers.length ? 'Correcto' : 'Incorrecto'}`;
+        feedbackElement.innerHTML = `<strong>Q${index + 1}:</strong> <span style="color: ${correctCount === correctAnswers.length ? 'green' : 'red'};">${correctCount === correctAnswers.length ? 'Correcto' : 'Incorrecto'}</span>`;
     });
 
     // Display the total score in the result section
