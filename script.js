@@ -43,23 +43,25 @@ document.getElementById('check-button').addEventListener('click', function() {
 
     questions.forEach((question, index) => {
         const correctAnswers = question.answers.map(ans => ans.toLowerCase());
-        let correctCount = 0; // Count how many answers are correct
+        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
+        let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
 
-        // Collect user answers and provide feedback after each full question
+        // Collect user answers and provide feedback for each input box
         correctAnswers.forEach((correctAnswer, i) => {
             const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
 
             // Check if the user's answer is correct
             if (userAnswer === correctAnswer) {
-                correctCount++;
+                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
                 score++;
+            } else {
+                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto</span> `;
             }
             total++;
         });
 
-        // Display feedback after each question
-        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
-        feedbackElement.innerHTML = `<strong>Q${index + 1}:</strong> <span style="color: ${correctCount === correctAnswers.length ? 'green' : 'red'};">${correctCount === correctAnswers.length ? 'Correcto' : 'Incorrecto'}</span>`;
+        // Display the feedback for this question
+        feedbackElement.innerHTML = feedbackHtml;
     });
 
     // Display the total score in the result section
