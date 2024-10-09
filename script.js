@@ -1,13 +1,20 @@
 const questions = [
-    { text: 'Las obras de Shakespeare son __ (conocer, saber) por todo el mundo. El año pasado yo __ (saber, conocer) que mi abuelo __ (tener) una colección de muchas de sus obras por décadas.', answers: ['conocidas', 'supe', 'ha tenido'] },
-    { text: 'Anteanoche, mientras los estudiantes hacían su tarea, hubo un apagón. Desafortunadamente, nadie __ (poder) terminarla porque la luz no volvió hasta muy tarde. El problema es tan grande que hasta hoy hay gente que __ (tener) problemas ahora mismo.', answers: ['pudo', 'está teniendo'] },
-    { text: 'Señores, ¡ __ (tener) más cuidado con lo que dicen, hay niños presentes!', answers: ['tengan'] },
-    { text: 'Desde el momento que entré, yo __ (tener) la sensación que alguien me ha estado mirando. --¿ __ (saber, conocer) tú a quién me refiero? ¿Lo has visto tú?', answers: ['he tenido', 'Sabes'] },
-    { text: 'Al __ (saber, conocer) la verdad, nosotros __ (tener) que irnos hace un rato. Ahora no __ (tener) dónde quedarnos. ¿Nos __ (poder) ayudar Ud. encontrar alojamiento?', answers: ['saber', 'tuvimos', 'tenemos', 'puede'] },
-    { text: 'Ayer, yo __ (saber, conocer) a la novia de mi hermano por primera vez. Yo no __ (saber, conocer) que ella era ingeniera y que ella __ (tener) una hija de cinco años. Ella la __ (tener) cuando estaba en la universidad.', answers: ['conocí', 'sabía', 'tenía', 'tuvo'] },
-    { text: 'Lila, ¿ __ (poder) (pretérito perfecto) terminar lo que te pedí? ---Lo siento, no lo __ (poder) hacer todavía.', answers: ['has podido', 'he podido'] },
-    { text: 'Las definiciones en inglés de tener son __.', answers: ['to have, to be'] },
-    { text: 'Vosotros lo __ (saber, conocer) (pretérito perfecto) a Tito desde que era chico porque les sorprende verlo hacerse el payaso ahora.', answers: ['habéis conocido'] }
+    { text: 'Cuando vosotros __ (comprometerse) a hacer algo, yo siempre podía contar con vosotros.', answers: ['os comprometíais'] },
+    { text: 'No lo ves, es obvio que está __ (arrepentirse).', answers: ['arrepentido'] },
+    { text: 'Cada vez que tú mientes, __ (arrepentirse) porque sabes que tu mamá la descubrirá.', answers: ['te arrepientes'] },
+    { text: 'Señoritas García, ¡ __ de alguien que las quiera y las trate bien y no de alguien que no las valore! (enamorarse)', answers: ['enamórense'] },
+    { text: 'Ay, ya tú __ de un chico nuevo otra vez. (enamorarse)', answers: ['te has enamorado'] },
+    { text: 'Nosotros no __ de haber venido todavía. (arrepentirse) (pretérito perfecto)', answers: ['nos hemos arrepentido'] },
+    { text: 'Octavia, ¡ __ (comprometerse) a ser amable con todos!', answers: ['comprométete'] },
+    { text: 'Ayer vi a Roberto que __ con otra mujer en la fiesta mientras su esposa estaba ayudando a su amiga. (coquetear)', answers: ['coqueteaba'] },
+    { text: 'Sr. Oso, ¡ __ (coquetear) (M-) con sus colegas porque todas están __ (comprometerse)!', answers: ['no coquetee', 'comprometidas'] },
+    { text: 'Mis padres me dijeron, hija, ¡ __ hasta que tengas treinta años! (comprometerse) porque piensan que primero tengo que establecerme en mi profesión.', answers: ['no te comprometas'] },
+    { text: 'Alejandra __ a ayudarme el otro día. (comprometerse)', answers: ['se comprometió'] },
+    { text: 'Olga __ (enamorarse) de Salvador, la primera vez que lo vio hace diez años. Cuando ellos __ (comprometerse) sólo tenían veinte años.', answers: ['se enamoró', 'se comprometieron'] },
+    { text: '¿Qué significa "arrepentirse"? Significa __.', answers: ['to regret'] },
+    { text: 'Antonio, ¿Por qué no __ con la rubia que te está mirando a cada rato. (coquetear) Si no lo haces, vas a __. (arrepentirse)', answers: ['coqueteas', 'arrepentirte'] },
+    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['me estoy arrepintiendo'] },
+    { text: 'Es muy claro que esa pareja que acaba de __ (comprometerse) está __ (enamorarse).', answers: ['comprometerse', 'enamorada'] }
 ];
 
 function shuffleArray(array) {
