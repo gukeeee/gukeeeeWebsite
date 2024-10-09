@@ -13,7 +13,7 @@ const questions = [
     { text: 'Olga __ (enamorarse) de Salvador, la primera vez que lo vio hace diez años. Cuando ellos __ (comprometerse) sólo tenían veinte años.', answers: ['se enamoró', 'se comprometieron'] },
     { text: '¿Qué significa "arrepentirse"? Significa __.', answers: ['to regret'] },
     { text: 'Antonio, ¿Por qué no __ con la rubia que te está mirando a cada rato. (coquetear) Si no lo haces, vas a __. (arrepentirse)', answers: ['coqueteas', 'arrepentirte'] },
-    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['me estoy arrepintiendo'] },
+    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['estoy arrepintiéndome'] },
     { text: 'Es muy claro que esa pareja que acaba de __ (comprometerse) está __ (enamorarse).', answers: ['comprometerse', 'enamorada'] }
 ];
 
