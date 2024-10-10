@@ -56,22 +56,23 @@ document.getElementById('check-button').addEventListener('click', function() {
             const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
 
             if (!userAnswer) {
-                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta</span> `;
+                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta,</span> `;
                 inputField.classList.add('empty');
             } 
             else if (possibleAnswers.includes(userAnswer)) {
-                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
+                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto,</span> `;
                 inputField.style.borderColor = 'green';
                 score++;
                 inputField.classList.remove('empty');
             } else {
-                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto</span> `;
+                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto,</span> `;
                 inputField.style.borderColor = 'red';
                 inputField.classList.remove('empty');
             }
             total++;
         });
-
+        feedbackHTML = feedbackHTML.slice(0, -2);
+        
         feedbackElement.innerHTML = feedbackHtml;
     });
 
