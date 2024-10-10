@@ -51,7 +51,7 @@ input::placeholder {
 }
 
 input.empty {
-    border-color: #FFD700; /* Darker yellow for visibility */
+    border-color: #FFD700; /* Default yellow for visibility */
 }
 
 button {
@@ -75,6 +75,14 @@ button:hover {
 .result {
     margin-top: 20px;
     font-weight: bold;
+}
+
+/* Feedback styles */
+.feedback {
+    margin-top: 10px; /* Spacing above feedback */
+    font-weight: normal;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Darker drop shadow for feedback */
+    padding: 5px;
 }
 
 /* Tiny bit smaller font for quiz */
