@@ -59,7 +59,7 @@ document.getElementById('check-button').addEventListener('click', function() {
 
             // Check if the input is empty
             if (!userAnswer) {
-                feedbackHtml += `<span style="color: yellow; font-weight: bold;">Sin respuesta</span> `;
+                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta</span> `;
                 inputField.classList.add('empty'); // Add empty class for darker yellow
             } 
             // Check if the user's answer matches any of the possible correct answers
