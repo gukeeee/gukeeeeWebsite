@@ -72,7 +72,7 @@ document.getElementById('check-button').addEventListener('click', function() {
             total++;
         });
         feedbackHtml = feedbackHtml.slice(0, -2);
-
+        console.log(feedbackHtml);
         feedbackElement.innerHTML = feedbackHtml;
     });
 
