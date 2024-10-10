@@ -50,10 +50,6 @@ input::placeholder {
     color: #888;
 }
 
-input.empty {
-    border-color: GoldenRod; /* Darker yellow for visibility */
-}
-
 button {
     margin-top: 15px;
     padding: 10px 15px;
