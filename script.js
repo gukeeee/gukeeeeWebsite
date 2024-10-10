@@ -27,17 +27,15 @@ function shuffleArray(array) {
 function loadQuestions() {
     shuffleArray(questions);
     const quizForm = document.getElementById('quiz-form');
-    quizForm.innerHTML = ''; // Clear any existing questions
+    quizForm.innerHTML = '';
 
     questions.forEach((question, index) => {
-        // Split the question text by the placeholders
         const parts = question.text.split('__');
-        // Create the question HTML with feedback span next to each input
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
-            return part; // The first part before the first blank
+            return part;
         }).join('');
 
         quizForm.insertAdjacentHTML('beforeend', `<p id="question-${index + 1}">${index + 1}. ${questionHtml}</p><div id="feedback-q${index + 1}" class="feedback"></div>`);
@@ -55,32 +53,28 @@ document.getElementById('check-button').addEventListener('click', function() {
         question.answers.forEach((correctAnswer, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             const userAnswer = inputField?.value.trim().toLowerCase();
-            const possibleAnswers = correctAnswer.toLowerCase().split(' / '); // Split by slash
+            const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
 
-            // Check if the input is empty
             if (!userAnswer) {
                 feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta</span> `;
-                inputField.classList.add('empty'); // Add empty class for darker yellow
+                inputField.classList.add('empty');
             } 
-            // Check if the user's answer matches any of the possible correct answers
             else if (possibleAnswers.includes(userAnswer)) {
                 feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
-                inputField.style.borderColor = 'green'; // Set border to green for correct answers
+                inputField.style.borderColor = 'green';
                 score++;
-                inputField.classList.remove('empty'); // Remove empty class if answered
+                inputField.classList.remove('empty');
             } else {
                 feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto</span> `;
-                inputField.style.borderColor = 'red'; // Set border to red for incorrect answers
-                inputField.classList.remove('empty'); // Remove empty class if answered
+                inputField.style.borderColor = 'red';
+                inputField.classList.remove('empty');
             }
             total++;
         });
 
-        // Display the feedback for this question
         feedbackElement.innerHTML = feedbackHtml;
     });
 
-    // Display the total score in the result section
     document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 });
 

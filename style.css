@@ -1,7 +1,7 @@
 body {
     font-family: "Poppins", sans-serif;
     background-color: #e0e7ff;
-    color: #000000; /* Black text */
+    color: #000000;
     margin: 0;
     padding: 0;
     display: flex;
@@ -11,9 +11,9 @@ body {
 }
 
 .container {
-    background-color: #ffffff; /* White background */
+    background-color: #ffffff;
     padding: 20px;
-    border-radius: 16px; /* More edge rounding */
+    border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 70%;
     max-width: 1500px;
@@ -23,13 +23,13 @@ body {
 }
 
 h1 {
-    font-weight: bold; /* Bold title */
+    font-weight: bold;
     margin-bottom: 20px;
 }
 
 h2 {
     font-weight: normal;
-    margin-bottom: 10px; /* Less spacing */
+    margin-bottom: 10px;
 }
 
 input {
@@ -39,19 +39,19 @@ input {
     max-width: 100px;
     box-sizing: border-box;
     display: inline-block;
-    border-radius: 4px; /* Less edge rounding for input */
+    border-radius: 4px;
     border: 1px solid #ccc;
-    font-size: 16px; /* Slightly bigger font */
+    font-size: 16px;
 }
 
 input::placeholder {
-    font-family: "Poppins", sans-serif; /* Poppins font for placeholder */
+    font-family: "Poppins", sans-serif;
     font-size: 14px;
     color: #888;
 }
 
 input.empty {
-    border-color: GoldenRod; /* Darker yellow for visibility */
+    border-color: GoldenRod;
 }
 
 button {
@@ -60,16 +60,16 @@ button {
     border: none;
     background-color: #007bff;
     color: white;
-    border-radius: 8px; /* Edge rounding for buttons */
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease; /* Smooth hover transition */
-    font-weight: bold; /* Bold text for button */
+    transition: all 0.3s ease;
+    font-weight: bold;
 }
 
 button:hover {
-    transform: translateY(-3px); /* Button moves up on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Drop shadow on hover */
-    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #0056b3;
 }
 
 .result {
@@ -77,7 +77,6 @@ button:hover {
     font-weight: bold;
 }
 
-/* Tiny bit smaller font for quiz */
 form {
     font-size: 15px;
 }
