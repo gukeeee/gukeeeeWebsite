@@ -51,7 +51,7 @@ input::placeholder {
 }
 
 input.empty {
-    border-color: #b09813; /* Darker yellow for visibility */
+    border-color: #FFD700; /* Darker yellow for visibility */
 }
 
 button {
