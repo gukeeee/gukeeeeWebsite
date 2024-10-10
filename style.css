@@ -1,7 +1,7 @@
 body {
     font-family: "Poppins", sans-serif; /* Apply Poppins font */
-    background-color: #e3f2fd; /* Light blue background */
-    color: #000000; /* Black text */
+    background-color: #b3d7f4; /* Bluer blue background */
+    color: #000000; /* Black text for everything */
     margin: 0;
     height: 100vh;
     display: flex;
@@ -12,58 +12,115 @@ body {
 .container {
     background-color: white;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 15px; /* Increased edge rounding */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 70%;
-    max-width: 1200px; /* Adjust max width */
-    max-height: 80vh; /* Limit height */
-    overflow-y: auto; /* Enable vertical scrolling */
+    max-width: 1200px;
+    max-height: 80vh;
+    overflow-y: auto;
     text-align: center;
+    border: 2px solid #1565c0; /* Blue outline */
+}
+
+h1, h2 {
+    color: #000000; /* Black text for headers */
+    margin-bottom: 20px;
 }
 
 h1 {
-    font-family: "Jost", sans-serif; /* Change to Jost for header */
+    font-family: "Jost", sans-serif;
     font-weight: 500;
-    color: #1565c0; /* Dark blue */
-    margin-bottom: 20px;
 }
 
 h2 {
     font-family: "Poppins", sans-serif;
     font-weight: 400;
-    color: #bbdefb; /* Light blue subtitle */
-    margin-bottom: 20px;
+    font-size: 1.2rem; /* Slightly smaller font */
 }
 
 input {
-    padding: 10px; /* Larger padding for inputs */
+    padding: 10px;
     margin: 10px 0;
-    width: 200px; /* Wider input box */
-    border: 2px solid #1565c0; /* Blue border */
-    border-radius: 5px;
+    width: 200px;
+    border: 2px solid #1565c0;
+    border-radius: 10px; /* Rounded input edges */
     box-sizing: border-box;
-    font-size: 1rem;
+    font-size: 0.9rem; /* Slightly smaller input font */
+    font-family: "Poppins", sans-serif; /* Poppins for "tu respuesta aqui" */
+}
+
+input::placeholder {
+    font-family: "Poppins", sans-serif; /* Poppins font for placeholder */
 }
 
 button {
     margin-top: 20px;
     padding: 10px 20px;
     border: none;
-    background-color: #1565c0; /* Dark blue background */
+    background-color: #1565c0; /* Blue button */
     color: white;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: "Poppins", sans-serif;
-    border-radius: 5px;
+    border-radius: 8px; /* Rounded button edges */
     cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 button:hover {
-    background-color: #003c8f; /* Darker blue on hover */
+    transform: translateY(-5px); /* Move up on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Drop shadow on hover */
 }
 
 .result {
     margin-top: 20px;
     font-weight: bold;
+    font-size: 1rem;
+    color: #000000; /* Black text for results */
+}
+
+/* Sidebar styling */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: #ffffff; /* White background */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Sidebar shadow */
+    padding: 20px;
+    border-radius: 0 15px 15px 0; /* Rounded right edge */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar h3 {
+    font-family: "Poppins", sans-serif;
     font-size: 1.2rem;
-    color: #1565c0;
+    color: #000000; /* Black text */
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #000000; /* Black links */
+    font-size: 1rem;
+    padding: 10px 0;
+    display: block;
+}
+
+.sidebar a:hover {
+    color: #1565c0; /* Blue on hover */
+}
+
+/* Container adjustments for smaller screens */
+@media (max-width: 768px) {
+    .container {
+        width: 90%; /* Adjust width for mobile */
+    }
+
+    .sidebar {
+        width: 150px; /* Smaller sidebar on mobile */
+    }
 }
