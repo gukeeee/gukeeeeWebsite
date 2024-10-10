@@ -77,15 +77,12 @@ button:hover {
     font-weight: bold;
 }
 
-/* Feedback styles */
-.feedback {
-    margin-top: 10px; /* Spacing above feedback */
-    font-weight: normal;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Darker drop shadow for feedback */
-    padding: 5px;
-}
-
 /* Tiny bit smaller font for quiz */
 form {
     font-size: 15px;
+}
+
+/* Feedback text styling with drop shadow */
+.feedback {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Drop shadow for feedback text */
 }
