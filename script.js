@@ -13,7 +13,7 @@ const questions = [
     { text: 'Olga __ (enamorarse) de Salvador, la primera vez que lo vio hace diez años. Cuando ellos __ (comprometerse) sólo tenían veinte años.', answers: ['se enamoró', 'se comprometieron'] },
     { text: '¿Qué significa "arrepentirse"? Significa __.', answers: ['to regret'] },
     { text: 'Antonio, ¿Por qué no __ con la rubia que te está mirando a cada rato. (coquetear) Si no lo haces, vas a __. (arrepentirse)', answers: ['coqueteas', 'arrepentirte'] },
-    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['estoy arrepintiéndome'] },
+    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['estoy arrepintiéndome/me estoy arrepintiendo'] },
     { text: 'Es muy claro que esa pareja que acaba de __ (comprometerse) está __ (enamorarse).', answers: ['comprometerse', 'enamorada'] }
 ];
 
@@ -30,14 +30,12 @@ function loadQuestions() {
     quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
-        // Split the question text by the placeholders
         const parts = question.text.split('__');
-        // Create the question HTML with feedback span next to each input
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
-            return part; // The first part before the first blank
+            return part;
         }).join('');
 
         quizForm.insertAdjacentHTML('beforeend', `<p id="question-${index + 1}">${index + 1}. ${questionHtml}</p><div id="feedback-q${index + 1}" class="feedback"></div>`);
@@ -49,16 +47,15 @@ document.getElementById('check-button').addEventListener('click', function() {
     let total = 0;
 
     questions.forEach((question, index) => {
-        const correctAnswers = question.answers.map(ans => ans.toLowerCase());
         const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
         let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
 
-        // Collect user answers and provide feedback for each input box
-        correctAnswers.forEach((correctAnswer, i) => {
+        question.answers.forEach((answerGroup, i) => {
             const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
+            const possibleAnswers = answerGroup.toLowerCase().split('/').map(ans => ans.trim()); // Split the answers on slashes
 
-            // Check if the user's answer is correct
-            if (userAnswer === correctAnswer) {
+            // Check if the user's answer matches any of the possible answers
+            if (possibleAnswers.includes(userAnswer)) {
                 feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
                 score++;
             } else {
@@ -67,7 +64,6 @@ document.getElementById('check-button').addEventListener('click', function() {
             total++;
         });
 
-        // Display the feedback for this question
         feedbackElement.innerHTML = feedbackHtml;
     });
 
