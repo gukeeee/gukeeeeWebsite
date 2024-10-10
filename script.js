@@ -71,8 +71,8 @@ document.getElementById('check-button').addEventListener('click', function() {
             }
             total++;
         });
-        feedbackHTML = feedbackHTML.slice(0, -2);
-        
+        feedbackHtml = feedbackHtml.slice(0, -2);
+
         feedbackElement.innerHTML = feedbackHtml;
     });
 
