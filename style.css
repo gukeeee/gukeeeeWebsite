@@ -1,53 +1,69 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    font-family: "Poppins", sans-serif; /* Apply Poppins font */
+    background-color: #e3f2fd; /* Light blue background */
+    color: #000000; /* Black text */
+    margin: 0;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
 }
 
 .container {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 70%; /* Adjusted width */
-    max-width: 1500px; /* Set max width to 1500px */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    max-width: 1200px; /* Adjust max width */
     max-height: 80vh; /* Limit height */
     overflow-y: auto; /* Enable vertical scrolling */
     text-align: center;
 }
 
 h1 {
+    font-family: "Jost", sans-serif; /* Change to Jost for header */
+    font-weight: 500;
+    color: #1565c0; /* Dark blue */
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    color: #bbdefb; /* Light blue subtitle */
     margin-bottom: 20px;
 }
 
 input {
-    padding: 5px; /* Keep the padding */
-    margin-left: 5px;
-    width: 100px; /* Set to a smaller width */
-    max-width: 100px; /* Prevent it from getting too wide */
-    box-sizing: border-box; /* Include padding in width calculation */
-    display: inline-block; /* Change display to inline-block */
+    padding: 10px; /* Larger padding for inputs */
+    margin: 10px 0;
+    width: 200px; /* Wider input box */
+    border: 2px solid #1565c0; /* Blue border */
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1rem;
 }
 
 button {
     margin-top: 20px;
-    padding: 10px 15px;
+    padding: 10px 20px;
     border: none;
-    background-color: #28a745;
+    background-color: #1565c0; /* Dark blue background */
     color: white;
+    font-size: 1.1rem;
+    font-family: "Poppins", sans-serif;
     border-radius: 5px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #003c8f; /* Darker blue on hover */
 }
 
 .result {
     margin-top: 20px;
     font-weight: bold;
+    font-size: 1.2rem;
+    color: #1565c0;
 }
