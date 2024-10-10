@@ -53,15 +53,23 @@ document.getElementById('check-button').addEventListener('click', function() {
         let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
 
         question.answers.forEach((correctAnswer, i) => {
-            const userAnswer = document.getElementById(`q${index + 1}_${i + 1}`)?.value.trim().toLowerCase();
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            const userAnswer = inputField?.value.trim().toLowerCase();
             const possibleAnswers = correctAnswer.toLowerCase().split(' / '); // Split by slash
 
+            // Check if the input is empty
+            if (!userAnswer) {
+                feedbackHtml += `<span style="color: yellow; font-weight: bold;">Sin respuesta</span> `;
+                inputField.style.borderColor = 'yellow'; // Set border to yellow for empty answers
+            } 
             // Check if the user's answer matches any of the possible correct answers
-            if (possibleAnswers.includes(userAnswer)) {
+            else if (possibleAnswers.includes(userAnswer)) {
                 feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
+                inputField.style.borderColor = 'green'; // Set border to green for correct answers
                 score++;
             } else {
                 feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto</span> `;
+                inputField.style.borderColor = 'red'; // Set border to red for incorrect answers
             }
             total++;
         });
