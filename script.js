@@ -60,16 +60,18 @@ document.getElementById('check-button').addEventListener('click', function() {
             // Check if the input is empty
             if (!userAnswer) {
                 feedbackHtml += `<span style="color: yellow; font-weight: bold;">Sin respuesta</span> `;
-                inputField.style.borderColor = 'yellow'; // Set border to yellow for empty answers
+                inputField.classList.add('empty'); // Add empty class for darker yellow
             } 
             // Check if the user's answer matches any of the possible correct answers
             else if (possibleAnswers.includes(userAnswer)) {
                 feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto</span> `;
                 inputField.style.borderColor = 'green'; // Set border to green for correct answers
                 score++;
+                inputField.classList.remove('empty'); // Remove empty class if answered
             } else {
                 feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto</span> `;
                 inputField.style.borderColor = 'red'; // Set border to red for incorrect answers
+                inputField.classList.remove('empty'); // Remove empty class if answered
             }
             total++;
         });
