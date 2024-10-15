@@ -1,21 +1,20 @@
 const questions = [
-    { text: 'Cuando vosotros __ (comprometerse) a hacer algo, yo siempre podía contar con vosotros.', answers: ['os comprometíais'] },
-    { text: 'No lo ves, es obvio que está __ (arrepentirse).', answers: ['arrepentido'] },
-    { text: 'Cada vez que tú mientes, __ (arrepentirse) porque sabes que tu mamá la descubrirá.', answers: ['te arrepientes'] },
-    { text: 'Señoritas García, ¡ __ de alguien que las quiera y las trate bien y no de alguien que no las valore! (enamorarse)', answers: ['enamórense'] },
-    { text: 'Ay, ya tú __ de un chico nuevo otra vez. (enamorarse)', answers: ['te has enamorado'] },
-    { text: 'Nosotros no __ de haber venido todavía. (arrepentirse) (pretérito perfecto)', answers: ['nos hemos arrepentido'] },
-    { text: 'Octavia, ¡ __ (comprometerse) a ser amable con todos!', answers: ['comprométete'] },
-    { text: 'Ayer vi a Roberto que __ con otra mujer en la fiesta mientras su esposa estaba ayudando a su amiga. (coquetear)', answers: ['coqueteaba'] },
-    { text: 'Sr. Oso, ¡ __ (coquetear) (M-) con sus colegas porque todas están __ (comprometerse)!', answers: ['no coquetee', 'comprometidas'] },
-    { text: 'Mis padres me dijeron, hija, ¡ __ hasta que tengas treinta años! (comprometerse) porque piensan que primero tengo que establecerme en mi profesión.', answers: ['no te comprometas'] },
-    { text: 'Alejandra __ a ayudarme el otro día. (comprometerse)', answers: ['se comprometió'] },
-    { text: 'Olga __ (enamorarse) de Salvador, la primera vez que lo vio hace diez años. Cuando ellos __ (comprometerse) sólo tenían veinte años.', answers: ['se enamoró', 'se comprometieron'] },
-    { text: '¿Qué significa "arrepentirse"? Significa __.', answers: ['to regret'] },
-    { text: 'Antonio, ¿Por qué no __ con la rubia que te está mirando a cada rato. (coquetear) Si no lo haces, vas a __. (arrepentirse)', answers: ['coqueteas', 'arrepentirte'] },
-    { text: 'Yo __ de venir más y más. (arrepentirse) (presente progresivo)', answers: ['estoy arrepintiéndome / me estoy arrepintiendo'] },
-    { text: 'Es muy claro que esa pareja que acaba de __ (comprometerse) está __ (enamorarse).', answers: ['comprometerse', 'enamorada'] }
+    { text: 'Antes, Alicia y yo siempre __ (tropezarse) y __ (caerse)', answers: ['nos tropezábamos', 'nos caíamos'] },
+    { text: '¡ __ (jalarse) el pelo Ud.! (mandato negativo)', answers: ['no se jale'] },
+    { text: 'Marina, __ (jalarse) el pelo. (mandato negativo)', answers: ['no te jales'] },
+    { text: 'Ayer estaba caminando cuando yo __ (tropezarse) con una piedra y __ (caerse).', answers: ['me tropecé', 'me caí'] },
+    { text: 'Señores y señoras, __ (tropezarse) con los cordones. (mandato negativo)', answers: ['no se tropiecen'] },
+    { text: '¿Quién me habías dicho que __ (resbalarse)? (imperfecto progresivo)', answers: ['se estaba resbalando / estaba resbalándose'] },
+    { text: '¿Qué quiere decir "tropezarse" __ (dos definiciones)?', answers: ['to run into / to trip', 'to trip / to run into'] },
+    { text: 'No __ (tropezarse) Uds. (mandato negativo) ni __ (caerse) tampoco.', answers: ['se tropiecen', 'se caigan'] },
+    { text: 'Nícola, ¿ __ (jalarse) un músculo ayer cuando __ (resbalarse)?', answers: ['te jalaste', 'te resbalaste'] },
+    { text: 'Si no te estiras antes de correr, vas a __ (jalarse) un músculo y posiblemente __ (caerse).', answers: ['jalarte', 'caerte'] },
+    { text: 'Si yo __ (tropezarse) con algo, yo __ (caerse) con frecuencia. (presente)', answers: ['me tropiezo', 'me caigo'] },
+    { text: 'Vosotros __ (caerse). (presente progresivo)', answers: ['os estáis cayendo / estáis cayéndoos'] },
+    { text: 'Jamás, en toda mi vida, __ (caerse) gracias al cuidado que siempre tengo, haga lo que haga.', answers: ['me he caído'] },
+    { text: '¿Qué quiere decir "resbalarse"? __', answers: ['to slip / to slide'] }
 ];
+
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
