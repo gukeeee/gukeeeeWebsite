@@ -5,7 +5,7 @@ const questions = [
     { text: 'Ayer estaba caminando cuando yo __ (tropezarse) con una piedra y __ (caerse).', answers: ['me tropecé', 'me caí'] },
     { text: 'Señores y señoras, __ (tropezarse) con los cordones. (mandato negativo)', answers: ['no se tropiecen'] },
     { text: '¿Quién me habías dicho que __ (resbalarse)? (imperfecto progresivo)', answers: ['se estaba resbalando / estaba resbalándose'] },
-    { text: '¿Qué quiere decir "tropezarse" __ __ (dos definiciones)?', answers: ['to run into / to trip', 'to trip / to run into'] },
+    { text: '¿Qué quiere decir "tropezarse" __ (dos definiciones)?', answers: ['to run into, to trip / to trip, to run into'] },
     { text: 'No __ (tropezarse) Uds. (mandato negativo) ni __ (caerse) tampoco.', answers: ['se tropiecen', 'se caigan'] },
     { text: 'Nícola, ¿ __ (jalarse) un músculo ayer cuando __ (resbalarse)?', answers: ['te jalaste', 'te resbalaste'] },
     { text: 'Si no te estiras antes de correr, vas a __ (jalarse) un músculo y posiblemente __ (caerse).', answers: ['jalarte', 'caerte'] },
