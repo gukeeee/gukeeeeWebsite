@@ -12,7 +12,7 @@ const questions = [
     { text: 'Si yo __ (tropezarse) con algo, yo __ (caerse) con frecuencia. (presente)', answers: ['me tropiezo', 'me caigo'] },
     { text: 'Vosotros __ (caerse). (presente progresivo)', answers: ['os estáis cayendo / estáis cayéndoos'] },
     { text: 'Jamás, en toda mi vida, __ (caerse) gracias al cuidado que siempre tengo, haga lo que haga.', answers: ['me he caído'] },
-    { text: '¿Qué quiere decir "resbalarse"? __', answers: ['to slip / to slide'] }
+    { text: '¿Qué quiere decir "resbalarse"? __', answers: ['to slip / to slide / to slip, to slide / to slide, to slip'] }
 ];
 
 
