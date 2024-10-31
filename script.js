@@ -1,20 +1,21 @@
 const questions = [
-    { text: 'Antes, Alicia y yo siempre __ (tropezarse) y __ (caerse)', answers: ['nos tropezábamos', 'nos caíamos'] },
-    { text: '¡ __ (jalarse) el pelo Ud.! (mandato negativo)', answers: ['no se jale'] },
-    { text: 'Marina, __ (jalarse) el pelo. (mandato negativo)', answers: ['no te jales'] },
-    { text: 'Ayer estaba caminando cuando yo __ (tropezarse) con una piedra y __ (caerse).', answers: ['me tropecé', 'me caí'] },
-    { text: 'Señores y señoras, __ (tropezarse) con los cordones. (mandato negativo)', answers: ['no se tropiecen'] },
-    { text: '¿Quién me habías dicho que __ (resbalarse)? (imperfecto progresivo)', answers: ['se estaba resbalando / estaba resbalándose'] },
-    { text: '¿Qué quiere decir "tropezarse" __ (dos definiciones)?', answers: ['to run into, to trip / to trip, to run into'] },
-    { text: 'No __ (tropezarse) Uds. (mandato negativo) ni __ (caerse) tampoco.', answers: ['se tropiecen', 'se caigan'] },
-    { text: 'Nícola, ¿ __ (jalarse) un músculo ayer cuando __ (resbalarse)?', answers: ['te jalaste', 'te resbalaste'] },
-    { text: 'Si no te estiras antes de correr, vas a __ (jalarse) un músculo y posiblemente __ (caerse).', answers: ['jalarte', 'caerte'] },
-    { text: 'Si yo __ (tropezarse) con algo, yo __ (caerse) con frecuencia. (presente)', answers: ['me tropiezo', 'me caigo'] },
-    { text: 'Vosotros __ (caerse). (presente progresivo)', answers: ['os estáis cayendo / estáis cayéndoos'] },
-    { text: 'Jamás, en toda mi vida, __ (caerse) gracias al cuidado que siempre tengo, haga lo que haga.', answers: ['me he caído'] },
-    { text: '¿Qué quiere decir "resbalarse"? __', answers: ['to slip / to slide / to slip, to slide / to slide, to slip'] }
+    { text: '¿Cuál es la definición de "desmayarse"?', answers: ['to faint, to pass out', 'to pass out, to faint'] },
+    { text: '¿Qué quiere decir "mejorarse"?', answers: ['to get well, to get better', 'to get better, to get well'] },
+    { text: 'Tengo el dedo __ (doblarse) ahora por jugar al basquétbol. Creo que nunca __ (mejorarse).', answers: ['doblado', 'voy a mejorarme'] },
+    { text: 'A: ¿Cómo __ (doblarse) tú el tobillo la vez pasada? --- __ (chocarse) con otro jugador.', answers: ['te doblaste', 'me choqué'] },
+    { text: 'Ninguno de mis amigos jamás __ (desmayarse).', answers: ['se ha desmayado'] },
+    { text: 'Como enfermera veo mucho. Pienso que tú __ (doblarse) el tobillo. Para __ (mejorarse) es mejor que descanses el pie.', answers: ['te has doblado', 'mejorarte'] },
+    { text: 'Es bueno __ (mejorarse) lo más rápido para no perder tantos días de escuela.', answers: ['mejorarse'] },
+    { text: 'Marina, ¡ __ (desmayarse) cuando estés cantando! ¡Come algo antes!', answers: ['no te desmayes'] },
+    { text: 'Chicos, ¡ __ (mejorarse) pronto para poder ir al cine este fin de semana! (En España)', answers: ['mejoraos'] },
+    { text: 'Ayer, por no haber comido, alguien __ (desmayarse). ¡Felizmente, no __ (chocarse) con algo cuando se cayó!', answers: ['se desmayó', 'se chocó'] },
+    { text: 'Dani, es cierto que siempre __ (chocarse) con todo cuando eras más chico.', answers: ['te chocabas'] },
+    { text: 'Es claro que los chicos __ (mejorarse) porque veo que ya quieren comer. (presente progresivo)', answers: ['se están mejorando'] },
+    { text: 'Para __ (mejorarse), tengo que descansar más.', answers: ['mejorarme'] },
+    { text: '¡ __ (chocarse) vosotros con otros jugadores!', answers: ['no os choquéis'] },
+    { text: 'De más pequeñas, nosotras __ (desmayarse) cada vez que nos sacaban sangre.', answers: ['nos desmayábamos'] },
+    { text: '¡ __ (chocarse) nosotros con nadie, por favor!', answers: ['no nos choquemos'] }
 ];
-
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
