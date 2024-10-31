@@ -1,6 +1,6 @@
 const questions = [
-    { text: '¿Cuál es la definición de "desmayarse"?', answers: ['to faint, to pass out / to pass out, to faint'] },
-    { text: '¿Qué quiere decir "mejorarse"?', answers: ['to get well, to get better / to get better, to get well'] },
+    { text: '¿Cuál es la definición de "desmayarse"? __', answers: ['to faint, to pass out / to pass out, to faint'] },
+    { text: '¿Qué quiere decir "mejorarse" __?', answers: ['to get well, to get better / to get better, to get well'] },
     { text: 'Tengo el dedo __ (doblarse) ahora por jugar al basquétbol. Creo que nunca __ (mejorarse).', answers: ['doblado', 'voy a mejorarme / me voy a mejorar'] },
     { text: 'A: ¿Cómo __ (doblarse) tú el tobillo la vez pasada? --- __ (chocarse) con otro jugador.', answers: ['te doblaste', 'me choqué'] },
     { text: 'Ninguno de mis amigos jamás __ (desmayarse).', answers: ['se ha desmayado'] },
