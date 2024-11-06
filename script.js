@@ -1,6 +1,6 @@
 const questions = [
     { text: '¡Tengamos cuidado y __ (arañarse) al abrir la caja porque podríamos __ (hacerse) un gran daño.', answers: ['no nos arañemos', 'hacernos'] },
-    { text: 'La definición de arañarse es __ y de lastimarse es __.', answers: ['to scratch', 'to hurt oneself, to injure oneself / to injure oneself, to hurt oneself'] },
+    { text: 'La definición de arañarse es __ y de lastimarse es __.', answers: ['to scratch oneself', 'to hurt oneself, to injure oneself / to injure oneself, to hurt oneself'] },
     { text: 'Niña,¡ __ (rascarse) o vas a crear una herida más grande! Es mejor que no __ (hacerse) más daño.', answers: ['no te rasques', 'te hagas'] },
     { text: 'Últimamente, mis amigos y yo __ (lastimarse) (pretérito perfecto) varias veces haciendo ejercicio. Tenemos las piernas todas __ (arañarse) por chocarnos con las barras.', answers: ['nos hemos lastimado', 'arañadas'] },
     { text: 'Busque atención médica inmediatamente si se cae o __.', answers: ['se lastima'] },
