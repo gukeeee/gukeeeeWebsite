@@ -1,21 +1,18 @@
 const questions = [
-    { text: '¿Cuál es la definición de "desmayarse"? __', answers: ['to faint, to pass out / to pass out, to faint'] },
-    { text: '¿Qué quiere decir "mejorarse" __?', answers: ['to get well, to get better / to get better, to get well'] },
-    { text: 'Tengo el dedo __ (doblarse) ahora por jugar al basquétbol. Creo que nunca __ (mejorarse).', answers: ['doblado', 'voy a mejorarme / me voy a mejorar'] },
-    { text: 'A: ¿Cómo __ (doblarse) tú el tobillo la vez pasada? --- __ (chocarse) con otro jugador.', answers: ['te doblaste', 'me choqué'] },
-    { text: 'Ninguno de mis amigos jamás __ (desmayarse).', answers: ['se ha desmayado'] },
-    { text: 'Como enfermera veo mucho. Pienso que tú __ (doblarse) el tobillo. Para __ (mejorarse) es mejor que descanses el pie.', answers: ['te has doblado', 'mejorarte'] },
-    { text: 'Es bueno __ (mejorarse) lo más rápido para no perder tantos días de escuela.', answers: ['mejorarse'] },
-    { text: 'Marina, ¡ __ (desmayarse) cuando estés cantando! ¡Come algo antes!', answers: ['no te desmayes'] },
-    { text: 'Chicos, ¡ __ (mejorarse) pronto para poder ir al cine este fin de semana! (En España)', answers: ['mejoraos'] },
-    { text: 'Ayer, por no haber comido, alguien __ (desmayarse). ¡Felizmente, no __ (chocarse) con algo cuando se cayó!', answers: ['se desmayó', 'se chocó'] },
-    { text: 'Dani, es cierto que siempre __ (chocarse) con todo cuando eras más chico.', answers: ['te chocabas'] },
-    { text: 'Es claro que los chicos __ (mejorarse) porque veo que ya quieren comer. (presente progresivo)', answers: ['se están mejorando / están mejorándose'] },
-    { text: 'Para __ (mejorarse), tengo que descansar más.', answers: ['mejorarme'] },
-    { text: '¡ __ (chocarse) vosotros con otros jugadores!', answers: ['no os choquéis'] },
-    { text: 'De más pequeñas, nosotras __ (desmayarse) cada vez que nos sacaban sangre.', answers: ['nos desmayábamos'] },
-    { text: '¡ __ (chocarse) nosotros con nadie, por favor!', answers: ['no nos choquemos'] }
+    { text: '¡Tengamos cuidado y __ (arañarse) al abrir la caja porque podríamos __ (hacerse) un gran daño.', answers: ['no nos arañemos', 'hacernos'] },
+    { text: 'La definición de arañarse es __ y de lastimarse es __.', answers: ['to scratch oneself', 'to hurt oneself, to injure oneself / to injure oneself, to hurt oneself'] },
+    { text: 'Niña,¡ __ (rascarse) o vas a crear una herida más grande! Es mejor que no __ (hacerse) más daño.', answers: ['no te rasques', 'te hagas'] },
+    { text: 'Últimamente, mis amigos y yo __ (lastimarse) (pretérito perfecto) varias veces haciendo ejercicio. Tenemos las piernas todas __ (arañarse) por chocarnos con las barras.', answers: ['nos hemos lastimado', 'arañadas'] },
+    { text: 'Busque atención médica inmediatamente si se cae o __.', answers: ['se lastima'] },
+    { text: 'Hubo un accidente ayer en la carretera. Es bueno que nadie __ (lastimarse) gravemente, pero sé que María __ (hacerse) daño al brazo porque la he visto hoy con un yeso.', answers: ['se haya lastimado', 'se hizo'] },
+    { text: 'De jóvenes, Uds. siempre __ (arañarse) sin darse cuenta.', answers: ['se arañaban'] },
+    { text: 'Si tienes un picazón (itch), ¡__ (rascarse), pero no me digas después que __ (lastimarse) (pretérito perfecto)!', answers: ['ráscate', 'te has lastimado'] },
+    { text: 'Dale una crema a ese niño que __ (rascarse) en este momento antes de que __ (hacerse) (subjuntivo) más daño.', answers: ['se está rascando / está rascándose', 'se haga'] },
+    { text: 'Mis hijos jamás __ (lastimarse) como mi sobrino.', answers: ['se han lastimado'] },
+    { text: 'Cuando yo era pequeño siempre __ (arañarse) con las ramas de los árboles. Felizmente, nunca __ (hacerse) daño.', answers: ['me arañaba', 'me hice'] },
+    { text: '¡__ (Rascarse) nosotros el bolsillo con las personas que sufren!', answers: ['Rasquémonos'] }
 ];
+
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
