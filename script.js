@@ -1,18 +1,23 @@
 const questions = [
-    { text: '¡Tengamos cuidado y __ (arañarse) al abrir la caja porque podríamos __ (hacerse) un gran daño.', answers: ['no nos arañemos', 'hacernos'] },
-    { text: 'La definición de arañarse es __ y de lastimarse es __.', answers: ['to scratch oneself', 'to hurt oneself, to injure oneself / to injure oneself, to hurt oneself'] },
-    { text: 'Niña,¡ __ (rascarse) o vas a crear una herida más grande! Es mejor que no __ (hacerse) más daño.', answers: ['no te rasques', 'te hagas'] },
-    { text: 'Últimamente, mis amigos y yo __ (lastimarse) (pretérito perfecto) varias veces haciendo ejercicio. Tenemos las piernas todas __ (arañarse) por chocarnos con las barras.', answers: ['nos hemos lastimado', 'arañadas'] },
-    { text: 'Busque atención médica inmediatamente si se cae o __.', answers: ['se lastima'] },
-    { text: 'Hubo un accidente ayer en la carretera. Es bueno que nadie __ (lastimarse) gravemente, pero sé que María __ (hacerse) daño al brazo porque la he visto hoy con un yeso.', answers: ['se haya lastimado', 'se hizo'] },
-    { text: 'De jóvenes, Uds. siempre __ (arañarse) sin darse cuenta.', answers: ['se arañaban'] },
-    { text: 'Si tienes un picazón (itch), ¡__ (rascarse), pero no me digas después que __ (lastimarse) (pretérito perfecto)!', answers: ['ráscate', 'te has lastimado'] },
-    { text: 'Dale una crema a ese niño que __ (rascarse) en este momento antes de que __ (hacerse) (subjuntivo) más daño.', answers: ['se está rascando / está rascándose', 'se haga'] },
-    { text: 'Mis hijos jamás __ (lastimarse) como mi sobrino.', answers: ['se han lastimado'] },
-    { text: 'Cuando yo era pequeño siempre __ (arañarse) con las ramas de los árboles. Felizmente, nunca __ (hacerse) daño.', answers: ['me arañaba', 'me hice'] },
-    { text: '¡__ (Rascarse) nosotros el bolsillo con las personas que sufren!', answers: ['Rasquémonos'] }
+    { text: 'Es improbable que alguien __ (desarrollar) algo hace poco porque es un problema muy grande.', answers: ['haya desarrollado'] },
+    { text: '¡ __ nosotros (quejarse) de lo que está pasando ya!', answers: ['Quejémonos'] },
+    { text: '¿Qué significa "quejarse" en inglés? Quiere decir __.', answers: ['to complain'] },
+    { text: 'Puede ser que el Sr. Contreras __ (quejarse) porque siempre lo hace.', answers: ['se queje'] },
+    { text: 'En clase, había unos chicos que __ a menudo del trabajo. (quejarse)', answers: ['se quejaban'] },
+    { text: 'Los planes __ por los arquitectos son innovadores. (desarrollar)', answers: ['desarrollados'] },
+    { text: 'Nadie aún no __ (desarrollar) algo para limpiar la contaminación al aire.', answers: ['ha desarrollado'] },
+    { text: 'Mami y papi,¡ ya __ más que estamos agotados! (exigirnos)', answers: ['no nos exijan'] },
+    { text: '¿Quién de Uds. __ (estirar) la liga (rubberband) tanto? --Lo siento, yo la __ (estirar) pensando que tenía más elasticidad.', answers: ['estiró', 'estiré'] },
+    { text: 'Yo les __ mucho a mis hijos para tener un mejor futuro. (exigir)', answers: ['exijo'] },
+    { text: 'Valentina, ¡__ sólo de las cosas que te importan más. ¡ __ de todo! (quejarse)', answers: ['quéjate', 'no te quejes'] },
+    { text: 'La manta que está __ en la mesa es la que yo hice. (estirar)', answers: ['estirada'] },
+    { text: 'La tarea __ de nosotros es casi imposible de lograr. (exigir)', answers: ['exigida'] },
+    { text: '¿De qué __ vosotros cuando los vi ? (quejarse) (pasado progresivo)', answers: ['os estabais quejando'] },
+    { text: '-- __ del servicio. (quejarse) (pasado progresivo)', answers: ['Nos estábamos quejando'] },
+    { text: 'Hija, ¡__ antes de correr! (estirarse)', answers: ['estírate'] },
+    { text: 'El equipo de correr __ en este momento porque los corredores van a competir en unos minutos. (estirarse)', answers: ['se está estirando'] },
+    { text: 'Cuando era más pequeño mis padres me __ que yo saludara a mis abuela cuando íbamos a su casa. (exigir)', answers: ['exigían'] }
 ];
-
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
