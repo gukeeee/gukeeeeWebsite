@@ -5,7 +5,7 @@ const questions = [
     { text: 'Yo te __ (agradecer) mucho por la ayuda que siempre me das, Lisenia. Nunca __ (temer) (mandato) en pedirme cualquier cosa.', answers: ['agradezco', 'temas'] },
     { text: 'Espero que tú __ (alegrarse) cuando recibiste las buenas noticias.', answers: ['te hayas alegrado'] },
     { text: '¡ __ vosotros a saltar! (atreverse) (mandato +). ¡ __ caeros que estoy aquí! (temer) (mandato - )', answers: ['Atreveos', 'No temáis'] },
-    { text: 'No __ Uds. (temer) (mandato) la verdad; es mejor saber que vivir en una burbuja de mentiras.', answers: ['teman'] },
+    { text: '__ Uds. (temer) (mandato) la verdad; es mejor saber que vivir en una burbuja de mentiras.', answers: ['No teman'] },
     { text: 'De pequeñas, vosotras nunca __ (atreverse) a contradecir a vuestros padres. Tú en particular, __ (temer) hacerlos llorar.', answers: ['os atrevíais', 'temías'] },
     { text: '¿Quién de Uds. __ (temer) venir a vernos? (imperfecto) Fue Julio que no __ (atreverse) (imperfecto) a venir.', answers: ['temía', 'se atrevía'] },
     { text: 'La clase __ (alegrarse) al saber que no iba a haber un examen antes de las vacaciones.', answers: ['se alegró'] },
