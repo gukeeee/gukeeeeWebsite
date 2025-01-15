@@ -1,17 +1,48 @@
 const questions = [
-    { text: '¡ __ nosotros que vamos a estar de vacaciones en unos días! (alegrarse). No hay que __ (temer) las conferencias porque nos van a ayudar ser mejores estudiantes.', answers: ['Alegrémonos', 'temer'] },
-    { text: 'Los hermanos de Lila son más __ (atreverse) que ella porque suelen no __ (temer) nada.', answers: ['atrevidos', 'temer'] },
-    { text: 'Siento mucho que mis hijos __ (atreverse) anoche a llevarse la frutas de sus árboles. Yo __ (alegrarse) que Uds. me hayan llamado para disciplinarlos.', answers: ['se hayan atrevido', 'me alegro'] },
-    { text: 'Yo te __ (agradecer) mucho por la ayuda que siempre me das, Lisenia. Nunca __ (temer) (mandato) en pedirme cualquier cosa.', answers: ['agradezco', 'temas'] },
-    { text: 'Espero que tú __ (alegrarse) cuando recibiste las buenas noticias.', answers: ['te hayas alegrado'] },
-    { text: '¡ __ vosotros a saltar! (atreverse) (mandato +). ¡ __ caeros que estoy aquí! (temer) (mandato - )', answers: ['Atreveos', 'No temáis'] },
-    { text: '__ Uds. (temer) (mandato) la verdad; es mejor saber que vivir en una burbuja de mentiras.', answers: ['No teman'] },
-    { text: 'De pequeñas, vosotras nunca __ (atreverse) a contradecir a vuestros padres. Tú en particular, __ (temer) hacerlos llorar.', answers: ['os atrevíais', 'temías'] },
-    { text: '¿Quién de Uds. __ (temer) venir a vernos? (imperfecto) Fue Julio que no __ (atreverse) (imperfecto) a venir.', answers: ['temía', 'se atrevía'] },
-    { text: 'La clase __ (alegrarse) al saber que no iba a haber un examen antes de las vacaciones.', answers: ['se alegró'] },
-    { text: 'Yo estoy tan __ por todo lo que tengo en mi vida. (agradecer)', answers: ['agradecido'] },
-    { text: 'Nosotros le __ (agradecer) (imperfecto progresivo) a la consejera por su ayuda cuando sonó el timbre.', answers: ['estábamos agradeciendo'] },
-    { text: 'Ojalá que Uds. __ (agradecer) a sus padres todos los días por todo lo que hacen por Uds.', answers: ['agradezcan'] }
+    { 
+        text: 'Sofi, ¿a qué universidades ya __ (to apply)? -- A diez, porque sabes que en la vida nada es __ (to guarantee); hay que luchar siempre.', 
+        answers: ['has solicitado', 'garantizado'] 
+    },
+    { 
+        text: 'Chicos, ¡__ (to protect) vuestras cosas que hay ladrones por todas partes!', 
+        answers: ['protejed'] 
+    },
+    { 
+        text: 'Mi compañero de clase me __ (guarantee) (pluscuamperfecto) antes de empezar el proyecto que él __ (was taking care of) editar la presentación.', 
+        answers: ['había garantizado', 'se encargaba de'] 
+    },
+    { 
+        text: 'Yo __ (to see to) traer todas las bebidas para la fiesta. Y tú, ¿De qué ya __ (to see to) (pretérito perfecto) traer?', 
+        answers: ['me encargo de', 'te has encargado de'] 
+    },
+    { 
+        text: 'Cuando eras chico, ¿quién te __ a ti? (to protect). -- Era mi hermana mayor porque ella __ de mí. (to be in charge of)', 
+        answers: ['protegía', 'se encargaba'] 
+    },
+    { 
+        text: 'Espero que Iván __ (handles, takes care of) mirar todas las solicitudes ayer. -- No, fui yo que fue la persona __ (handles, takes care of) mirarlas todas.', 
+        answers: ['se haya encargado de', 'encargada de'] 
+    },
+    { 
+        text: 'Esta área está __ (to protect) por el gobierno. Es importante que nosotros __ nuestros recursos naturales. (to protect)', 
+        answers: ['protegida', 'protejamos'] 
+    },
+    { 
+        text: 'Diego: Valentino, ¿Qué haces aquí?\n\nCarisa: --- Yo __ (to apply) (presente progresivo) para el puesto de gerente.\n\nDiego: ¡Qué coincidencia! Yo soy la persona __ (in charge of) contratar al personal de esta tienda.', 
+        answers: ['estoy solicitando', 'encargada de'] 
+    },
+    { 
+        text: 'Cada vez que ella se va y yo tengo que __ (take charge of) mi hermano menor, ella siempre me dice, "¡__ a tu hermanito!" (to protect)', 
+        answers: ['encargarme de', 'protege'] 
+    },
+    { 
+        text: 'Muchos de los aparatos electrónicos están __ (guarantee), pero si uno abusa y no los __ (to protect), no es seguro que se puedan devolver.', 
+        answers: ['garantizados', 'protege'] 
+    },
+    { 
+        text: 'Conviene que haya un sistema que sea comprensible y que nos __ buenos resultados. (to guarantee)', 
+        answers: ['garantice'] 
+    }
 ];
 
 function shuffleArray(array) {
