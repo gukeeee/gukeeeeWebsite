@@ -5,7 +5,7 @@ const questions = [
     },
     { 
         text: 'Chicos, ¡__ (to protect) vuestras cosas que hay ladrones por todas partes!', 
-        answers: ['protejed'] 
+        answers: ['proteged'] 
     },
     { 
         text: 'Mi compañero de clase me __ (guarantee) (pluscuamperfecto) antes de empezar el proyecto que él __ (was taking care of) editar la presentación.', 
