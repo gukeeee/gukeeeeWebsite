@@ -16,8 +16,8 @@ const questions = [
         answers: ['me encargo de', 'te has encargado de'] 
     },
     { 
-        text: 'Cuando eras chico, ¿quién te __ a ti? (to protect). -- Era mi hermana mayor porque ella __ de mí. (to be in charge of)', 
-        answers: ['protegía', 'se encargaba'] 
+        text: 'Cuando eras chico, ¿quién te __ a ti? (to protect). -- Era mi hermana mayor porque ella __ mí. (to be in charge of)', 
+        answers: ['protegía', 'se encargaba de'] 
     },
     { 
         text: 'Espero que Iván __ (handles, takes care of) mirar todas las solicitudes ayer. -- No, fui yo que fue la persona __ (handles, takes care of) mirarlas todas.', 
