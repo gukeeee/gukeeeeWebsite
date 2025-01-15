@@ -93,7 +93,7 @@ input.empty {
 .red-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    background-color: #e60000;
+    background-color: #b30000;
 }
 
 .result {
