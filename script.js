@@ -106,4 +106,23 @@ document.getElementById('check-button').addEventListener('click', function() {
     document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 });
 
+document.getElementById('clear-button').addEventListener('click', function() {
+    // Clear all input fields and reset their styles
+    const inputs = document.querySelectorAll('#quiz-form input');
+    inputs.forEach(input => {
+        input.value = ''; // Clear the input value
+        input.style.borderColor = ''; // Reset border color
+        input.classList.remove('empty'); // Remove empty class if applied
+    });
+
+    // Clear all feedback messages
+    const feedbackElements = document.querySelectorAll('.feedback');
+    feedbackElements.forEach(feedback => {
+        feedback.innerHTML = '';
+    });
+
+    // Clear the result display
+    document.getElementById('result').innerHTML = '';
+});
+
 window.onload = loadQuestions;
