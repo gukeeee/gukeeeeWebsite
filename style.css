@@ -84,10 +84,16 @@ input.empty {
 }
 
 
-button:hover {
+.blue-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     background-color: #0056b3;
+}
+
+.red-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #e60000;
 }
 
 .result {
