@@ -37,7 +37,7 @@ const questions = [
     },
     {
         text: 'Todas fueron __ (atender) por mis padres. Por supuesto. En nuestra casa, siempre __ (cumplir) con lo que se promete.',
-        answers: ['atendidas', 'cumplimos con']
+        answers: ['atendidas', 'se cumple con']
     },
     {
         text: 'A: Marína, ¿__ (repartir) anoche los anuncios?\n\nB: Claro que sí. Yo __ (cumplir) con lo que fui asignada.',
