@@ -33,7 +33,7 @@ const questions = [
     },
     {
         text: 'El verbo atender significa __ (to attend to, deal with, take care of) (3 definiciones)',
-        answers: ['to attend to', 'deal with', 'take care of']
+        answers: ['to attend to / to deal with / to take care of']
     },
     {
         text: 'Todas fueron __ (atender) por mis padres. Por supuesto. En nuestra casa, siempre __ (cumplir) lo que se promete.',
