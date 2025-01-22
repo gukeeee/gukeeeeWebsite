@@ -36,7 +36,7 @@ const questions = [
         answers: ['to attend to', 'deal with', 'take care of']
     },
     {
-        text: 'Todas fueron __ (atender) por mis padres. Por supuesto. En nuestra casa, siempre __ (cumplir) con lo que se promete.',
+        text: 'Todas fueron __ (atender) por mis padres. Por supuesto. En nuestra casa, siempre __ (cumplir) lo que se promete.',
         answers: ['atendidas', 'se cumple con']
     },
     {
