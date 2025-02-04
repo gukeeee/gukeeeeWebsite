@@ -1,49 +1,54 @@
 const questions = [
     {
-        text: 'Señores, ¡__ (repartir) todos los periódicos ahora y __ (cumplir) con lo que les he pedido!',
-        answers: ['repartan', 'cumplan']
+        text: "Vosotros le __ (prohibir) (pretérito perfecto) a Lucía mirar Youtube hasta que __ terminado su tarea, ¿no?",
+        answers: ["habéis prohibido", "haya"]
     },
     {
-        text: '¿Qué está haciendo Ud. en este momento? __ (atender) a los invitados. ¿Y Uds. qué han hecho? -- Ya __ (repartir) todos los recuerdos.',
-        answers: ['Estoy atendiendo', 'hemos repartido']
+        text: "Lo siento, chicos. Es que sé que mi madre me lo __ (prohibir) sin pedírselo. Es mejor que __ (conseguir) a otra persona que pueda ir con Uds.",
+        answers: ["prohibirá", "consigan"]
     },
     {
-        text: 'Si __ (sembrar) (se pasivo) las semillas al final del invierno, habrá flores en la primavera, pero si no __ (repartir) con cuidado no brotarán (will flower).',
-        answers: ['se siembran', 'se reparten']
+        text: "¿Escuchaste el tiempo __ para hoy? (pronosticar)",
+        answers: ["pronosticado"]
     },
     {
-        text: 'Niño, ¡__ (atenderme) ya que me muero de hambre!',
-        answers: ['atiéndeme']
+        text: "No __ (haber) nadie que me __ (haber) podido ayudar con mi problema ayer.",
+        answers: ["hubo", "haya"]
     },
     {
-        text: 'Carlos es tan perezoso. Dudo que él __ (cumplir) anteayer con lo prometido. Te aconsejo que __ (repartir) los deberes de él entre nosotros.',
-        answers: ['haya cumplido', 'repartas']
+        text: "Para __ (conservar) la flora y la fauna de este santuario, __ (prohibir) entrar sin guía.",
+        answers: ["conservar", "se prohíbe"]
     },
     {
-        text: 'Cada año mi abuelo __ (sembrar) verduras en su jardín cuando vivía en nuestra casa. Ahora es mi papá que __ (cumplir) con ese deber.',
-        answers: ['sembraba', 'cumple']
+        text: "¡Deja de hablar! No ves que quiero escuchar lo que __ (pronosticar) el meteorólogo antes de salir afuera.",
+        answers: ["está pronosticando"]
     },
     {
-        text: 'Vosotros ya __ (cumplir) (pret perfecto) con lo que habíais prometido. Fue algo nuevo para vosotros porque jamás __ (sembrar) flores en un jardín antes.',
-        answers: ['habéis cumplido', 'habíais sembrado']
+        text: " __ (haber) una vez dos princesas gemelas que estaban __ (prohibir) salir de su torre.",
+        answers: ["Había", "prohibidas"]
     },
     {
-        text: 'Mi amiga ideal es __ (cumplir) y __ (atender) a las necesidades de otros.',
-        answers: ['cumplida', 'atenta']
+        text: "¿Alguno de Uds. nos __ (pronosticar) el clima hoy ya que Daniel está enfermo? No sé, quizás haya otra persona más calificada.",
+        answers: ["pronosticará"]
     },
     {
-        text: 'El verbo atender significa __ (to attend to, deal with, take care of) (3 definiciones)',
-        answers: ['to attend to / to deal with / to take care of']
+        text: "La mermelada __ (conservar) es para ti.",
+        answers: ["conservada"]
     },
     {
-        text: 'Todas fueron __ (atender) por mis padres. Por supuesto. En nuestra casa, siempre __ (cumplir) lo que se promete.',
-        answers: ['atendidas', 'se cumple con']
+        text: "Hace varias semanas el noticiero __ (pronosticar) que iba a llover toda esta semana, pero no he visto ni una nube.",
+        answers: ["había pronosticado"]
     },
     {
-        text: 'A: Marína, ¿__ (repartir) anoche los anuncios?\n\nB: Claro que sí. Yo __ (cumplir) con lo que fui asignada.',
-        answers: ['Repartiste', 'cumplí']
+        text: "¡__ (conservar) nosotros nuestros recursos naturales por el bien de nuestro futuro y el de nuestros hijos! Hay que __ (prohibir) el uso de plásticos desechables.",
+        answers: ["Conservemos", "prohibir"]
+    },
+    {
+        text: "Haber significa __. En el presente es __ y su segundo uso es como un verbo __ para los tiempos perfectos.",
+        answers: ["to have", "hay", "ayudando"]
     }
 ];
+
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
