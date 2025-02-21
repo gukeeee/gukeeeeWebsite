@@ -9,7 +9,7 @@ const questions = [
     },
     {
         text: "¿Qué quiere decir 'cubrir' en inglés? __",
-        answers: ["to cover", "to hide"]
+        answers: ["to cover, to hide"]
     },
     {
         text: "No te preocupes si yo __ (aparecerse) tarde a la función esta noche. Más vale que yo __ (aparecerse) tarde que nunca, ¿no crees?",
