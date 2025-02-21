@@ -8,7 +8,7 @@ const questions = [
         answers: ["haya cubierto", "Cubrámosla"]
     },
     {
-        text: "¿Qué quiere decir 'cubrir' en inglés?",
+        text: "¿Qué quiere decir 'cubrir' en inglés? __",
         answers: ["to cover", "to hide"]
     },
     {
