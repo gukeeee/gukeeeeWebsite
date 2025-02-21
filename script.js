@@ -40,8 +40,8 @@ const questions = [
         answers: ["había medido"]
     },
     {
-        text: "Señores, ¡__ (resolver) sus problemas! ¡No __ (aparecerse) (mandato negativo) hasta hacer las paces!",
-        answers: ["resuelvan", "se aparezcan"]
+        text: "Señores, ¡__ (resolver) sus problemas! ¡__ (aparecerse) (mandato negativo) hasta hacer las paces!",
+        answers: ["resuelvan", "No se aparezcan"]
     },
     {
         text: "De aquí en adelante, nosotros __ (medir) cuanta azúcar consumimos para prevenir la diabetes.",
