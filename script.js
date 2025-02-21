@@ -1,51 +1,55 @@
 const questions = [
     {
-        text: "Vosotros le __ (prohibir) (pretérito perfecto) a Lucía mirar Youtube hasta que __ terminado su tarea, ¿no?",
-        answers: ["habéis prohibido", "haya"]
+        text: "Hace unos minutos mi hijo __ (aparecer) a la puerta con la rodilla __ (cubrir) de sangre porque se había caído de su bici.",
+        answers: ["apareció", "cubierta"]
     },
     {
-        text: "Lo siento, chicos. Es que sé que mi madre me lo __ (prohibir) sin pedírselo. Es mejor que __ (conseguir) a otra persona que pueda ir con Uds.",
-        answers: ["prohibirá", "consigan"]
+        text: "Me parece increíble que nadie __ (cubrir) esa mesa tan fea con un mantel. ¡__ (cubrirla) nosotros con algo antes de que vengan los invitados y la vean!",
+        answers: ["haya cubierto", "Cubrámosla"]
     },
     {
-        text: "¿Escuchaste el tiempo __ para hoy? (pronosticar)",
-        answers: ["pronosticado"]
+        text: "¿Qué quiere decir 'cubrir' en inglés?",
+        answers: ["to cover", "to hide"]
     },
     {
-        text: "No __ (haber) nadie que me __ (haber) podido ayudar con mi problema ayer.",
-        answers: ["hubo", "haya"]
+        text: "No te preocupes si yo __ (aparecerse) tarde a la función esta noche. Más vale que yo __ (aparecerse) tarde que nunca, ¿no crees?",
+        answers: ["me aparezco", "me aparezca"]
     },
     {
-        text: "Para __ (conservar) la flora y la fauna de este santuario, __ (prohibir) entrar sin guía.",
-        answers: ["conservar", "se prohíbe"]
+        text: "¿Qué está haciendo Ud. en este momento?--- __ (medir) el tamaño de la piscina para saber la cantidad de agua que necesitaremos para poder llenarla.",
+        answers: ["Estoy midiendo"]
     },
     {
-        text: "¡Deja de hablar! No ves que quiero escuchar lo que __ (pronosticar) el meteorólogo antes de salir afuera.",
-        answers: ["está pronosticando"]
+        text: "Día tras día había un gato que __ (aparecerse) para que le diéramos algo de comer.",
+        answers: ["se aparecía"]
     },
     {
-        text: " __ (haber) una vez dos princesas gemelas que estaban __ (prohibir) salir de su torre.",
-        answers: ["Había", "prohibidas"]
+        text: "Cecilia, ¿__ (resolver) (pretérito perfecto) el problema para la tarea de hoy? - No, porque no __ (medir) (pluscuamperfecto) mi tiempo bien anoche.",
+        answers: ["has resuelto", "había medido"]
     },
     {
-        text: "¿Alguno de Uds. nos __ (pronosticar) el clima hoy ya que Daniel está enfermo? No sé, quizás haya otra persona más calificada.",
-        answers: ["pronosticará"]
+        text: "Yo todavía no __ (cubrir) las jaulas (cages) de los pájaros hasta que __ (aparecer) el que se escapó.",
+        answers: ["he cubierto", "aparezca"]
     },
     {
-        text: "La mermelada __ (conservar) es para ti.",
-        answers: ["conservada"]
+        text: "Te ayudaré después de que tú __ (cubrir) los carros.",
+        answers: ["cubras"]
     },
     {
-        text: "Hace varias semanas el noticiero __ (pronosticar) que iba a llover toda esta semana, pero no he visto ni una nube.",
-        answers: ["había pronosticado"]
+        text: "Hasta ahora, ninguna organización __ (medir) (pluscuamperfecto) la huella (footprint) de carbono en sus instalaciones.",
+        answers: ["había medido"]
     },
     {
-        text: "¡__ (conservar) nosotros nuestros recursos naturales por el bien de nuestro futuro y el de nuestros hijos! Hay que __ (prohibir) el uso de plásticos desechables.",
-        answers: ["Conservemos", "prohibir"]
+        text: "Señores, ¡__ (resolver) sus problemas! ¡No __ (aparecerse) (mandato negativo) hasta hacer las paces!",
+        answers: ["resuelvan", "se aparezcan"]
     },
     {
-        text: "Haber significa __. En el presente es __ y su segundo uso es como un verbo __ para los tiempos perfectos.",
-        answers: ["to have", "hay", "ayudando"]
+        text: "De aquí en adelante, nosotros __ (medir) cuanta azúcar consumimos para prevenir la diabetes.",
+        answers: ["mediremos"]
+    },
+    {
+        text: "Tú ya __ (resolver) (el futuro perfecto) el problema antes de la fecha límite, ¿verdad? Te aconsejo que __ (medir) tu tiempo bien porque no te queda mucho más tiempo.",
+        answers: ["habrás resuelto", "midas"]
     }
 ];
 
