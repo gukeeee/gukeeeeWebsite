@@ -152,9 +152,9 @@ window.onload = loadQuestions;
 document.addEventListener("keydown", function (event) {
     if (event.ctrlKey && event.shiftKey) {
         event.preventDefault(); // Prevents default browser behavior
-        if (event.key === "1") {
+        if (event.code === "KeyS") {
             revealAnswers();
-        } else if (event.key === "2") {
+        } else if (event.code === "KeyH") {
             hideAnswers();
         }
     }
