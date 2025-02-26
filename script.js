@@ -150,13 +150,13 @@ document.getElementById('clear-button').addEventListener('click', function() {
 window.onload = loadQuestions;
 
 document.addEventListener("keydown", function (event) {
-    if (event.ctrlKey && event.shiftKey && event.code === "Key1") {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyS") {
         revealAnswers();
     }
 });
 
 document.addEventListener("keydown", function (event) {
-    if (event.ctrlKey && event.shiftKey && event.code === "Key2") {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyH") {
         hideAnswers();
     }
 });
