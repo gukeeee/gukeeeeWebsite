@@ -148,3 +148,21 @@ document.getElementById('clear-button').addEventListener('click', function() {
 });
 
 window.onload = loadQuestions;
+
+document.addEventListener("keydown", function (event) {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyA") {
+        revealAnswers();
+    }
+});
+
+function revealAnswers() {
+    questions.forEach((question, index) => {
+        question.answers.forEach((correctAnswer, i) => {
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            if (inputField) {
+                inputField.value = correctAnswer;  // Fill in correct answer
+                inputField.style.borderColor = 'blue';  // Highlight answer
+            }
+        });
+    });
+}
