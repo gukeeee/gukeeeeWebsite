@@ -1,57 +1,70 @@
 const questions = [
     {
-        text: "Hace unos minutos mi hijo __ (aparecer) a la puerta con la rodilla __ (cubrir) de sangre porque se había caído de su bici.",
-        answers: ["apareció", "cubierta"]
+        text: "¿Qué significa 'trazar' en inglés? __",
+        answers: ["to draw, to trace"]
     },
     {
-        text: "Me parece increíble que nadie __ (cubrir) esa mesa tan fea con un mantel. ¡__ (cubrirla) nosotros con algo antes de que vengan los invitados y la vean!",
-        answers: ["haya cubierto", "Cubrámosla"]
+        text: "Se contribuyeron figuras __ (trazar) por artistas famosos el año pasado.",
+        answers: ["trazadas"]
     },
     {
-        text: "¿Qué quiere decir 'cubrir' en inglés? __",
-        answers: ["to cover, to hide"]
+        text: "Muchos no creen que __ (existir) una civilización en la selva (jungle) hace más de cien años.",
+        answers: ["haya existido"]
     },
     {
-        text: "No te preocupes si yo __ (aparecerse) tarde a la función esta noche. Más vale que yo __ (aparecerse) tarde que nunca, ¿no crees?",
-        answers: ["me aparezco", "me aparezca"]
+        text: "En menos de cinco horas, el día __ (convertirse) en noche el día que estuvimos en Islandia.",
+        answers: ["se convirtió"]
     },
     {
-        text: "¿Qué está haciendo Ud. en este momento?--- __ (medir) el tamaño de la piscina para saber la cantidad de agua que necesitaremos para poder llenarla.",
-        answers: ["Estoy midiendo"]
+        text: "Las Líneas de Nazca son dibujos __ (trazar) en la tierra que sólo se pueden ver desde un avión.",
+        answers: ["trazados"]
     },
     {
-        text: "Día tras día había un gato que __ (aparecerse) para que le diéramos algo de comer.",
-        answers: ["se aparecía"]
+        text: "Mientras yo __ (trazar) la ruta que íbamos a tomar, mi esposo __ (contribuir) en hacer las maletas.",
+        answers: ["trazaba", "contribuía"]
     },
     {
-        text: "Cecilia, ¿__ (resolver) (pretérito perfecto) el problema para la tarea de hoy? - No, porque no __ (medir) (pluscuamperfecto) mi tiempo bien anoche.",
-        answers: ["has resuelto", "había medido"]
+        text: "¿__ (Existir) los extraterrestres? --- No lo sé, pero hay personas que dicen que los han visto.",
+        answers: ["Existirán"]
     },
     {
-        text: "Yo todavía no __ (cubrir) las jaulas (cages) de los pájaros hasta que __ (aparecer) el que se escapó.",
-        answers: ["he cubierto", "aparezca"]
+        text: "Yo __ (contribuir) a tu causa el mes que viene con tal de que __ (existir) una forma de probárselo a mi contador.",
+        answers: ["contribuiré", "exista"]
     },
     {
-        text: "Te ayudaré después de que tú __ (cubrir) los carros.",
-        answers: ["cubras"]
+        text: "Mis abuelos __ (contribuir) (pluscuamperfecto) mucho dinero a la fundación por muchos años.",
+        answers: ["habían contribuido"]
     },
     {
-        text: "Hasta ahora, ninguna organización __ (medir) (pluscuamperfecto) la huella (footprint) de carbono en sus instalaciones.",
-        answers: ["había medido"]
+        text: "¡__ (Trazar) nosotros nuestros nombres con un marcador más oscuro!",
+        answers: ["Tracemos"]
     },
     {
-        text: "Señores, ¡__ (resolver) sus problemas! ¡__ (aparecerse) (mandato negativo) hasta hacer las paces!",
-        answers: ["resuelvan", "No se aparezcan"]
+        text: "Es increíble que __ (existir) una civilización tan avanzada en la Ciudad Perdida.",
+        answers: ["haya existido"]
     },
     {
-        text: "De aquí en adelante, nosotros __ (medir) cuanta azúcar consumimos para prevenir la diabetes.",
-        answers: ["mediremos"]
+        text: "No hay nadie que __ (convertirse) en pianista de noche al día sin haber practicado millones de horas.",
+        answers: ["se convierta"]
     },
     {
-        text: "Tú ya __ (resolver) (el futuro perfecto) el problema antes de la fecha límite, ¿verdad? Te aconsejo que __ (medir) tu tiempo bien porque no te queda mucho más tiempo.",
-        answers: ["habrás resuelto", "midas"]
+        text: "Ahoritita mismo, hay mucha gente que __ (contribuir) una gran cantidad de dinero. ¡Ojalá __ (convertirse) en algo bueno!",
+        answers: ["está contribuyendo", "se convierta"]
+    },
+    {
+        text: "Chicos, ¡__ (convertirse) vosotros en humanitarios para el bien de todos!",
+        answers: ["convertíos"]
+    },
+    {
+        text: "Yo __ (convertirse) (pretérito perfecto) en una mejor persona después de estudiar filosofía.",
+        answers: ["me he convertido"]
+    },
+    {
+        text: "Con los pies __ (trazar) en un papel, voy a poder comprarte los zapatos sin que tú estés.",
+        answers: ["trazados"]
     }
 ];
+
 
 
 function shuffleArray(array) {
