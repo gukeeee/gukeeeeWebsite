@@ -173,7 +173,7 @@ function revealAnswers() {
     });
 }
 
-function revealAnswers() {
+function hideAnswers() {
     questions.forEach((question, index) => {
         question.answers.forEach((correctAnswer, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
