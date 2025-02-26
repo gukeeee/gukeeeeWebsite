@@ -150,7 +150,7 @@ document.getElementById('clear-button').addEventListener('click', function() {
 window.onload = loadQuestions;
 
 document.addEventListener("keydown", function (event) {
-    if (event.ctrlKey && event.shiftKey) {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
         event.preventDefault(); // Prevents default browser behavior
         if (event.code === "KeyS") {
             revealAnswers();
@@ -159,6 +159,7 @@ document.addEventListener("keydown", function (event) {
         }
     }
 });
+
 
 function revealAnswers() {
     questions.forEach((question, index) => {
