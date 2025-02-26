@@ -62,28 +62,24 @@ input.empty {
     border-color: GoldenRod;
 }
 
-.blue-button {
-    padding: 5px 5px;
+.blue-button, .red-button {
+    padding: 5px 10px;
     border: none;
-    background-color: #007bff;
     color: white;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: bold;
+    margin: 5px 3px; /* Reduced top and bottom margin */
+}
+
+.blue-button {
+    background-color: #007bff;
 }
 
 .red-button {
-    padding: 5px 5px;
-    border: none;
     background-color: #ff0000;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: bold;
 }
-
 
 .blue-button:hover {
     transform: translateY(-3px);
