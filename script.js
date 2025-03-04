@@ -11,7 +11,7 @@ async function fetchQuestions(className) {
         
         let questions = [];
 
-        for (let i = 1; i < rows.length; i++) {
+        for (let i = 2; i < rows.length; i++) { // Start from index 2 (B3)
             const row = rows[i].map(cell => cell.trim());
             let questionText = row[1];
             let answers = row.slice(2).filter(answer => answer !== "");
