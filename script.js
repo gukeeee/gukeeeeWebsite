@@ -38,7 +38,7 @@ function loadQuestions(questions) {
     quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
-        const parts = question.text.split('__'); // Split question text if it's formatted with __ as placeholders
+        const parts = question.text.split('_'); // Split question text if it's formatted with __ as placeholders
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
