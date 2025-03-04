@@ -1,6 +1,6 @@
 const SHEET_URLS = {
-    "Clase 6": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/1BEXAMPLE7SPREADSHEETLINK/pub?output=csv' // Replace with the actual URL for Clase 7
+    "Clase 6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA-9Hy7Ag/pub?output=csv',
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv' // Replace with the actual URL for Clase 7
 };
 
 async function fetchQuestions(className) {
