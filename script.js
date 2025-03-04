@@ -1,6 +1,6 @@
 const SHEET_URLS = {
-    "Clase6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA/pub?output=csv',
-    "Clase7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
+    "Clase 6": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv',
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/1BEXAMPLE7SPREADSHEETLINK/pub?output=csv' // Replace with the actual URL for Clase 7
 };
 
 async function fetchQuestions(className) {
@@ -50,12 +50,68 @@ function loadQuestions(questions) {
     document.getElementById('clear-button').addEventListener('click', clearAnswers);
 }
 
-// Load default class (Clase 6)
+function checkAnswers(questions) {
+    let score = 0;
+    let total = 0;
+
+    questions.forEach((question, index) => {
+        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
+        let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
+
+        question.answers.forEach((correctAnswer, i) => {
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            const userAnswer = inputField?.value.trim().toLowerCase();
+            const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
+
+            if (!userAnswer) {
+                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta, </span>`;
+                inputField.classList.add('empty');
+            } else if (possibleAnswers.includes(userAnswer)) {
+                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto, </span>`;
+                inputField.style.borderColor = 'green';
+                score++;
+                inputField.classList.remove('empty');
+            } else {
+                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto, </span>`;
+                inputField.style.borderColor = 'red';
+                inputField.classList.remove('empty');
+            }
+            total++;
+        });
+
+        feedbackElement.innerHTML = feedbackHtml.slice(0, -9) + '</span>';
+    });
+
+    document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
+}
+
+function clearAnswers() {
+    document.querySelectorAll('#quiz-form input').forEach(input => {
+        input.value = '';
+        input.style.borderColor = '';
+        input.classList.remove('empty');
+    });
+
+    document.querySelectorAll('.feedback').forEach(feedback => {
+        feedback.innerHTML = '';
+    });
+
+    document.getElementById('result').innerHTML = '';
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Event listener for class selection
 document.getElementById('class-selector').addEventListener('change', function() {
-    fetchQuestions(this.value);
+    fetchQuestions(this.value); // Fetch questions for the selected class
 });
 
-// Load default on page load
+// Load default on page load (Clase 6)
 window.onload = function() {
-    fetchQuestions("Clase6");
+    fetchQuestions("Clase 6");
 };
