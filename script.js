@@ -29,7 +29,7 @@ async function fetchQuestions(className) {
 function loadQuestions(questions) {
     shuffleArray(questions);
     const quizForm = document.getElementById('quiz-form');
-    quizForm.innerHTML = '';
+    quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
         const parts = question.text.split('__');
@@ -43,11 +43,37 @@ function loadQuestions(questions) {
         quizForm.insertAdjacentHTML('beforeend', `<p id="question-${index + 1}">${index + 1}. ${questionHtml}</p><div id="feedback-q${index + 1}" class="feedback"></div>`);
     });
 
-    document.getElementById('check-button').addEventListener('click', function() {
-        checkAnswers(questions);
+    // Reset event listeners for the buttons to avoid multiple listeners being added
+    const checkButton = document.getElementById('check-button');
+    const clearButton = document.getElementById('clear-button');
+
+    checkButton.removeEventListener('click', handleCheckAnswers);
+    checkButton.addEventListener('click', handleCheckAnswers);
+
+    clearButton.removeEventListener('click', clearAnswers);
+    clearButton.addEventListener('click', clearAnswers);
+}
+
+function handleCheckAnswers() {
+    const questions = getCurrentQuestions();
+    checkAnswers(questions);
+}
+
+function getCurrentQuestions() {
+    // This is a temporary way to retrieve the questions after load.
+    // Modify this logic according to how you structure your questions in the page.
+    const questions = [];
+    const quizForm = document.getElementById('quiz-form');
+    const questionElements = quizForm.querySelectorAll('p');
+
+    questionElements.forEach((questionElement, index) => {
+        const questionText = questionElement.innerText.replace(/\d+\.\s*/, ''); // Remove the question number
+        const answers = questionElement.querySelectorAll('input');
+        const answerTexts = Array.from(answers).map(input => input.value.trim());
+        questions.push({ text: questionText, answers: answerTexts });
     });
 
-    document.getElementById('clear-button').addEventListener('click', clearAnswers);
+    return questions;
 }
 
 function checkAnswers(questions) {
