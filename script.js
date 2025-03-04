@@ -1,6 +1,6 @@
 const SHEET_URLS = {
     "Clase 6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA-9Hy7Ag/pub?output=csv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv' // Replace with the actual URL for Clase 7
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
 };
 
 async function fetchQuestions(className) {
@@ -27,60 +27,24 @@ async function fetchQuestions(className) {
 }
 
 function loadQuestions(questions) {
-    shuffleArray(questions);
     const quizForm = document.getElementById('quiz-form');
     quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
         const parts = question.text.split('__');
         const questionHtml = parts.map((part, i) => {
-            // For each part, create a proper structure
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
             return part;
         }).join('');
 
-        // Ensure proper HTML structure for each question
         const questionElement = `
             <p id="question-${index + 1}">${index + 1}. ${questionHtml}</p>
             <div id="feedback-q${index + 1}" class="feedback"></div>
         `;
         quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
-
-    // Reset event listeners for the buttons to avoid multiple listeners being added
-    const checkButton = document.getElementById('check-button');
-    const clearButton = document.getElementById('clear-button');
-
-    // Clear previous event listeners if any
-    checkButton.removeEventListener('click', handleCheckAnswers);
-    checkButton.addEventListener('click', handleCheckAnswers);
-
-    clearButton.removeEventListener('click', clearAnswers);
-    clearButton.addEventListener('click', clearAnswers);
-}
-
-function handleCheckAnswers() {
-    const questions = getCurrentQuestions();
-    checkAnswers(questions);
-}
-
-function getCurrentQuestions() {
-    // This is a temporary way to retrieve the questions after load.
-    // Modify this logic according to how you structure your questions in the page.
-    const questions = [];
-    const quizForm = document.getElementById('quiz-form');
-    const questionElements = quizForm.querySelectorAll('p');
-
-    questionElements.forEach((questionElement, index) => {
-        const questionText = questionElement.innerText.replace(/\d+\.\s*/, ''); // Remove the question number
-        const answers = questionElement.querySelectorAll('input');
-        const answerTexts = Array.from(answers).map(input => input.value.trim());
-        questions.push({ text: questionText, answers: answerTexts });
-    });
-
-    return questions;
 }
 
 function checkAnswers(questions) {
@@ -130,13 +94,6 @@ function clearAnswers() {
     });
 
     document.getElementById('result').innerHTML = '';
-}
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
 }
 
 // Event listener for class selection
