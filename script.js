@@ -11,14 +11,21 @@ async function fetchQuestions(className) {
         
         let questions = [];
 
-        rows.forEach(row => {
-            let questionText = row[0].trim(); // A1, A2, A3... (Question)
-            let answers = row.slice(1).map(answer => answer.trim()).filter(answer => answer !== ""); // B1-Z1 (Answers)
+        // Start processing from row 2 (B2) onwards and treat columns as follows
+        // B2: Question Text, C2-Z2: Answers
+        for (let i = 1; i < rows.length; i++) { // Skip the header row (A1)
+            const row = rows[i].map(cell => cell.trim());
             
+            // The question text will be in column B (index 1)
+            let questionText = row[1]; // Question is in column B (index 1)
+            
+            // The possible answers will be in columns C to Z (index 2 to 25)
+            let answers = row.slice(2).filter(answer => answer !== "");
+
             if (questionText && answers.length > 0) {
                 questions.push({ text: questionText, answers });
             }
-        });
+        }
 
         loadQuestions(questions);
     } catch (error) {
@@ -31,7 +38,7 @@ function loadQuestions(questions) {
     quizForm.innerHTML = ''; // Clear any existing questions
 
     questions.forEach((question, index) => {
-        const parts = question.text.split('__');
+        const parts = question.text.split('__'); // Split question text if it's formatted with __ as placeholders
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
