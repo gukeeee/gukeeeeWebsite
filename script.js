@@ -34,19 +34,26 @@ function loadQuestions(questions) {
     questions.forEach((question, index) => {
         const parts = question.text.split('__');
         const questionHtml = parts.map((part, i) => {
+            // For each part, create a proper structure
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
             return part;
         }).join('');
 
-        quizForm.insertAdjacentHTML('beforeend', `<p id="question-${index + 1}">${index + 1}. ${questionHtml}</p><div id="feedback-q${index + 1}" class="feedback"></div>`);
+        // Ensure proper HTML structure for each question
+        const questionElement = `
+            <p id="question-${index + 1}">${index + 1}. ${questionHtml}</p>
+            <div id="feedback-q${index + 1}" class="feedback"></div>
+        `;
+        quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
 
     // Reset event listeners for the buttons to avoid multiple listeners being added
     const checkButton = document.getElementById('check-button');
     const clearButton = document.getElementById('clear-button');
 
+    // Clear previous event listeners if any
     checkButton.removeEventListener('click', handleCheckAnswers);
     checkButton.addEventListener('click', handleCheckAnswers);
 
