@@ -45,6 +45,13 @@ function loadQuestions(questions) {
         `;
         quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
+
+    // Ensure the buttons are still functional
+    document.getElementById('check-button').addEventListener('click', function() {
+        checkAnswers(questions);
+    });
+
+    document.getElementById('clear-button').addEventListener('click', clearAnswers);
 }
 
 function checkAnswers(questions) {
