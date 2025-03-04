@@ -11,15 +11,9 @@ async function fetchQuestions(className) {
         
         let questions = [];
 
-        // Start processing from row 2 (B2) onwards and treat columns as follows
-        // B2: Question Text, C2-Z2: Answers
-        for (let i = 1; i < rows.length; i++) { // Skip the header row (A1)
+        for (let i = 1; i < rows.length; i++) {
             const row = rows[i].map(cell => cell.trim());
-            
-            // The question text will be in column B (index 1)
-            let questionText = row[1]; // Question is in column B (index 1)
-            
-            // The possible answers will be in columns C to Z (index 2 to 25)
+            let questionText = row[1];
             let answers = row.slice(2).filter(answer => answer !== "");
 
             if (questionText && answers.length > 0) {
@@ -35,10 +29,10 @@ async function fetchQuestions(className) {
 
 function loadQuestions(questions) {
     const quizForm = document.getElementById('quiz-form');
-    quizForm.innerHTML = ''; // Clear any existing questions
+    quizForm.innerHTML = '';
 
     questions.forEach((question, index) => {
-        const parts = question.text.split('_'); // Split question text if it's formatted with __ as placeholders
+        const parts = question.text.split('_');
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
                 return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
@@ -53,7 +47,6 @@ function loadQuestions(questions) {
         quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
 
-    // Ensure the buttons are still functional
     document.getElementById('check-button').addEventListener('click', function() {
         checkAnswers(questions);
     });
@@ -112,10 +105,15 @@ function clearAnswers() {
 
 // Event listener for class selection
 document.getElementById('class-selector').addEventListener('change', function() {
-    fetchQuestions(this.value); // Fetch questions for the selected class
+    const selectedClass = this.value;
+    localStorage.setItem('selectedClass', selectedClass); // Save selection in localStorage
+    fetchQuestions(selectedClass);
+    document.getElementById('result').innerHTML = '';
 });
 
-// Load default on page load (Clase 6)
+// Load last selected class or default to "Clase 6"
 window.onload = function() {
-    fetchQuestions("Clase 6");
+    const savedClass = localStorage.getItem('selectedClass') || "Clase 6";
+    document.getElementById('class-selector').value = savedClass;
+    fetchQuestions(savedClass);
 };
