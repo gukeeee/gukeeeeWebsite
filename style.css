@@ -101,3 +101,13 @@ input.empty {
 form {
     font-size: 15px;
 }
+
+.dropdown {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: #ffffff;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
