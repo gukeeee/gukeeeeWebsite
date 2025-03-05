@@ -117,3 +117,39 @@ window.onload = function() {
     document.getElementById('class-selector').value = savedClass;
     fetchQuestions(savedClass);
 };
+
+document.addEventListener("keydown", function (event) {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
+        event.preventDefault(); // Prevents default browser behavior
+        if (event.code === "KeyS") {
+            revealAnswers();
+        } else if (event.code === "KeyH") {
+            hideAnswers();
+        }
+    }
+});
+
+
+function revealAnswers() {
+    questions.forEach((question, index) => {
+        question.answers.forEach((correctAnswer, i) => {
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            if (inputField) {
+                inputField.value = correctAnswer;  // Fill in correct answer
+                inputField.style.borderColor = 'purple';  // Highlight answer
+            }
+        });
+    });
+}
+
+function hideAnswers() {
+    questions.forEach((question, index) => {
+        question.answers.forEach((correctAnswer, i) => {
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            if (inputField) {
+                inputField.value = '';  // Clear answer
+                inputField.style.borderColor = '';  // Clear highlight
+            }
+        });
+    });
+}
