@@ -3,7 +3,7 @@ const SHEET_URLS = {
     "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
 };
 
-let questions = []; // Declare globally
+let questions = []; // Declare globally so all functions can access it.
 
 async function fetchQuestions(className) {
     try {
@@ -11,7 +11,7 @@ async function fetchQuestions(className) {
         const data = await response.text();
         const rows = data.split("\n").map(row => row.split(","));
         
-        questions = []; // Reset global questions array
+        questions = []; // Reset questions before fetching new ones.
 
         for (let i = 2; i < rows.length; i++) { // Start from index 2 (B3)
             const row = rows[i].map(cell => cell.trim());
@@ -34,8 +34,8 @@ function revealAnswers() {
         question.answers.forEach((correctAnswer, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             if (inputField) {
-                inputField.value = correctAnswer;
-                inputField.style.borderColor = 'purple';
+                inputField.value = correctAnswer;  // Fill in correct answer
+                inputField.style.borderColor = 'purple';  // Highlight answer
             }
         });
     });
@@ -46,9 +46,27 @@ function hideAnswers() {
         question.answers.forEach((_, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             if (inputField) {
-                inputField.value = '';
-                inputField.style.borderColor = '';
+                inputField.value = '';  // Clear answer
+                inputField.style.borderColor = '';  // Clear highlight
             }
         });
     });
 }
+
+// Load last selected class or default to "Clase 6"
+window.onload = function() {
+    const savedClass = localStorage.getItem('selectedClass') || "Clase 6";
+    document.getElementById('class-selector').value = savedClass;
+    fetchQuestions(savedClass);
+};
+
+document.addEventListener("keydown", function (event) {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
+        event.preventDefault(); // Prevents default browser behavior
+        if (event.code === "KeyS") {
+            revealAnswers();
+        } else if (event.code === "KeyH") {
+            hideAnswers();
+        }
+    }
+});
