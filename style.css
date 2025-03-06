@@ -45,13 +45,13 @@ header {
     margin-left: auto;
 }
 .profile-button {
-    padding: 5px 12px;
+    padding: 6px 15px;
     border: none;
     background-color: #8A2BE2; /* Changed from blue to purple */
     color: white;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     font-family: "Poppins", sans-serif; /* Added Poppins font */
     transition: all 0.3s ease;
