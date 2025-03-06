@@ -1,8 +1,10 @@
 // User database - hardcoded users
 const USERS = [
-    { username: "student1", password: "pass123", displayName: "Juan Pérez" },
-    { username: "student2", password: "pass456", displayName: "Maria García" },
-    { username: "teacher", password: "admin123", displayName: "Prof. Rodriguez" }
+    { username: "29arunb", password: "29arunb", displayName: "Arun Banerjee" },
+    { username: "29arushs", password: "29arushs", displayName: "Arush Savla" },
+    { username: "29derekd", password: "29derekd", displayName: "Derek Ding" },
+    { username: "29hanw", password: "29hanw", displayName: "Han Wu" },
+    { username: "29lukeg", password: "29lukeg", displayName: "Luke Guo" },
 ];
 
 // Sheet URLs for different classes
@@ -13,12 +15,14 @@ const SHEET_URLS = {
 
 let questions = []; // Global variable to store questions
 let currentUser = null; // Authentication state management
+let isLoggedIn = false; // Track if the user is logged in
 
 // Check if user is already logged in
 function checkLoginStatus() {
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
+        isLoggedIn = true; // Set login status to true if user is found
         updateUIForLoggedInUser();
     }
 }
@@ -95,6 +99,8 @@ function loginUser(user) {
         displayName: user.displayName
     };
     
+    isLoggedIn = true; // Set login status to true upon successful login
+    
     // Save to localStorage
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
@@ -105,6 +111,7 @@ function loginUser(user) {
 // Logout user
 function logoutUser() {
     currentUser = null;
+    isLoggedIn = false; // Set login status to false upon logout
     localStorage.removeItem('currentUser');
     
     // Update UI
@@ -277,9 +284,9 @@ window.onload = function() {
     
     document.getElementById('clear-button').addEventListener('click', clearAnswers);
     
-    // Set up keyboard shortcuts for teachers
+    // Set up keyboard shortcuts for teachers only if logged in
     document.addEventListener("keydown", function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
+        if (isLoggedIn && (event.ctrlKey || event.metaKey) && event.shiftKey) {
             event.preventDefault();
             if (event.code === "KeyS") {
                 revealAnswers();
