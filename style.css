@@ -73,7 +73,7 @@ header .sign-in button:hover {
     max-height: 80vh;
     overflow-y: auto;
     text-align: center;
-    margin-top: 20px; /* Adjusted for spacing below the header */
+    margin-top: 20px; /* Added margin to keep some space under the header */
 }
 
 h1 {
@@ -173,4 +173,3 @@ form {
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
