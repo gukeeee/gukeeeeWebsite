@@ -6,61 +6,77 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
-    flex-direction: column;
 }
 
 header {
     width: 100%;
-    background-color: #fff;
-    padding: 10px 20px;
+    padding: 10px 0;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 1500px;
+    margin: 0 auto;
 }
 
-header .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #007bff;
+.logo {
+    height: 40px;
 }
 
-header .dropdown-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-}
-
-header .dropdown {
-    padding: 8px 16px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-header .sign-in {
+.class-dropdown {
     display: flex;
     align-items: center;
 }
 
-header .sign-in button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-header .sign-in button:hover {
+.profile-button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.profile-button:hover {
+    transform: translateY(-2px);
     background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-pic {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+#user-name {
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .container {
@@ -73,31 +89,12 @@ header .sign-in button:hover {
     max-height: 80vh;
     overflow-y: auto;
     text-align: center;
-    margin-top: 20px; /* Added margin to keep some space under the header */
 }
 
 h1 {
     font-family: "Poppins", sans-serif;
     font-weight: bold;
     margin-bottom: 20px;
-}
-
-h2 {
-    font-family: "Poppins", sans-serif;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-h3 {
-    font-family: "Poppins", sans-serif;
-    font-weight: bold;
-    margin: 5px 0;
-}
-
-h4 {
-    font-family: "Poppins", sans-serif;
-    font-weight: bold;
-    margin: 5px 0;
 }
 
 input {
@@ -165,11 +162,11 @@ form {
 }
 
 .dropdown {
-    padding: 8px 16px;
-    font-size: 16px;
-    border-radius: 5px;
+    padding: 8px;
+    border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: #ffffff;
+    margin: 5px 0;
     cursor: pointer;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
