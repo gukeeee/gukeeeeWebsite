@@ -8,7 +8,59 @@ body {
     justify-content: center;
     align-items: flex-start;
     height: 100vh;
-    flex-direction: column; /* Adjusted for proper header placement */
+    flex-direction: column;
+}
+
+header {
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+header .dropdown-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+header .dropdown {
+    padding: 8px 16px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header .sign-in {
+    display: flex;
+    align-items: center;
+}
+
+header .sign-in button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+header .sign-in button:hover {
+    background-color: #0056b3;
 }
 
 .container {
@@ -21,41 +73,7 @@ body {
     max-height: 80vh;
     overflow-y: auto;
     text-align: center;
-}
-
-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-header .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #007bff;
-}
-
-header .dropdown-container {
-    flex-grow: 1;
-    text-align: center;
-}
-
-header .sign-in {
-    display: flex;
-    align-items: center;
-}
-
-header .sign-in .profile {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin-top: 20px; /* Adjusted for spacing below the header */
 }
 
 h1 {
@@ -147,25 +165,12 @@ form {
 }
 
 .dropdown {
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    padding: 8px 16px;
     font-size: 16px;
-    background-color: #ffffff;
-    margin: 5px 0;
-    cursor: pointer;
-}
-
-header .sign-in button {
-    padding: 5px 10px;
     border-radius: 5px;
-    background-color: #007bff;
-    color: white;
+    border: 1px solid #ccc;
     cursor: pointer;
-    font-weight: bold;
-    font-family: "Poppins", sans-serif;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-header .sign-in button:hover {
-    background-color: #0056b3;
-}
