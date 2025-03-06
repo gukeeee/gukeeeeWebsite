@@ -55,13 +55,13 @@ input {
     display: inline-block;
     border-radius: 4px;
     border: 1px solid #ccc;
-    font-size: 16px;
+    font-size: 12px;
     font-family: "Poppins", sans-serif; /* Ensure Poppins is applied */
 }
 
 input::placeholder {
     font-family: "Poppins", sans-serif; /* Apply Poppins to placeholders as well */
-    font-size: 14px;
+    font-size: 12px;
     color: #888;
 }
 
