@@ -1,11 +1,16 @@
 // User database - hardcoded users
-const USERS = [
-    { username: "29arunb", password: "29arunb", displayName: "Arun Banerjee" },
-    { username: "29arushs", password: "29arushs", displayName: "Arush Savla" },
-    { username: "29derekd", password: "29derekd", displayName: "Derek Ding" },
-    { username: "29hanw", password: "29hanw", displayName: "Han Wu" },
-    { username: "29lukeg", password: "29lukeg", displayName: "Luke Guo" },
-];
+fetch("https://api.jsonbin.io/v3/b/67c9d5cdacd3cb34a8f6219b", {
+    headers: {
+        "X-Master-Key": "$2a$10$CW7znb50fOdlcdF0gimryeNmHmEAZQBqpIeYGQ8iA9uMibz3o2a46"
+    }
+})
+    .then(response => response.json())
+    .then(data => {
+        const users = data.record.USERS; // Extract the USERS array
+        console.log(users); // Log the USERS array
+    })
+    .catch(error => console.error("Error fetching data:", error));
+
 
 // Sheet URLs for different classes
 const SHEET_URLS = {
