@@ -210,11 +210,19 @@ form {
 }
 
 #login-btn {
-    background-color: #8A2BE2;
+    background-color: #4CAF50; /* Green color */
+}
+
+#login-btn:hover {
+    background-color: #388E3C; /* Darker green when hovered */
 }
 
 #cancel-btn {
-    background-color: #f44336;
+    background-color: #f44336; /* Red color */
+}
+
+#cancel-btn:hover {
+    background-color: #d32f2f; /* Darker red when hovered */
 }
 
 #login-error {
