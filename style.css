@@ -4,10 +4,11 @@ body {
     color: #000000;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    flex-direction: column; /* Add this */
+    align-items: center; /* Keep this */
+    justify-content: flex-start; /* Change this from center */
 }
 
 header {
@@ -20,13 +21,17 @@ header {
     z-index: 100;
 }
 
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 70%;
     max-width: 1500px;
-    margin: 0 auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    margin-top: 20px; /* Add this for spacing below header */
 }
 
 .logo {
