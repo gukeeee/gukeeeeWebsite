@@ -52,7 +52,7 @@ function showLoginForm() {
     const loginForm = document.createElement('div');
     loginForm.className = 'login-form';
     
-    loginForm.innerHTML = 
+    loginForm.innerHTML = `
         <h2>Iniciar Sesión</h2>
         <div style="margin-bottom: 15px;">
             <label for="username">Usuario:</label>
@@ -67,7 +67,7 @@ function showLoginForm() {
             <button id="cancel-btn">Cancelar</button>
         </div>
         <p id="login-error">Usuario o contraseña incorrectos</p>
-    ;
+    `;
     
     overlay.appendChild(loginForm);
     document.body.appendChild(overlay);
@@ -181,14 +181,14 @@ function loadQuestions(questions) {
         const parts = question.text.split('_');
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return <input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part};
+                return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
             }
             return part;
         }).join('');
-        const questionElement = 
+        const questionElement = `
             <p id="question-${index + 1}">${index + 1}. ${questionHtml}</p>
             <div id="feedback-q${index + 1}" class="feedback"></div>
-        ;
+        `;
         quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
 }
@@ -198,22 +198,22 @@ function checkAnswers(questions) {
     let score = 0;
     let total = 0;
     questions.forEach((question, index) => {
-        const feedbackElement = document.getElementById(feedback-q${index + 1});
-        let feedbackHtml = <strong>Q${index + 1}:</strong> ;
+        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
+        let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
         question.answers.forEach((correctAnswer, i) => {
-            const inputField = document.getElementById(q${index + 1}_${i + 1});
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             const userAnswer = inputField?.value.trim().toLowerCase();
             const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
             if (!userAnswer) {
-                feedbackHtml += <span style="color: GoldenRod; font-weight: bold;">Sin respuesta, </span>;
+                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta, </span>`;
                 inputField.classList.add('empty');
             } else if (possibleAnswers.includes(userAnswer)) {
-                feedbackHtml += <span style="color: green; font-weight: bold;">Correcto, </span>;
+                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto, </span>`;
                 inputField.style.borderColor = 'green';
                 score++;
                 inputField.classList.remove('empty');
             } else {
-                feedbackHtml += <span style="color: red; font-weight: bold;">Incorrecto, </span>;
+                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto, </span>`;
                 inputField.style.borderColor = 'red';
                 inputField.classList.remove('empty');
             }
@@ -221,7 +221,7 @@ function checkAnswers(questions) {
         });
         feedbackElement.innerHTML = feedbackHtml.slice(0, -9) + '</span>';
     });
-    document.getElementById('result').innerHTML = <p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>;
+    document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 }
 
 // Clear answers
@@ -241,7 +241,7 @@ function clearAnswers() {
 function revealAnswers() {
     questions.forEach((question, index) => {
         question.answers.forEach((correctAnswer, i) => {
-            const inputField = document.getElementById(q${index + 1}_${i + 1});
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             if (inputField) {
                 inputField.value = correctAnswer;
                 inputField.style.borderColor = 'purple';
@@ -254,7 +254,7 @@ function revealAnswers() {
 function hideAnswers() {
     questions.forEach((question, index) => {
         question.answers.forEach((_, i) => {
-            const inputField = document.getElementById(q${index + 1}_${i + 1});
+            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
             if (inputField) {
                 inputField.value = '';
                 inputField.style.borderColor = '';
