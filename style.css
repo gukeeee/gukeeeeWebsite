@@ -10,7 +10,6 @@ body {
     align-items: center;
     justify-content: flex-start;
 }
-
 header {
     width: 100%;
     padding: 7px 0;
@@ -20,7 +19,6 @@ header {
     top: 0;
     z-index: 100;
 }
-
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -30,11 +28,9 @@ header {
     margin: 0 auto;
     position: relative;
 }
-
 .logo {
     height: 30px;
 }
-
 .class-dropdown {
     position: absolute;
     left: 50%;
@@ -42,49 +38,43 @@ header {
     display: flex;
     align-items: center;
 }
-
 .user-profile {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-left: auto;
 }
-
 .profile-button {
     padding: 5px 12px;
     border: none;
-    background-color: #007bff;
+    background-color: #8A2BE2; /* Changed from blue to purple */
     color: white;
     border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
     font-weight: bold;
+    font-family: "Poppins", sans-serif; /* Added Poppins font */
     transition: all 0.3s ease;
 }
-
 .profile-button:hover {
     transform: translateY(-2px);
-    background-color: #0056b3;
+    background-color: #6A1B9A; /* Darker purple on hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
-
 .profile-info {
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
 .profile-pic {
     width: 30px;
     height: 30px;
     border-radius: 50%;
 }
-
 #user-name {
     font-size: 14px;
     font-weight: bold;
 }
-
 .container {
     background-color: #ffffff;
     padding: 20px;
@@ -97,13 +87,11 @@ header {
     text-align: center;
     margin-top: 20px;
 }
-
 h1 {
     font-family: "Poppins", sans-serif;
     font-weight: bold;
     margin-bottom: 20px;
 }
-
 input {
     padding: 5px;
     margin: 5px 0;
@@ -116,19 +104,16 @@ input {
     font-size: 12px;
     font-family: "Poppins", sans-serif;
 }
-
 input::placeholder {
     font-family: "Poppins", sans-serif;
     font-size: 12px;
     color: #888;
 }
-
 input.empty {
     border-color: GoldenRod;
 }
-
 .blue-button, .red-button {
-    padding: 5px 10px;
+    padding: 3px 8px; /* Reduced padding to make buttons less thick */
     border: none;
     color: white;
     border-radius: 8px;
@@ -136,38 +121,36 @@ input.empty {
     transition: all 0.3s ease;
     font-weight: bold;
     margin: 3px 6px;
+    font-family: "Poppins", sans-serif;
 }
-
 .blue-button {
     background-color: #007bff;
 }
-
 .red-button {
     background-color: #ff0000;
 }
-
+/* Remove extra space from h4 elements in buttons */
+.blue-button h4, .red-button h4 {
+    margin: 5px 0;
+}
 .blue-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     background-color: #0056b3;
 }
-
 .red-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     background-color: #b30000;
 }
-
 .result {
     margin-top: 15px;
     font-weight: bold;
 }
-
 form {
     font-size: 15px;
     margin: 10px 0;
 }
-
 .dropdown {
     padding: 8px;
     border-radius: 8px;
@@ -177,7 +160,6 @@ form {
     margin: 5px 0;
     cursor: pointer;
 }
-
 /* Make the dropdown in the header a bit smaller */
 .header-container .dropdown {
     padding: 5px;
