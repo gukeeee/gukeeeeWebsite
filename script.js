@@ -2,7 +2,7 @@ let USERS = [];
 
 async function fetchUsers() {
     try {
-        const response = await fetch("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/users.json");
+        const response = await fetch("https://gist.githubusercontent.com/gukeeee/76c792fec2bb289e73fd05cc6a93159c/raw/126d8b4ea418e5efbaa19e2e93b1df871b8c3bc7/users.json");
         const data = await response.json();
         USERS = data.USERS;
         console.log(USERS); // Now USERS contains the fetched data
