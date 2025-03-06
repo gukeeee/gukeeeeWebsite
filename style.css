@@ -1,60 +1,56 @@
-body {
-    font-family: "Poppins", sans-serif;
-    background-color: #e0e7ff;
-    color: #000000;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
 header {
     width: 100%;
-    padding: 10px 0;
-    margin-bottom: 5px;
+    padding: 10px 0; /* Changed from 7px to 10px as requested */
     background-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
 }
+
 .header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 90%;
+    width: 95%; /* Increased from 90% to spread elements more */
     max-width: 1500px;
     margin: 0 auto;
     position: relative;
 }
+
 .logo {
-    height: 35px;
+    height: 35px; /* Scaled up from 30px */
+    margin-left: -10px; /* Move logo closer to left edge */
 }
+
 .class-dropdown {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Removed absolute positioning */
+    position: static;
+    transform: none;
     display: flex;
     align-items: center;
+    margin-left: auto; /* Push it to the right */
+    margin-right: 15px; /* Add space between dropdown and button */
 }
+
 .user-profile {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: auto;
+    margin-left: 0; /* Removed auto margin */
+    margin-right: -10px; /* Move button closer to right edge */
 }
+
 .profile-button {
-    padding: 5px 12px;
+    padding: 6px 14px; /* Increased from 5px 12px */
     border: none;
-    background-color: #8A2BE2; /* Changed from blue to purple */
+    background-color: #8A2BE2;
     color: white;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px; /* Increased from 13px */
     font-weight: bold;
-    font-family: "Poppins", sans-serif; /* Added Poppins font */
+    font-family: "Poppins", sans-serif;
     transition: all 0.3s ease;
 }
 .profile-button:hover {
@@ -66,15 +62,6 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-.profile-pic {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-}
-#user-name {
-    font-size: 14px;
-    font-weight: bold;
 }
 .container {
     background-color: #ffffff;
@@ -162,8 +149,79 @@ form {
     margin: 5px 0;
     cursor: pointer;
 }
-/* Make the dropdown in the header a bit smaller */
+/* Make the dropdown in the header a bit larger */
 .header-container .dropdown {
-    padding: 5px;
-    font-size: 14px;
+    padding: 7px; /* Increased from 5px */
+    font-size: 15px; /* Increased from 14px */
+}
+
+/* Modal login form styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    font-family: "Poppins", sans-serif;
+}
+
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    max-width: none;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.login-form button {
+    padding: 8px 15px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+#login-btn {
+    background-color: #8A2BE2;
+}
+
+#cancel-btn {
+    background-color: #f44336;
+}
+
+#login-error {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+}
+
+#user-name-display {
+    margin-right: 10px;
+    font-weight: bold;
 }
