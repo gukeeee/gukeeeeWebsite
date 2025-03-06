@@ -1,15 +1,17 @@
-// User database - hardcoded users
-fetch("https://api.jsonbin.io/v3/b/67c9d5cdacd3cb34a8f6219b", {
-    headers: {
-        "X-Master-Key": "$2a$10$CW7znb50fOdlcdF0gimryeNmHmEAZQBqpIeYGQ8iA9uMibz3o2a46"
+let USERS = [];
+
+async function fetchUsers() {
+    try {
+        const response = await fetch("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/users.json");
+        const data = await response.json();
+        USERS = data.USERS;
+        console.log(USERS); // Now USERS contains the fetched data
+    } catch (error) {
+        console.error("Error fetching data:", error);
     }
-})
-    .then(response => response.json())
-    .then(data => {
-        const users = data.record.USERS; // Extract the USERS array
-        console.log(users); // Log the USERS array
-    })
-    .catch(error => console.error("Error fetching data:", error));
+}
+
+fetchUsers(); // Call the function
 
 
 // Sheet URLs for different classes
