@@ -159,7 +159,7 @@ async function fetchQuestions(className) {
         const data = await response.text();
         const rows = data.split("\n").map(row => row.split(","));
         questions = []; // Reset global questions array
-        for (let i = 2; i < rows.length; i++) { // Start from index 2 (B3)
+        for (let i = 3; i < rows.length; i++) { // Start from index 2 (B3)
             const row = rows[i].map(cell => cell.trim());
             let questionText = row[1];
             let answers = row.slice(2).filter(answer => answer !== "");
