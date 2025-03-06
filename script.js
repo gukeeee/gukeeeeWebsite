@@ -4,7 +4,7 @@ let USERS = [];
 // Sheet URLs for different classes
 const SHEET_URLS = {
     "Clase 6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA-9Hy7Ag/pub?output=csv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv',
     "Users": 'https://docs.google.com/spreadsheets/d/1ECsxtrSV6e8zbFJY12pNporsPJbPwB5fW9H4c3Hmybo/pub?output=csv'
 };
 
