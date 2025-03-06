@@ -1,11 +1,16 @@
 // User database - hardcoded users
-let USERS = [];
+const USERS = [
+    { username: "29arunb", password: "29arunb", displayName: "Arun Banerjee" },
+    { username: "29arushs", password: "29arushs", displayName: "Arush Savla" },
+    { username: "29derekd", password: "29derekd", displayName: "Derek Ding" },
+    { username: "29hanw", password: "29hanw", displayName: "Han Wu" },
+    { username: "29lukeg", password: "29lukeg", displayName: "Luke Guo" },
+];
 
 // Sheet URLs for different classes
 const SHEET_URLS = {
     "Clase 6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA-9Hy7Ag/pub?output=csv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv',
-    "Users": 'https://docs.google.com/spreadsheets/d/1ECsxtrSV6e8zbFJY12pNporsPJbPwB5fW9H4c3Hmybo/pub?output=csv'
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
 };
 
 let questions = []; // Global variable to store questions
@@ -168,32 +173,6 @@ async function fetchQuestions(className) {
     }
 }
 
-// Fetch user data from the published Google Sheets CSV
-async function fetchUserData(sheetUrl) {
-    try {
-        const response = await fetch(SHEET_URLS[sheetUrl]);
-        const data = await response.text();
-        const rows = data.split("\n").map(row => row.split("\t"));  // Use tab as separator
-        
-        users = [];  // Reset the users array
-
-        for (let i = 0; i < rows.length; i++) {  // Iterate through rows
-            const row = rows[i].map(cell => cell.trim());
-            if (row.length === 3) {  // Ensure the row has 3 columns
-                const username = row[0];
-                const password = row[1];
-                const displayName = row[2];
-                if (username && password && displayName) {
-                    users.push({ username, password, displayName });
-                }
-            }
-        }
-        console.log('Users fetched:', users);  // Display fetched users
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
-}
-
 // Load questions into the form
 function loadQuestions(questions) {
     const quizForm = document.getElementById('quiz-form');
@@ -290,7 +269,7 @@ window.onload = function() {
     const savedClass = localStorage.getItem('selectedClass') || "Clase 6";
     document.getElementById('class-selector').value = savedClass;
     fetchQuestions(savedClass);
-    fetchUserData("Users");
+    
     // Set up event listeners
     document.getElementById('class-selector').addEventListener('change', function() {
         const selectedClass = this.value;
