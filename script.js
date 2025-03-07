@@ -159,23 +159,69 @@ function updateUIForLoggedOutUser() {
 }
 
 // Fetch questions from Google Sheets
+// Fetch questions from Google Sheets
 async function fetchQuestions(className) {
     try {
         const response = await fetch(SHEET_URLS[className]);
         const data = await response.text();
-        const rows = data.split("\n").map(row => row.split(","));
-        questions = []; // Reset global questions array
-        for (let i = 3; i < rows.length; i++) { // Start from index 2 (B3)
-            const row = rows[i].map(cell => cell.trim());
-            let questionText = row[1];
-            let answers = row.slice(2).filter(answer => answer !== "");
+        
+        // Split the CSV data into rows
+        const rows = data.split("\n").map(row => {
+            // Handle quoted fields correctly (CSV can have commas inside quotes)
+            const processedRow = [];
+            let inQuotes = false;
+            let currentField = '';
+            
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    processedRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            // Add the last field
+            processedRow.push(currentField.trim());
+            return processedRow;
+        });
+        
+        // Reset global questions array
+        questions = [];
+        
+        // Skip header rows (first 3 rows)
+        for (let i = 3; i < rows.length; i++) {
+            const row = rows[i];
+            
+            // Skip empty rows
+            if (row.length < 3 || !row[1]) continue;
+            
+            const questionText = row[1];
+            const answers = row.slice(2).filter(answer => answer !== "");
+            
             if (questionText && answers.length > 0) {
                 questions.push({ text: questionText, answers });
             }
         }
+        
+        // After parsing, load the questions into the UI
         loadQuestions(questions);
+        
+        // Clear previous results when switching classes
+        document.getElementById('result').innerHTML = '';
+        
+        // Debug info to help troubleshoot
+        console.log(`Loaded ${questions.length} questions for ${className}`);
+        
     } catch (error) {
         console.error("Error fetching questions:", error);
+        // Provide user feedback
+        const quizForm = document.getElementById('quiz-form');
+        quizForm.innerHTML = '<p>Error cargando preguntas. Por favor intente de nuevo.</p>';
     }
 }
 
