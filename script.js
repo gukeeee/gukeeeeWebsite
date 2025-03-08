@@ -19,36 +19,77 @@ const SHEET_URLS = {
     "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
 };
 
+// Authentication system with signup and profile management
+
+// Firebase configuration (you'll need to create a Firebase project)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// Current user state
+let currentUser = null;
+let isLoggedIn = false;
+
 let questions = []; // Global variable to store questions
 let currentUser = null; // Authentication state management
 let isLoggedIn = false; // Track if the user is logged in
 
 // Check if user is already logged in
 function checkLoginStatus() {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        isLoggedIn = true; // Set login status to true if user is found
-        updateUIForLoggedInUser();
-    }
-}
-
-// Handle sign in button click
-function setupAuthUI() {
-    const signInBtn = document.getElementById('sign-in-btn');
-    
-    signInBtn.addEventListener('click', function() {
-        if (currentUser) {
-            // If user is logged in, log them out
-            logoutUser();
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // Get user profile from Firestore
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        currentUser = {
+                            uid: user.uid,
+                            email: user.email,
+                            username: doc.data().username,
+                            displayName: doc.data().displayName
+                        };
+                        isLoggedIn = true;
+                        updateUIForLoggedInUser();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching user data:", error);
+                });
         } else {
-            // If user is not logged in, show login form
-            showLoginForm();
+            updateUIForLoggedOutUser();
         }
     });
 }
 
-// Show login form
+// Setup authentication UI elements
+function setupAuthUI() {
+    const authBtn = document.getElementById('auth-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    
+    authBtn.addEventListener('click', function() {
+        if (isLoggedIn) {
+            showProfileModal();
+        } else {
+            showLoginForm();
+        }
+    });
+    
+    signupBtn.addEventListener('click', function() {
+        showSignupForm();
+    });
+}
+
+// Show login form modal
 function showLoginForm() {
     // Create modal overlay
     const overlay = document.createElement('div');
@@ -56,89 +97,397 @@ function showLoginForm() {
     
     // Create login form
     const loginForm = document.createElement('div');
-    loginForm.className = 'login-form';
+    loginForm.className = 'auth-form';
     
     loginForm.innerHTML = `
         <h2>Iniciar Sesión</h2>
-        <div style="margin-bottom: 15px;">
-            <label for="username">Usuario:</label>
-            <input type="text" id="username">
+        <div class="form-group">
+            <label for="login-email">Correo electrónico:</label>
+            <input type="email" id="login-email" required>
         </div>
-        <div style="margin-bottom: 20px;">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password">
+        <div class="form-group">
+            <label for="login-password">Contraseña:</label>
+            <input type="password" id="login-password" required>
         </div>
-        <div style="display: flex; justify-content: space-between;">
-            <button id="login-btn">Ingresar</button>
-            <button id="cancel-btn">Cancelar</button>
+        <div class="form-actions">
+            <button id="login-btn" class="primary-btn">Ingresar</button>
+            <button id="cancel-login-btn" class="secondary-btn">Cancelar</button>
         </div>
-        <p id="login-error">Usuario o contraseña incorrectos</p>
+        <p id="login-error" class="error-message">Error al iniciar sesión</p>
+        <p class="form-footer">¿No tienes una cuenta? <a href="#" id="show-signup">Regístrate aquí</a></p>
     `;
     
     overlay.appendChild(loginForm);
     document.body.appendChild(overlay);
     
-    // Add event listeners for login form buttons
+    // Event listeners for login form
     document.getElementById('login-btn').addEventListener('click', function() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
         
-        const user = USERS.find(u => u.username === username && u.password === password);
-        
-        if (user) {
-            loginUser(user);
-            document.body.removeChild(overlay);
-        } else {
+        if (!email || !password) {
+            document.getElementById('login-error').textContent = "Por favor completa todos los campos";
             document.getElementById('login-error').style.display = 'block';
+            return;
         }
+        
+        loginUser(email, password);
     });
     
-    document.getElementById('cancel-btn').addEventListener('click', function() {
+    document.getElementById('cancel-login-btn').addEventListener('click', function() {
         document.body.removeChild(overlay);
+    });
+    
+    document.getElementById('show-signup').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        showSignupForm();
     });
 }
 
+// Show signup form modal
+function showSignupForm() {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    
+    // Create signup form
+    const signupForm = document.createElement('div');
+    signupForm.className = 'auth-form';
+    
+    signupForm.innerHTML = `
+        <h2>Crear Cuenta</h2>
+        <div class="form-group">
+            <label for="signup-email">Correo electrónico:</label>
+            <input type="email" id="signup-email" required>
+        </div>
+        <div class="form-group">
+            <label for="signup-username">Nombre de usuario:</label>
+            <input type="text" id="signup-username" required>
+        </div>
+        <div class="form-group">
+            <label for="signup-display-name">Nombre visible:</label>
+            <input type="text" id="signup-display-name" required>
+        </div>
+        <div class="form-group">
+            <label for="signup-password">Contraseña:</label>
+            <input type="password" id="signup-password" required>
+        </div>
+        <div class="form-group">
+            <label for="signup-confirm-password">Confirmar contraseña:</label>
+            <input type="password" id="signup-confirm-password" required>
+        </div>
+        <div class="form-actions">
+            <button id="signup-submit-btn" class="primary-btn">Registrarse</button>
+            <button id="cancel-signup-btn" class="secondary-btn">Cancelar</button>
+        </div>
+        <p id="signup-error" class="error-message">Error en el registro</p>
+        <p class="form-footer">¿Ya tienes una cuenta? <a href="#" id="show-login">Inicia sesión aquí</a></p>
+    `;
+    
+    overlay.appendChild(signupForm);
+    document.body.appendChild(overlay);
+    
+    // Event listeners for signup form
+    document.getElementById('signup-submit-btn').addEventListener('click', function() {
+        const email = document.getElementById('signup-email').value;
+        const username = document.getElementById('signup-username').value;
+        const displayName = document.getElementById('signup-display-name').value;
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+        
+        // Validate inputs
+        if (!email || !username || !displayName || !password || !confirmPassword) {
+            document.getElementById('signup-error').textContent = "Por favor completa todos los campos";
+            document.getElementById('signup-error').style.display = 'block';
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            document.getElementById('signup-error').textContent = "Las contraseñas no coinciden";
+            document.getElementById('signup-error').style.display = 'block';
+            return;
+        }
+        
+        // Check if username already exists
+        db.collection('users')
+            .where('username', '==', username)
+            .get()
+            .then(snapshot => {
+                if (!snapshot.empty) {
+                    document.getElementById('signup-error').textContent = "Este nombre de usuario ya está en uso";
+                    document.getElementById('signup-error').style.display = 'block';
+                } else {
+                    createUser(email, username, displayName, password);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking username:", error);
+                document.getElementById('signup-error').textContent = "Error al verificar nombre de usuario";
+                document.getElementById('signup-error').style.display = 'block';
+            });
+    });
+    
+    document.getElementById('cancel-signup-btn').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+    });
+    
+    document.getElementById('show-login').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        showLoginForm();
+    });
+}
+
+// Create a new user
+function createUser(email, username, displayName, password) {
+    // Create user with email and password
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            // Store additional user data in Firestore
+            return db.collection('users').doc(userCredential.user.uid).set({
+                email: email,
+                username: username,
+                displayName: displayName,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        })
+        .then(() => {
+            // Close the signup modal
+            const overlay = document.querySelector('.modal-overlay');
+            if (overlay) document.body.removeChild(overlay);
+            
+            // Show success message
+            showNotification("Cuenta creada con éxito", "success");
+        })
+        .catch(error => {
+            console.error("Error creating user:", error);
+            document.getElementById('signup-error').textContent = getAuthErrorMessage(error.code);
+            document.getElementById('signup-error').style.display = 'block';
+        });
+}
+
 // Login user
-function loginUser(user) {
-    currentUser = {
-        username: user.username,
-        displayName: user.displayName
-    };
-    
-    isLoggedIn = true; // Set login status to true upon successful login
-    
-    // Save to localStorage
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-    // Update UI
-    updateUIForLoggedInUser();
+function loginUser(email, password) {
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            // Close the login modal
+            const overlay = document.querySelector('.modal-overlay');
+            if (overlay) document.body.removeChild(overlay);
+            
+            // Show success message
+            showNotification("Has iniciado sesión correctamente", "success");
+        })
+        .catch(error => {
+            console.error("Error logging in:", error);
+            document.getElementById('login-error').textContent = getAuthErrorMessage(error.code);
+            document.getElementById('login-error').style.display = 'block';
+        });
 }
 
 // Logout user
 function logoutUser() {
-    currentUser = null;
-    isLoggedIn = false; // Set login status to false upon logout
-    localStorage.removeItem('currentUser');
+    auth.signOut()
+        .then(() => {
+            currentUser = null;
+            isLoggedIn = false;
+            showNotification("Has cerrado sesión correctamente", "success");
+        })
+        .catch(error => {
+            console.error("Error signing out:", error);
+            showNotification("Error al cerrar sesión", "error");
+        });
+}
+
+// Show profile modal
+function showProfileModal() {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
     
-    // Update UI
-    updateUIForLoggedOutUser();
+    // Create profile form
+    const profileForm = document.createElement('div');
+    profileForm.className = 'auth-form profile-form';
+    
+    profileForm.innerHTML = `
+        <h2>Mi Perfil</h2>
+        <div class="form-group">
+            <label for="profile-email">Correo electrónico:</label>
+            <input type="email" id="profile-email" value="${currentUser.email}" disabled>
+        </div>
+        <div class="form-group">
+            <label for="profile-username">Nombre de usuario:</label>
+            <input type="text" id="profile-username" value="${currentUser.username}">
+        </div>
+        <div class="form-group">
+            <label for="profile-display-name">Nombre visible:</label>
+            <input type="text" id="profile-display-name" value="${currentUser.displayName}">
+        </div>
+        <div class="form-group">
+            <label for="profile-current-password">Contraseña actual:</label>
+            <input type="password" id="profile-current-password" placeholder="Requerido para actualizar">
+        </div>
+        <div class="form-group">
+            <label for="profile-new-password">Nueva contraseña:</label>
+            <input type="password" id="profile-new-password" placeholder="Dejar en blanco para no cambiar">
+        </div>
+        <div class="form-group">
+            <label for="profile-confirm-password">Confirmar nueva contraseña:</label>
+            <input type="password" id="profile-confirm-password" placeholder="Dejar en blanco para no cambiar">
+        </div>
+        <div class="form-actions">
+            <button id="update-profile-btn" class="primary-btn">Actualizar perfil</button>
+            <button id="logout-btn" class="warning-btn">Cerrar sesión</button>
+            <button id="cancel-profile-btn" class="secondary-btn">Cancelar</button>
+        </div>
+        <p id="profile-error" class="error-message">Error actualizando perfil</p>
+        <p id="profile-success" class="success-message">Perfil actualizado correctamente</p>
+    `;
+    
+    overlay.appendChild(profileForm);
+    document.body.appendChild(overlay);
+    
+    // Event listeners for profile form
+    document.getElementById('update-profile-btn').addEventListener('click', function() {
+        updateUserProfile();
+    });
+    
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        logoutUser();
+    });
+    
+    document.getElementById('cancel-profile-btn').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+    });
+}
+
+// Update user profile
+function updateUserProfile() {
+    const username = document.getElementById('profile-username').value;
+    const displayName = document.getElementById('profile-display-name').value;
+    const currentPassword = document.getElementById('profile-current-password').value;
+    const newPassword = document.getElementById('profile-new-password').value;
+    const confirmPassword = document.getElementById('profile-confirm-password').value;
+    
+    const profileError = document.getElementById('profile-error');
+    const profileSuccess = document.getElementById('profile-success');
+    
+    profileError.style.display = 'none';
+    profileSuccess.style.display = 'none';
+    
+    // Validate inputs
+    if (!username || !displayName) {
+        profileError.textContent = "Nombre de usuario y nombre visible son obligatorios";
+        profileError.style.display = 'block';
+        return;
+    }
+    
+    if (!currentPassword) {
+        profileError.textContent = "Contraseña actual requerida para actualizar perfil";
+        profileError.style.display = 'block';
+        return;
+    }
+    
+    if (newPassword && newPassword !== confirmPassword) {
+        profileError.textContent = "Las contraseñas no coinciden";
+        profileError.style.display = 'block';
+        return;
+    }
+    
+    // Check if username already exists (if changed)
+    if (username !== currentUser.username) {
+        db.collection('users')
+            .where('username', '==', username)
+            .get()
+            .then(snapshot => {
+                if (!snapshot.empty) {
+                    profileError.textContent = "Este nombre de usuario ya está en uso";
+                    profileError.style.display = 'block';
+                } else {
+                    proceedWithProfileUpdate(username, displayName, currentPassword, newPassword);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking username:", error);
+                profileError.textContent = "Error al verificar nombre de usuario";
+                profileError.style.display = 'block';
+            });
+    } else {
+        proceedWithProfileUpdate(username, displayName, currentPassword, newPassword);
+    }
+}
+
+// Proceed with profile update after validations
+function proceedWithProfileUpdate(username, displayName, currentPassword, newPassword) {
+    const profileError = document.getElementById('profile-error');
+    const profileSuccess = document.getElementById('profile-success');
+    
+    // Re-authenticate user to verify current password
+    const credential = firebase.auth.EmailAuthProvider.credential(
+        auth.currentUser.email, 
+        currentPassword
+    );
+    
+    auth.currentUser.reauthenticateWithCredential(credential)
+        .then(() => {
+            // Update Firestore profile
+            const userRef = db.collection('users').doc(auth.currentUser.uid);
+            return userRef.update({
+                username: username,
+                displayName: displayName,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        })
+        .then(() => {
+            // Update password if provided
+            if (newPassword) {
+                return auth.currentUser.updatePassword(newPassword);
+            }
+            return Promise.resolve();
+        })
+        .then(() => {
+            // Update current user object
+            currentUser.username = username;
+            currentUser.displayName = displayName;
+            
+            // Update UI
+            updateUIForLoggedInUser();
+            
+            // Show success message
+            profileSuccess.textContent = "Perfil actualizado correctamente";
+            profileSuccess.style.display = 'block';
+            
+            // Reset password fields
+            document.getElementById('profile-current-password').value = '';
+            document.getElementById('profile-new-password').value = '';
+            document.getElementById('profile-confirm-password').value = '';
+        })
+        .catch(error => {
+            console.error("Error updating profile:", error);
+            profileError.textContent = getAuthErrorMessage(error.code);
+            profileError.style.display = 'block';
+        });
 }
 
 // Update UI for logged in user
 function updateUIForLoggedInUser() {
-    const signInBtn = document.getElementById('sign-in-btn');
+    const authBtn = document.getElementById('auth-btn');
+    const signupBtn = document.getElementById('signup-btn');
     
-    // Change sign in button to sign out
-    signInBtn.textContent = 'Cerrar sesión';
+    // Update auth button
+    authBtn.textContent = 'Mi Perfil';
+    authBtn.className = 'profile-button logged-in';
     
-    // Create an element for the display name
+    // Hide signup button
+    signupBtn.style.display = 'none';
+    
+    // Create an element for the display name if it doesn't exist
     if (!document.getElementById('user-name-display')) {
         const userNameDisplay = document.createElement('span');
         userNameDisplay.id = 'user-name-display';
         userNameDisplay.textContent = currentUser.displayName;
         
         const userProfile = document.querySelector('.user-profile');
-        userProfile.insertBefore(userNameDisplay, signInBtn);
+        userProfile.insertBefore(userNameDisplay, authBtn);
     } else {
         document.getElementById('user-name-display').textContent = currentUser.displayName;
     }
@@ -146,10 +495,19 @@ function updateUIForLoggedInUser() {
 
 // Update UI for logged out user
 function updateUIForLoggedOutUser() {
-    const signInBtn = document.getElementById('sign-in-btn');
+    const authBtn = document.getElementById('auth-btn');
+    const signupBtn = document.getElementById('signup-btn');
     
-    // Change sign out button back to sign in
-    signInBtn.textContent = 'Iniciar sesión';
+    // Reset current user data
+    currentUser = null;
+    isLoggedIn = false;
+    
+    // Update auth button
+    authBtn.textContent = 'Iniciar sesión';
+    authBtn.className = 'profile-button';
+    
+    // Show signup button
+    signupBtn.style.display = 'inline-block';
     
     // Remove the display name
     const userNameDisplay = document.getElementById('user-name-display');
@@ -157,6 +515,68 @@ function updateUIForLoggedOutUser() {
         userNameDisplay.remove();
     }
 }
+
+// Display notification message
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Get user-friendly error messages
+function getAuthErrorMessage(errorCode) {
+    switch(errorCode) {
+        case 'auth/email-already-in-use':
+            return "Este correo electrónico ya está registrado";
+        case 'auth/invalid-email':
+            return "El formato del correo electrónico no es válido";
+        case 'auth/weak-password':
+            return "La contraseña es demasiado débil";
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            return "Usuario o contraseña incorrectos";
+        default:
+            return "Error de autenticación: " + errorCode;
+    }
+}
+
+// Initialize the authentication system
+function initializeAuthSystem() {
+    // Update HTML structure for auth buttons
+    const userProfile = document.querySelector('.user-profile');
+    userProfile.innerHTML = `
+        <button id="signup-btn" class="signup-button">Registrarse</button>
+        <button id="auth-btn" class="profile-button">Iniciar sesión</button>
+    `;
+    
+    // Set up event listeners
+    setupAuthUI();
+    
+    // Check if user is already logged in
+    checkLoginStatus();
+}
+
+// Call when the page loads
+window.addEventListener('DOMContentLoaded', function() {
+    // Initialize Firebase and Auth system
+    initializeAuthSystem();
+});
 
 // Fetch questions from Google Sheets
 // Fetch questions from Google Sheets
