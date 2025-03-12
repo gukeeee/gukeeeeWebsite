@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Streams</title>
+    <title>Basketball</title>
     <style>
         body {
             font-family: "Poppins", sans-serif;
-            background-color: #e0e7ff;
+            background-color: #f3e5f5; /* Light purple background */
             color: #000000;
             margin: 0;
             padding: 0;
@@ -33,6 +33,7 @@
             font-family: "Poppins", sans-serif;
             font-weight: bold;
             margin-bottom: 20px;
+            color: #6a1b9a; /* Darker purple for title */
         }
 
         .team-input {
@@ -43,7 +44,7 @@
             box-sizing: border-box;
             display: inline-block;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #ba68c8; /* Light purple border */
             font-size: 14px;
             font-family: "Poppins", sans-serif;
         }
@@ -54,10 +55,16 @@
             color: #888;
         }
 
-        .blue-button {
+        .team-input:focus {
+            outline: none;
+            border-color: #6a1b9a; /* Darker purple when focused */
+            box-shadow: 0 0 0 2px rgba(106, 27, 154, 0.2);
+        }
+
+        .purple-button {
             padding: 8px 15px;
             border: none;
-            background-color: #007bff;
+            background-color: #9c27b0; /* Purple button */
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -67,16 +74,17 @@
             font-family: "Poppins", sans-serif;
         }
 
-        .blue-button:hover {
+        .purple-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            background-color: #0056b3;
+            background-color: #6a1b9a; /* Darker purple on hover */
         }
 
         .current-team {
             font-size: 14px;
-            color: #555;
+            color: #9c27b0; /* Purple text */
             margin-top: 5px;
+            font-weight: 500;
         }
 
         iframe {
@@ -101,9 +109,9 @@
             type="text" 
             id="teamInput" 
             class="team-input" 
-            placeholder="Enter team name (e.g., lakers)" 
+            placeholder="Team name (lowercase, no spaces, e.g. warriors)" 
         />
-        <button id="updateButton" class="blue-button">Watch Team</button>
+        <button id="updateButton" class="purple-button">Watch Team</button>
         <div id="currentTeam" class="current-team"></div>
     </div>
     
@@ -125,8 +133,6 @@
         const basketballFrame = document.getElementById('basketballFrame');
         const currentTeam = document.getElementById('currentTeam');
         
-        // Default team
-        const defaultTeam = 'lakers';
         const baseUrl = 'https://givemereddit.eu/nba/';
         
         // Function to update iframe source
@@ -148,11 +154,12 @@
         // Check if a team is saved in localStorage
         const savedTeam = localStorage.getItem('basketball_team');
         
-        // Load the saved team or default team
+        // Load the saved team if available
         if (savedTeam) {
             updateTeam(savedTeam);
         } else {
-            updateTeam(defaultTeam);
+            // Clear current team display if no saved team
+            currentTeam.textContent = 'Enter a team name to start watching';
         }
         
         // Update button click event
