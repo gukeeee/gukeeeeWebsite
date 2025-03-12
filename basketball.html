@@ -109,7 +109,7 @@
             type="text" 
             id="teamInput" 
             class="team-input" 
-            placeholder="Team name (lowercase, no spaces, e.g. warriors)" 
+            placeholder="Team name (e.g. Golden State Warriors)" 
         />
         <button id="updateButton" class="purple-button">Watch Team</button>
         <div id="currentTeam" class="current-team"></div>
@@ -138,17 +138,18 @@
         // Function to update iframe source
         function updateTeam(team) {
             // Convert to lowercase and remove spaces
-            team = team.toLowerCase().replace(/\s+/g, '');
+            const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
             
             // Construct the full URL
-            const fullUrl = baseUrl + team + '.html';
+            const fullUrl = baseUrl + formattedTeam + '.html';
             
             // Update iframe, localStorage, and display
             basketballFrame.src = fullUrl;
             localStorage.setItem('basketball_link', fullUrl);
-            localStorage.setItem('basketball_team', team);
-            teamInput.value = team;
-            currentTeam.textContent = 'Currently watching: ' + team;
+            localStorage.setItem('basketball_team', formattedTeam);
+            
+            // Display the lowercase, no-spaces version for "currently watching"
+            currentTeam.textContent = 'currentlywatching ' + formattedTeam;
         }
         
         // Check if a team is saved in localStorage
@@ -156,10 +157,11 @@
         
         // Load the saved team if available
         if (savedTeam) {
+            // Use the saved team but update the display format
             updateTeam(savedTeam);
         } else {
             // Clear current team display if no saved team
-            currentTeam.textContent = 'Enter a team name to start watching';
+            currentTeam.textContent = 'enterateamnametostartwatching';
         }
         
         // Update button click event
