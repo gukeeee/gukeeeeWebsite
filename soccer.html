@@ -109,7 +109,7 @@
             type="text" 
             id="teamInput" 
             class="team-input" 
-            placeholder="Enter team name (e.g. Real Madrid, Liverpool)" 
+            placeholder="Enter team name (e.g. Arsenal)" 
         />
         <button id="updateButton" class="green-button">Watch Team</button>
         <div id="currentTeam" class="current-team"></div>
@@ -149,7 +149,7 @@
             localStorage.setItem('soccer_team', formattedTeam);
             
             // Display the lowercase, no-spaces version for "currently watching"
-            currentTeam.textContent = 'currentlywatching ' + formattedTeam;
+            currentTeam.textContent = 'currently watching: ' + formattedTeam;
         }
         
         // Check if a team is saved in localStorage
