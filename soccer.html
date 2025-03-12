@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soccer Streams</title>
+    <title>Soccer</title>
     <style>
         body {
             font-family: "Poppins", sans-serif;
-            background-color: #e0e7ff;
+            background-color: #e8f5e9; /* Light green background */
             color: #000000;
             margin: 0;
             padding: 0;
@@ -33,6 +33,7 @@
             font-family: "Poppins", sans-serif;
             font-weight: bold;
             margin-bottom: 20px;
+            color: #2e7d32; /* Darker green for title */
         }
 
         .team-input {
@@ -43,7 +44,7 @@
             box-sizing: border-box;
             display: inline-block;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #81c784; /* Light green border */
             font-size: 14px;
             font-family: "Poppins", sans-serif;
         }
@@ -54,10 +55,16 @@
             color: #888;
         }
 
-        .blue-button {
+        .team-input:focus {
+            outline: none;
+            border-color: #2e7d32; /* Darker green when focused */
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+
+        .green-button {
             padding: 8px 15px;
             border: none;
-            background-color: #007bff;
+            background-color: #4caf50; /* Green button */
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -67,16 +74,17 @@
             font-family: "Poppins", sans-serif;
         }
 
-        .blue-button:hover {
+        .green-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            background-color: #0056b3;
+            background-color: #2e7d32; /* Darker green on hover */
         }
 
         .current-team {
             font-size: 14px;
-            color: #555;
+            color: #4caf50; /* Green text */
             margin-top: 5px;
+            font-weight: 500;
         }
 
         iframe {
@@ -101,9 +109,9 @@
             type="text" 
             id="teamInput" 
             class="team-input" 
-            placeholder="Enter team name (e.g., realmadrid)" 
+            placeholder="Enter team name - lowercase, no spaces (e.g. realmadrid, liverpool)" 
         />
-        <button id="updateButton" class="blue-button">Watch Team</button>
+        <button id="updateButton" class="green-button">Watch Team</button>
         <div id="currentTeam" class="current-team"></div>
     </div>
     
@@ -125,8 +133,6 @@
         const soccerFrame = document.getElementById('soccerFrame');
         const currentTeam = document.getElementById('currentTeam');
         
-        // Default team
-        const defaultTeam = 'realmadrid';
         const baseUrl = 'https://givemereddit.eu/soccer/';
         
         // Function to update iframe source
@@ -148,11 +154,12 @@
         // Check if a team is saved in localStorage
         const savedTeam = localStorage.getItem('soccer_team');
         
-        // Load the saved team or default team
+        // Load the saved team if available
         if (savedTeam) {
             updateTeam(savedTeam);
         } else {
-            updateTeam(defaultTeam);
+            // Clear current team display if no saved team
+            currentTeam.textContent = 'Enter a team name to start watching';
         }
         
         // Update button click event
