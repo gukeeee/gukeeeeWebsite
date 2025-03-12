@@ -149,7 +149,7 @@
             localStorage.setItem('basketball_team', formattedTeam);
             
             // Display the lowercase, no-spaces version for "currently watching"
-            currentTeam.textContent = 'currently watching: ' + formattedTeam;
+            currentTeam.textContent = 'Currently watching: ' + formattedTeam;
         }
         
         // Check if a team is saved in localStorage
@@ -161,7 +161,7 @@
             updateTeam(savedTeam);
         } else {
             // Clear current team display if no saved team
-            currentTeam.textContent = 'enter a team name to start watching';
+            currentTeam.textContent = 'Enter a team name to start watching';
         }
         
         // Update button click event
