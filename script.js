@@ -13,10 +13,10 @@ async function fetchUsers() {
 fetchUsers(); // Call the function
 
 
-// Sheet URLs for different classes (set output to tsv instead of csv)
+// Sheet URLs for different classes
 const SHEET_URLS = {
-    "Clase 6": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTDujY9EaaiPwPnZq8PcHrSKKxHUkmaVn3nJY9DASaI8MhCw2hjECM5kFmCZUyUnQ_sigJ6acOj-Hqi/pub?output=tsv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSETEUaN_bm0xn7JOBNI-pngCABGgeCo_8h2PFKUbP7sg7jNNU-mtKVEso5kA1EHFfVWM2rcVD1j8ZZ/pub?output=tsv'
+    "Clase 6": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTDujY9EaaiPwPnZq8PcHrSKKxHUkmaVn3nJY9DASaI8MhCw2hjECM5kFmCZUyUnQ_sigJ6acOj-Hqi/pub?output=csv',
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSETEUaN_bm0xn7JOBNI-pngCABGgeCo_8h2PFKUbP7sg7jNNU-mtKVEso5kA1EHFfVWM2rcVD1j8ZZ/pub?output=csv'
 };
 
 let questions = []; // Global variable to store questions
@@ -58,7 +58,7 @@ function showLoginForm() {
     const loginForm = document.createElement('div');
     loginForm.className = 'login-form';
     
-    loginForm.innerHTML = `
+    loginForm.innerHTML = 
         <h2>Iniciar Sesión</h2>
         <div style="margin-bottom: 15px;">
             <label for="username">Usuario:</label>
@@ -73,7 +73,7 @@ function showLoginForm() {
             <button id="cancel-btn">Cancelar</button>
         </div>
         <p id="login-error">Usuario o contraseña incorrectos</p>
-    `;
+    ;
     
     overlay.appendChild(loginForm);
     document.body.appendChild(overlay);
@@ -158,41 +158,64 @@ function updateUIForLoggedOutUser() {
     }
 }
 
-// Fetch questions from Google Sheets (using tab separation)
+// Fetch questions from Google Sheets
+// Fetch questions from Google Sheets
 async function fetchQuestions(className) {
     try {
         const response = await fetch(SHEET_URLS[className]);
         const data = await response.text();
-
-        // Split data into rows using newline
-        const rows = data.split("\n").map(row => row.split("\t")); // Use tab (`\t`) as separator
-
+        
+        // Split the CSV data into rows
+        const rows = data.split("\n").map(row => {
+            // Handle quoted fields correctly (CSV can have commas inside quotes)
+            const processedRow = [];
+            let inQuotes = false;
+            let currentField = '';
+            
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    processedRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            // Add the last field
+            processedRow.push(currentField.trim());
+            return processedRow;
+        });
+        
         // Reset global questions array
         questions = [];
-
+        
         // Skip header rows (first 3 rows)
         for (let i = 3; i < rows.length; i++) {
             const row = rows[i];
-
+            
             // Skip empty rows
             if (row.length < 3 || !row[1]) continue;
-
+            
             const questionText = row[1];
             const answers = row.slice(2).filter(answer => answer !== "");
-
+            
             if (questionText && answers.length > 0) {
                 questions.push({ text: questionText, answers });
             }
         }
-
+        
         // After parsing, load the questions into the UI
         loadQuestions(questions);
-
+        
         // Clear previous results when switching classes
-        document.getElementById('result').innerHTML = '';
-
+        document.getElementById('result').innerHTML = '';        
     } catch (error) {
         console.error("Error fetching questions:", error);
+        // Provide user feedback
         const quizForm = document.getElementById('quiz-form');
         quizForm.innerHTML = '<p>Error cargando preguntas. Por favor intente de nuevo.</p>';
     }
@@ -206,14 +229,14 @@ function loadQuestions(questions) {
         const parts = question.text.split('_');
         const questionHtml = parts.map((part, i) => {
             if (i > 0) {
-                return `<input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part}`;
+                return <input type="text" id="q${index + 1}_${i}" placeholder="Tu respuesta aquí">${part};
             }
             return part;
         }).join('');
-        const questionElement = `
+        const questionElement = 
             <p id="question-${index + 1}">${index + 1}. ${questionHtml}</p>
             <div id="feedback-q${index + 1}" class="feedback"></div>
-        `;
+        ;
         quizForm.insertAdjacentHTML('beforeend', questionElement);
     });
 }
@@ -223,22 +246,22 @@ function checkAnswers(questions) {
     let score = 0;
     let total = 0;
     questions.forEach((question, index) => {
-        const feedbackElement = document.getElementById(`feedback-q${index + 1}`);
-        let feedbackHtml = `<strong>Q${index + 1}:</strong> `;
+        const feedbackElement = document.getElementById(feedback-q${index + 1});
+        let feedbackHtml = <strong>Q${index + 1}:</strong> ;
         question.answers.forEach((correctAnswer, i) => {
-            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            const inputField = document.getElementById(q${index + 1}_${i + 1});
             const userAnswer = inputField?.value.trim().toLowerCase();
             const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
             if (!userAnswer) {
-                feedbackHtml += `<span style="color: GoldenRod; font-weight: bold;">Sin respuesta, </span>`;
+                feedbackHtml += <span style="color: GoldenRod; font-weight: bold;">Sin respuesta, </span>;
                 inputField.classList.add('empty');
             } else if (possibleAnswers.includes(userAnswer)) {
-                feedbackHtml += `<span style="color: green; font-weight: bold;">Correcto, </span>`;
+                feedbackHtml += <span style="color: green; font-weight: bold;">Correcto, </span>;
                 inputField.style.borderColor = 'green';
                 score++;
                 inputField.classList.remove('empty');
             } else {
-                feedbackHtml += `<span style="color: red; font-weight: bold;">Incorrecto, </span>`;
+                feedbackHtml += <span style="color: red; font-weight: bold;">Incorrecto, </span>;
                 inputField.style.borderColor = 'red';
                 inputField.classList.remove('empty');
             }
@@ -246,7 +269,7 @@ function checkAnswers(questions) {
         });
         feedbackElement.innerHTML = feedbackHtml.slice(0, -9) + '</span>';
     });
-    document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
+    document.getElementById('result').innerHTML = <p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>;
 }
 
 // Clear answers
@@ -266,7 +289,7 @@ function clearAnswers() {
 function revealAnswers() {
     questions.forEach((question, index) => {
         question.answers.forEach((correctAnswer, i) => {
-            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            const inputField = document.getElementById(q${index + 1}_${i + 1});
             if (inputField) {
                 inputField.value = correctAnswer;
                 inputField.style.borderColor = 'purple';
@@ -279,7 +302,7 @@ function revealAnswers() {
 function hideAnswers() {
     questions.forEach((question, index) => {
         question.answers.forEach((_, i) => {
-            const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
+            const inputField = document.getElementById(q${index + 1}_${i + 1});
             if (inputField) {
                 inputField.value = '';
                 inputField.style.borderColor = '';
