@@ -15,8 +15,8 @@ fetchUsers(); // Call the function
 
 // Sheet URLs for different classes
 const SHEET_URLS = {
-    "Clase 6": 'https://docs.google.com/spreadsheets/d/1_zyDdNFB2K6xz4I4CdgOPhDChqy1drBrPJwA-9Hy7Ag/pub?output=csv',
-    "Clase 7": 'https://docs.google.com/spreadsheets/d/17OGUPM0djxN6LweVHa2CWHgf31GYherET482JmBLJxk/pub?output=csv'
+    "Clase 6": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTDujY9EaaiPwPnZq8PcHrSKKxHUkmaVn3nJY9DASaI8MhCw2hjECM5kFmCZUyUnQ_sigJ6acOj-Hqi/pub?output=csv',
+    "Clase 7": 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSETEUaN_bm0xn7JOBNI-pngCABGgeCo_8h2PFKUbP7sg7jNNU-mtKVEso5kA1EHFfVWM2rcVD1j8ZZ/pub?output=csv'
 };
 
 let questions = []; // Global variable to store questions
