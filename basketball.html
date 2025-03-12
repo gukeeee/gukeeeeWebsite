@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball</title>
+    <title>Basketball Streams</title>
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -35,11 +35,11 @@
             margin-bottom: 20px;
         }
 
-        .link-input {
+        .team-input {
             padding: 8px;
             margin: 10px 0;
-            width: 80%;
-            max-width: 600px;
+            width: 60%;
+            max-width: 300px;
             box-sizing: border-box;
             display: inline-block;
             border-radius: 8px;
@@ -48,7 +48,7 @@
             font-family: "Poppins", sans-serif;
         }
 
-        .link-input::placeholder {
+        .team-input::placeholder {
             font-family: "Poppins", sans-serif;
             font-size: 14px;
             color: #888;
@@ -73,6 +73,12 @@
             background-color: #0056b3;
         }
 
+        .current-team {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+
         iframe {
             border: none;
             width: 100%;
@@ -93,11 +99,12 @@
         <h1>Basketball Viewer</h1>
         <input 
             type="text" 
-            id="linkInput" 
-            class="link-input" 
-            placeholder="Enter basketball link (e.g., https://givemereddit.eu/basketball/lakers.html)" 
+            id="teamInput" 
+            class="team-input" 
+            placeholder="Enter team name (e.g., lakers)" 
         />
-        <button id="updateButton" class="blue-button">Update Link</button>
+        <button id="updateButton" class="blue-button">Watch Team</button>
+        <div id="currentTeam" class="current-team"></div>
     </div>
     
     <div class="iframe-container">
@@ -113,44 +120,55 @@
 
     <script>
         // Get elements
-        const linkInput = document.getElementById('linkInput');
+        const teamInput = document.getElementById('teamInput');
         const updateButton = document.getElementById('updateButton');
         const basketballFrame = document.getElementById('basketballFrame');
+        const currentTeam = document.getElementById('currentTeam');
         
-        // Default link
-        const defaultLink = 'https://givemereddit.eu/basketball/lakers.html';
+        // Default team
+        const defaultTeam = 'lakers';
+        const baseUrl = 'https://givemereddit.eu/nba/';
         
         // Function to update iframe source
-        function updateIframeSource(link) {
-            basketballFrame.src = link;
-            localStorage.setItem('basketball_link', link);
-            linkInput.value = link;
+        function updateTeam(team) {
+            // Convert to lowercase and remove spaces
+            team = team.toLowerCase().replace(/\s+/g, '');
+            
+            // Construct the full URL
+            const fullUrl = baseUrl + team + '.html';
+            
+            // Update iframe, localStorage, and display
+            basketballFrame.src = fullUrl;
+            localStorage.setItem('basketball_link', fullUrl);
+            localStorage.setItem('basketball_team', team);
+            teamInput.value = team;
+            currentTeam.textContent = 'Currently watching: ' + team;
         }
         
-        // Check if a link is saved in localStorage
-        const savedLink = localStorage.getItem('basketball_link');
+        // Check if a team is saved in localStorage
+        const savedTeam = localStorage.getItem('basketball_team');
         
-        // Load the saved link or default link
-        if (savedLink) {
-            updateIframeSource(savedLink);
+        // Load the saved team or default team
+        if (savedTeam) {
+            updateTeam(savedTeam);
         } else {
-            updateIframeSource(defaultLink);
+            updateTeam(defaultTeam);
         }
         
         // Update button click event
         updateButton.addEventListener('click', function() {
-            const newLink = linkInput.value.trim();
-            if (newLink) {
-                updateIframeSource(newLink);
+            const newTeam = teamInput.value.trim();
+            if (newTeam) {
+                updateTeam(newTeam);
             }
         });
         
-        // Allow pressing Enter to update the link
-        linkInput.addEventListener('keyup', function(event) {
+        // Allow pressing Enter to update the team
+        teamInput.addEventListener('keyup', function(event) {
             if (event.key === 'Enter') {
-                const newLink = linkInput.value.trim();
-                if (newLink) {
-                    updateIframeSource(newLink);
+                const newTeam = teamInput.value.trim();
+                if (newTeam) {
+                    updateTeam(newTeam);
                 }
             }
         });
