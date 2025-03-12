@@ -4,19 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soccer</title>
-    <link rel="stylesheet" href="soccer.css">
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: #e0e7ff;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1500px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: "Poppins", sans-serif;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .link-input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 600px;
+            box-sizing: border-box;
+            display: inline-block;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .link-input::placeholder {
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .blue-button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin: 10px 6px;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .blue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: #0056b3;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 75vh;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .iframe-container {
+            width: 90%;
+            max-width: 1500px;
+            height: 75vh;
+        }
+    </style>
 </head>
 <body>
-    <iframe 
-        src="https://givemereddit.eu/soccer/realmadrid.html"
-        width="100%" 
-        height="100%" 
-        frameborder="0" 
-        allowfullscreen 
-        scrolling="no" 
-        allowtransparency 
-        sandbox="allow-scripts allow-same-origin">
-    </iframe>
-    <script src="script.js"></script>
+    <div class="container">
+        <h1>Soccer Viewer</h1>
+        <input 
+            type="text" 
+            id="linkInput" 
+            class="link-input" 
+            placeholder="Enter soccer link (e.g., https://givemereddit.eu/soccer/realmadrid.html)" 
+        />
+        <button id="updateButton" class="blue-button">Update Link</button>
+    </div>
+    
+    <div class="iframe-container">
+        <iframe 
+            id="soccerFrame"
+            frameborder="0" 
+            allowfullscreen 
+            scrolling="no" 
+            allowtransparency 
+            sandbox="allow-scripts allow-same-origin">
+        </iframe>
+    </div>
+
+    <script>
+        // Get elements
+        const linkInput = document.getElementById('linkInput');
+        const updateButton = document.getElementById('updateButton');
+        const soccerFrame = document.getElementById('soccerFrame');
+        
+        // Default link
+        const defaultLink = 'https://givemereddit.eu/soccer/realmadrid.html';
+        
+        // Function to update iframe source
+        function updateIframeSource(link) {
+            soccerFrame.src = link;
+            localStorage.setItem('soccer_link', link);
+            linkInput.value = link;
+        }
+        
+        // Check if a link is saved in localStorage
+        const savedLink = localStorage.getItem('soccer_link');
+        
+        // Load the saved link or default link
+        if (savedLink) {
+            updateIframeSource(savedLink);
+        } else {
+            updateIframeSource(defaultLink);
+        }
+        
+        // Update button click event
+        updateButton.addEventListener('click', function() {
+            const newLink = linkInput.value.trim();
+            if (newLink) {
+                updateIframeSource(newLink);
+            }
+        });
+        
+        // Allow pressing Enter to update the link
+        linkInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                const newLink = linkInput.value.trim();
+                if (newLink) {
+                    updateIframeSource(newLink);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
