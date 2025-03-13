@@ -20,16 +20,18 @@
             font-size: 4rem;
             font-weight: 700;
             text-align: center;
-            margin-top: 5rem;
             opacity: 0;
             transform: translateY(50px);
-            /* Create the moving gradient background */
-            background: linear-gradient(90deg, #C77DFF, #5A189A, #C77DFF);
+            /* Modified gradient to create seamless animation */
+            background: linear-gradient(90deg, 
+                #C77DFF 0%, 
+                #5A189A 50%, 
+                #C77DFF 100%);
             background-size: 200% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            animation: gradientMove 6s linear infinite,
+            animation: gradientMove 8s linear infinite,
                        float 4s ease-in-out infinite, 
                        pulse 2s infinite,
                        glow 3s ease-in-out infinite alternate;
@@ -66,20 +68,22 @@
             gap: 10px;
         }
         
-        /* Container now fills the viewport height */
+        /* Fixed container width */
         .container {
             overflow: hidden;
-            max-width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             height: calc(100% - 60px); /* Adjust based on header height */
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
-        /* Header styling to ensure it stays in place */
+        /* Header styling to ensure it stays in place with proper width */
         header {
             position: relative;
             z-index: 10;
+            width: 100%;
         }
         
         .header-container {
@@ -87,6 +91,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         @keyframes pulse {
@@ -101,12 +107,13 @@
             }
         }
         
+        /* Modified gradient animation to make it continuous */
         @keyframes gradientMove {
             0% {
                 background-position: 0% 50%;
             }
             100% {
-                background-position: 100% 50%;
+                background-position: 200% 50%;
             }
         }
         
