@@ -30,6 +30,10 @@ function checkLoginStatus() {
         currentUser = JSON.parse(savedUser);
         isLoggedIn = true; // Set login status to true if user is found
         updateUIForLoggedInUser();
+        showQuizContent(); // Show quiz content for logged in users
+    } else {
+        hideQuizContent(); // Hide quiz content for users who aren't logged in
+        showLoginMessage(); // Show message prompting user to log in
     }
 }
 
@@ -112,6 +116,13 @@ function loginUser(user) {
     
     // Update UI
     updateUIForLoggedInUser();
+    
+    // Show quiz content
+    showQuizContent();
+    
+    // Fetch questions for the selected class
+    const selectedClass = document.getElementById('class-selector').value;
+    fetchQuestions(selectedClass);
 }
 
 // Logout user
@@ -122,6 +133,12 @@ function logoutUser() {
     
     // Update UI
     updateUIForLoggedOutUser();
+    
+    // Hide quiz content
+    hideQuizContent();
+    
+    // Show login message
+    showLoginMessage();
 }
 
 // Update UI for logged in user
@@ -131,14 +148,15 @@ function updateUIForLoggedInUser() {
     // Change sign in button to sign out
     signInBtn.textContent = 'Cerrar sesión';
     
-    // Create an element for the display name
+    // Create an element for the display name if not exists
     if (!document.getElementById('user-name-display')) {
         const userNameDisplay = document.createElement('span');
         userNameDisplay.id = 'user-name-display';
         userNameDisplay.textContent = currentUser.displayName;
         
-        const userProfile = document.querySelector('.user-profile');
-        userProfile.insertBefore(userNameDisplay, signInBtn);
+        // Insert before the sign in button in the nav-buttons div
+        const navButtons = document.querySelector('.nav-buttons');
+        navButtons.insertBefore(userNameDisplay, signInBtn);
     } else {
         document.getElementById('user-name-display').textContent = currentUser.displayName;
     }
@@ -158,8 +176,65 @@ function updateUIForLoggedOutUser() {
     }
 }
 
+// Hide quiz content
+function hideQuizContent() {
+    // Hide form and buttons
+    document.getElementById('quiz-form').style.display = 'none';
+    document.getElementById('check-button').style.display = 'none';
+    document.getElementById('clear-button').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+}
+
+// Show quiz content
+function showQuizContent() {
+    // Show form and buttons
+    document.getElementById('quiz-form').style.display = 'block';
+    document.getElementById('check-button').style.display = 'inline-block';
+    document.getElementById('clear-button').style.display = 'inline-block';
+    document.getElementById('result').style.display = 'block';
+    
+    // Remove login message if exists
+    const loginMessage = document.getElementById('login-message');
+    if (loginMessage) {
+        loginMessage.remove();
+    }
+}
+
+// Show login message
+function showLoginMessage() {
+    // Check if message already exists
+    if (!document.getElementById('login-message')) {
+        const container = document.querySelector('.container');
+        const heading = container.querySelector('h1');
+        
+        const loginMessage = document.createElement('div');
+        loginMessage.id = 'login-message';
+        loginMessage.style.textAlign = 'center';
+        loginMessage.style.margin = '30px 0';
+        loginMessage.style.padding = '20px';
+        loginMessage.style.borderRadius = '8px';
+        loginMessage.style.backgroundColor = '#f8f9fa';
+        loginMessage.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        
+        loginMessage.innerHTML = `
+            <h3 style="color: #007bff; margin-bottom: 15px;">Inicie sesión para acceder al chequeo de verbos</h3>
+            <p style="font-size: 16px; margin-bottom: 20px;">Para ver y completar el chequeo de verbos, debe iniciar sesión con su cuenta.</p>
+            <button id="login-prompt-btn" class="blue-button" style="margin: 0 auto; display: block;">Iniciar sesión</button>
+        `;
+        
+        // Insert after the heading
+        heading.parentNode.insertBefore(loginMessage, heading.nextSibling);
+        
+        // Add event listener for the login button
+        document.getElementById('login-prompt-btn').addEventListener('click', showLoginForm);
+    }
+}
+
 // Fetch questions from Google Sheets
 async function fetchQuestions(className) {
+    // Only fetch questions if user is logged in
+    if (!isLoggedIn) return;
+    
     try {
         const response = await fetch(SHEET_URLS[className]);
         const data = await response.text();
@@ -222,6 +297,9 @@ async function fetchQuestions(className) {
 
 // Load questions into the form
 function loadQuestions(questions) {
+    // Only load questions if user is logged in
+    if (!isLoggedIn) return;
+    
     const quizForm = document.getElementById('quiz-form');
     quizForm.innerHTML = '';
     questions.forEach((question, index) => {
@@ -242,6 +320,9 @@ function loadQuestions(questions) {
 
 // Check answers
 function checkAnswers(questions) {
+    // Only check answers if user is logged in
+    if (!isLoggedIn) return;
+    
     let score = 0;
     let total = 0;
     questions.forEach((question, index) => {
@@ -273,6 +354,9 @@ function checkAnswers(questions) {
 
 // Clear answers
 function clearAnswers() {
+    // Only clear answers if user is logged in
+    if (!isLoggedIn) return;
+    
     document.querySelectorAll('#quiz-form input').forEach(input => {
         input.value = '';
         input.style.borderColor = '';
@@ -286,6 +370,9 @@ function clearAnswers() {
 
 // Reveal answers (teacher mode)
 function revealAnswers() {
+    // Only reveal answers if user is logged in
+    if (!isLoggedIn) return;
+    
     questions.forEach((question, index) => {
         question.answers.forEach((correctAnswer, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
@@ -299,6 +386,9 @@ function revealAnswers() {
 
 // Hide answers (teacher mode)
 function hideAnswers() {
+    // Only hide answers if user is logged in
+    if (!isLoggedIn) return;
+    
     questions.forEach((question, index) => {
         question.answers.forEach((_, i) => {
             const inputField = document.getElementById(`q${index + 1}_${i + 1}`);
@@ -315,14 +405,17 @@ window.onload = function() {
     // Set up class selector
     const savedClass = localStorage.getItem('selectedClass') || "Clase 6";
     document.getElementById('class-selector').value = savedClass;
-    fetchQuestions(savedClass);
     
     // Set up event listeners
     document.getElementById('class-selector').addEventListener('change', function() {
         const selectedClass = this.value;
         localStorage.setItem('selectedClass', selectedClass);
-        fetchQuestions(selectedClass);
-        document.getElementById('result').innerHTML = '';
+        
+        // Only fetch questions if user is logged in
+        if (isLoggedIn) {
+            fetchQuestions(selectedClass);
+            document.getElementById('result').innerHTML = '';
+        }
     });
     
     document.getElementById('check-button').addEventListener('click', function() {
@@ -346,4 +439,9 @@ window.onload = function() {
     // Initialize authentication
     setupAuthUI();
     checkLoginStatus();
+    
+    // Only fetch questions if user is logged in
+    if (isLoggedIn) {
+        fetchQuestions(savedClass);
+    }
 };
