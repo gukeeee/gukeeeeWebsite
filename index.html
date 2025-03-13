@@ -15,11 +15,22 @@
         .main-title {
             font-size: 4rem;
             font-weight: 700;
-            color: #8A2BE2;
             text-align: center;
             margin-top: 5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: pulse 2s infinite;
+            opacity: 0;
+            transform: translateY(50px);
+            background: linear-gradient(45deg, #9D4EDD, #6A1B9A);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+            animation: glow 2s infinite alternate;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .main-title.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .nav-button {
@@ -64,6 +75,17 @@
                 transform: scale(1);
             }
         }
+        
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(138, 43, 226, 0.8),
+                             0 0 30px rgba(138, 43, 226, 0.6),
+                             0 0 40px rgba(138, 43, 226, 0.4);
+            }
+        }
     </style>
 </head>
 <body>
@@ -87,9 +109,14 @@
     </div>
     
     <script>
-        // Any JavaScript you might need
+        // JavaScript to animate the title when page loads
         window.onload = function() {
             console.log("Homepage loaded successfully");
+            
+            // Wait a short moment before triggering animation
+            setTimeout(function() {
+                document.querySelector('.main-title').classList.add('visible');
+            }, 300);
         };
     </script>
 </body>
