@@ -74,6 +74,7 @@ header {
 .nav-buttons {
     display: flex;
     gap: 10px;
+    align-items: center;
 }
 .container {
     background-color: #ffffff;
@@ -258,4 +259,21 @@ a {
   padding: 0;
   text-decoration: none;
   border: none;
+}
+
+/* Login message styles */
+#login-message {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation for login message */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Login prompt button styling */
+#login-prompt-btn {
+    font-size: 15px;
+    padding: 10px 20px;
 }
