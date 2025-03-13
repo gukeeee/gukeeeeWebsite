@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chequeo.css">
+    <style>
+        /* Additional styles specific to index page */
+        body {
+            background-color: #e4d0ff; /* Light purple background */
+        }
+        
+        .main-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #8A2BE2;
+            text-align: center;
+            margin-top: 5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        .nav-button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #8A2BE2;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            background-color: #6A1B9A;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="https://gukeeee.pages.dev/gukeeee-logo.png" alt="Gukeeee Logo" class="logo">
+            
+            <div class="nav-buttons">
+                <a href="https://gukeeee.pages.dev/chequeo">
+                    <button class="nav-button">Chequeo</button>
+                </a>
+                <a href="https://gukeeee.pages.dev/soccer">
+                    <button class="nav-button">Soccer</button>
+                </a>
+                <a href="https://gukeeee.pages.dev/basketball">
+                    <button class="nav-button">Basketball</button>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1 class="main-title">gukeeee</h1>
+        <p>Welcome to gukeeee!</p>
+    </div>
+    
+    <script>
+        // Any JavaScript you might need
+        window.onload = function() {
+            console.log("Homepage loaded successfully");
+        };
+    </script>
+</body>
+</html>
