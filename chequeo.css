@@ -110,19 +110,21 @@ input.empty {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: bold;
+    font-weight: bold; /* Already bold, but ensuring consistency */
     margin: 3px 6px;
     font-family: "Poppins", sans-serif;
+}
+
+/* Make h4 elements in buttons have the same boldness as nav-button */
+.blue-button h4, .red-button h4 {
+    margin: 5px 0;
+    font-weight: bold; /* Match the boldness of index.html buttons */
 }
 .blue-button {
     background-color: #007bff;
 }
 .red-button {
     background-color: #ff0000;
-}
-/* Remove extra space from h4 elements in buttons */
-.blue-button h4, .red-button h4 {
-    margin: 5px 0;
 }
 .blue-button:hover {
     transform: translateY(-2px);
