@@ -39,7 +39,7 @@ header {
 /* Make the dropdown smaller to match header width */
 #class-selector {
     width: 100px; /* Reduced width */
-    font-size: 13px; /* Smaller font */
+    font-size: 14px; /* Smaller font */
     padding: 5px; /* Reduced padding */
 }
 .user-profile {
