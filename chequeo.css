@@ -32,9 +32,15 @@ header {
     height: 35px;
 }
 .class-dropdown {
-    position: relative; /* Changed from absolute to relative */
+    position: relative;
     display: flex;
     align-items: center;
+}
+/* Make the dropdown smaller to match header width */
+#class-selector {
+    width: 100px; /* Reduced width */
+    font-size: 13px; /* Smaller font */
+    padding: 5px; /* Reduced padding */
 }
 .user-profile {
     display: flex;
@@ -42,9 +48,9 @@ header {
     gap: 10px;
 }
 .profile-button, .home-button {
-    padding: 8px 15px; /* Matched to nav-button padding */
+    padding: 8px 15px;
     border: none;
-    background-color: #007bff; /* Kept blue color as requested */
+    background-color: #007bff;
     color: white;
     border-radius: 8px;
     cursor: pointer;
@@ -52,11 +58,11 @@ header {
     font-weight: bold;
     font-family: "Poppins", sans-serif;
     transition: all 0.3s ease;
-    margin-left: 10px; /* Added margin-left to match nav-button */
+    margin-left: 10px;
 }
 .profile-button:hover, .home-button:hover {
     transform: translateY(-2px);
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #0056b3;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 .profile-info {
@@ -64,7 +70,7 @@ header {
     align-items: center;
     gap: 10px;
 }
-/* Navigation buttons container - added for consistency with index.html */
+/* Navigation buttons container */
 .nav-buttons {
     display: flex;
     gap: 10px;
@@ -80,8 +86,8 @@ header {
     overflow-y: auto;
     text-align: center;
     margin-top: 20px;
-    overflow-x: hidden; /* Added to prevent horizontal scrolling */
-    max-width: 100%; /* Added for consistency with index.html */
+    overflow-x: hidden;
+    max-width: 100%;
 }
 h1 {
     font-family: "Poppins", sans-serif;
@@ -109,7 +115,7 @@ input.empty {
     border-color: GoldenRod;
 }
 .blue-button, .red-button {
-    padding: 8px 15px; /* Updated to match nav-button padding */
+    padding: 8px 15px;
     border: none;
     color: white;
     border-radius: 8px;
@@ -159,10 +165,11 @@ form {
     margin: 5px 0;
     cursor: pointer;
 }
-/* Make the dropdown in the header a bit smaller */
+/* Make the dropdown in the header much smaller */
 .header-container .dropdown {
-    padding: 7px;
-    font-size: 15px;
+    padding: 5px;
+    font-size: 13px;
+    width: 100px;
 }
 /* Modal login form styles */
 .modal-overlay {
