@@ -8,39 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="chequeo.css">
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Prevents both horizontal and vertical scrolling */
+        body {
             background-color: #e4d0ff; /* Light purple background */
         }
         
         .main-title {
             font-size: 4rem;
             font-weight: 700;
+            color: #8A2BE2;
             text-align: center;
-            opacity: 0;
-            transform: translateY(50px);
-            /* Modified gradient to create seamless animation */
-            background: linear-gradient(90deg, 
-                #C77DFF 0%, 
-                #5A189A 50%, 
-                #C77DFF 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: gradientMove 8s linear infinite,
-                       float 4s ease-in-out infinite, 
-                       pulse 2s infinite,
-                       glow 3s ease-in-out infinite alternate;
-            transition: opacity 1s ease, transform 1s ease;
-        }
-        
-        .main-title.visible {
-            opacity: 1;
-            transform: translateY(0);
+            margin-top: 5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
         }
         
         .nav-button {
@@ -68,31 +47,10 @@
             gap: 10px;
         }
         
-        /* Fixed container width */
+        /* Prevent horizontal scrolling in container */
         .container {
-            overflow: hidden;
-            max-width: 1200px;
-            margin: 0 auto;
-            height: calc(100% - 60px); /* Adjust based on header height */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* Header styling to ensure it stays in place with proper width */
-        header {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-        }
-        
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            overflow-x: hidden;
+            max-width: 100%;
         }
         
         @keyframes pulse {
@@ -104,38 +62,6 @@
             }
             100% {
                 transform: scale(1);
-            }
-        }
-        
-        /* Modified gradient animation to make it continuous */
-        @keyframes gradientMove {
-            0% {
-                background-position: 0% 50%;
-            }
-            100% {
-                background-position: 200% 50%;
-            }
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
-        
-        @keyframes glow {
-            0% {
-                text-shadow: 0 0 5px rgba(138, 43, 226, 0.2);
-            }
-            100% {
-                text-shadow: 0 0 10px rgba(138, 43, 226, 0.4),
-                            0 0 15px rgba(138, 43, 226, 0.2);
             }
         }
     </style>
@@ -161,14 +87,9 @@
     </div>
     
     <script>
-        // JavaScript to animate the title when page loads
+        // Any JavaScript you might need
         window.onload = function() {
             console.log("Homepage loaded successfully");
-            
-            // Wait a short moment before triggering animation
-            setTimeout(function() {
-                document.querySelector('.main-title').classList.add('visible');
-            }, 300);
         };
     </script>
 </body>
