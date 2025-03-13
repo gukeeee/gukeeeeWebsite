@@ -2,17 +2,13 @@ let USERS = [];
 
 async function fetchUsers() {
     try {
-        const URL = process.env.USERS; // Load from environment variable
-        if (!URL) throw new Error("URL is not defined");
-
-        const response = await fetch(URL);
+        const response = await fetch("https://gist.githubusercontent.com/gukeeee/76c792fec2bb289e73fd05cc6a93159c/raw");
         const data = await response.json();
         USERS = data.USERS;
     } catch (error) {
         console.error("Error fetching data:", error);
     }
 }
-
 
 fetchUsers(); // Call the function
 
