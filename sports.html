@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soccer</title>
+    <title>Sports Viewer</title>
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -59,6 +59,23 @@
             transform: translateY(-2px);
             background-color: #2e7d32; /* Darker green on hover */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .sport-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #sport-selector {
+            width: 120px;
+            font-size: 14px;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            cursor: pointer;
         }
 
         .container {
@@ -125,6 +142,25 @@
             background-color: #2e7d32; /* Darker green on hover */
         }
 
+        .clear-button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #ff9800; /* Orange button for clear */
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin: 10px 6px;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .clear-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background-color: #ef6c00; /* Darker orange on hover */
+        }
+
         .current-team {
             font-size: 14px;
             color: #4caf50; /* Green text */
@@ -161,6 +197,17 @@
             <a href="https://gukeeee.pages.dev/">
                 <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
             </a>
+            
+            <div class="sport-dropdown">
+                <select id="sport-selector">
+                    <option value="soccer">Soccer</option>
+                    <option value="nba">Basketball</option>
+                    <option value="nfl">Football</option>
+                    <option value="mlb">Baseball</option>
+                    <option value="nhl">Hockey</option>
+                </select>
+            </div>
+            
             <a href="https://gukeeee.pages.dev/">
                 <button class="home-button">Home</button>
             </a>
@@ -168,20 +215,21 @@
     </header>
     
     <div class="container">
-        <h1>Soccer Viewer</h1>
+        <h1 id="sport-title">Sports Viewer</h1>
         <input 
             type="text" 
             id="teamInput" 
             class="team-input" 
-            placeholder="Home team name (e.g. Arsenal)" 
+            placeholder="Team name (e.g. Arsenal)" 
         />
         <button id="updateButton" class="green-button">Watch Team</button>
+        <button id="clearButton" class="clear-button">Clear Team</button>
         <div id="currentTeam" class="current-team"></div>
     </div>
     
     <div class="iframe-container">
         <iframe 
-            id="soccerFrame"
+            id="sportsFrame"
             frameborder="0" 
             allowfullscreen 
             scrolling="no" 
@@ -192,48 +240,129 @@
 
     <script>
         // Get elements
+        const sportSelector = document.getElementById('sport-selector');
+        const sportTitle = document.getElementById('sport-title');
         const teamInput = document.getElementById('teamInput');
         const updateButton = document.getElementById('updateButton');
-        const soccerFrame = document.getElementById('soccerFrame');
+        const clearButton = document.getElementById('clearButton');
+        const sportsFrame = document.getElementById('sportsFrame');
         const currentTeam = document.getElementById('currentTeam');
         
-        const baseUrl = 'https://givemereddit.eu/soccer/';
+        // Sport-specific configuration
+        const sportConfig = {
+            soccer: {
+                baseUrl: 'https://givemereddit.eu/soccer/',
+                title: 'Soccer Viewer',
+                placeholder: 'Team name (e.g. Arsenal)',
+                storageKey: 'soccer_team'
+            },
+            nba: {
+                baseUrl: 'https://givemereddit.eu/nba/',
+                title: 'Basketball Viewer',
+                placeholder: 'Team name (e.g. Warriors)',
+                storageKey: 'basketball_team'
+            },
+            nfl: {
+                baseUrl: 'https://givemereddit.eu/nfl/',
+                title: 'Football Viewer',
+                placeholder: 'Team name (e.g. Patriots)',
+                storageKey: 'football_team'
+            },
+            mlb: {
+                baseUrl: 'https://givemereddit.eu/mlb/',
+                title: 'Baseball Viewer',
+                placeholder: 'Team name (e.g. Yankees)',
+                storageKey: 'baseball_team'
+            },
+            nhl: {
+                baseUrl: 'https://givemereddit.eu/nhl/',
+                title: 'Hockey Viewer',
+                placeholder: 'Team name (e.g. Penguins)',
+                storageKey: 'hockey_team'
+            }
+        };
         
         // Function to update iframe source
-        function updateTeam(team) {
+        function updateTeam(sport, team) {
+            // Get current sport configuration
+            const config = sportConfig[sport];
+            
             // Convert to lowercase and remove spaces
             const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
             
             // Construct the full URL
-            const fullUrl = baseUrl + formattedTeam + '.html';
+            const fullUrl = config.baseUrl + formattedTeam + '.html';
             
             // Update iframe, localStorage, and display
-            soccerFrame.src = fullUrl;
-            localStorage.setItem('soccer_link', fullUrl);
-            localStorage.setItem('soccer_team', formattedTeam);
+            sportsFrame.src = fullUrl;
+            localStorage.setItem(config.storageKey, formattedTeam);
             
             // Display the lowercase, no-spaces version for "currently watching"
             currentTeam.textContent = 'Currently watching: ' + formattedTeam;
         }
         
-        // Check if a team is saved in localStorage
-        const savedTeam = localStorage.getItem('soccer_team');
-        
-        // Load the saved team if available
-        if (savedTeam) {
-            // Use the saved team but update the display format
-            updateTeam(savedTeam);
-        } else {
-            // Clear current team display if no saved team
-            currentTeam.textContent = 'Enter a team name to start watching';
+        // Function to set up the UI for the current sport
+        function setupSportUI(sport) {
+            const config = sportConfig[sport];
+            
+            // Update the title and placeholder
+            sportTitle.textContent = config.title;
+            teamInput.placeholder = config.placeholder;
+            
+            // Check if a team is saved in localStorage for this sport
+            const savedTeam = localStorage.getItem(config.storageKey);
+            
+            // Load the saved team if available
+            if (savedTeam) {
+                // Update display and iframe
+                currentTeam.textContent = 'Currently watching: ' + savedTeam;
+                sportsFrame.src = config.baseUrl + savedTeam + '.html';
+            } else {
+                // Clear current team display if no saved team
+                currentTeam.textContent = 'Enter a team name to start watching';
+                sportsFrame.src = '';
+            }
         }
+        
+        // Function to clear the current team selection
+        function clearTeamSelection() {
+            const currentSport = sportSelector.value;
+            const config = sportConfig[currentSport];
+            
+            // Clear localStorage for this sport
+            localStorage.removeItem(config.storageKey);
+            
+            // Reset the UI
+            currentTeam.textContent = 'Enter a team name to start watching';
+            teamInput.value = '';
+            sportsFrame.src = '';
+        }
+        
+        // Initialize with the default sport (first one in dropdown)
+        let initialSport = localStorage.getItem('current_sport') || 'soccer';
+        sportSelector.value = initialSport;
+        setupSportUI(initialSport);
+        
+        // Sport selector change event
+        sportSelector.addEventListener('change', function() {
+            const selectedSport = this.value;
+            // Save current sport selection
+            localStorage.setItem('current_sport', selectedSport);
+            // Set up UI for selected sport
+            setupSportUI(selectedSport);
+        });
         
         // Update button click event
         updateButton.addEventListener('click', function() {
             const newTeam = teamInput.value.trim();
             if (newTeam) {
-                updateTeam(newTeam);
+                updateTeam(sportSelector.value, newTeam);
             }
+        });
+        
+        // Clear button click event
+        clearButton.addEventListener('click', function() {
+            clearTeamSelection();
         });
         
         // Allow pressing Enter to update the team
@@ -241,7 +370,7 @@
             if (event.key === 'Enter') {
                 const newTeam = teamInput.value.trim();
                 if (newTeam) {
-                    updateTeam(newTeam);
+                    updateTeam(sportSelector.value, newTeam);
                 }
             }
         });
