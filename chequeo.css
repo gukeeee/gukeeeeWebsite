@@ -47,7 +47,7 @@ header {
 .profile-button {
     padding: 6px 15px;
     border: none;
-    background-color: #8A2BE2; /* Changed from blue to purple */
+    background-color: #8A2BE2;
     color: white;
     border-radius: 8px;
     cursor: pointer;
