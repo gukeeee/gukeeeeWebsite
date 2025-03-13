@@ -445,3 +445,76 @@ window.onload = function() {
         fetchQuestions(savedClass);
     }
 };
+
+// Show login form with animation
+function showLoginForm() {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    
+    // Create login form
+    const loginForm = document.createElement('div');
+    loginForm.className = 'login-form';
+    
+    loginForm.innerHTML = `
+        <h2>Iniciar Sesión</h2>
+        <div style="margin-bottom: 15px;">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password">
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <button id="login-btn">Ingresar</button>
+            <button id="cancel-btn">Cancelar</button>
+        </div>
+        <p id="login-error">Usuario o contraseña incorrectos</p>
+    `;
+    
+    overlay.appendChild(loginForm);
+    document.body.appendChild(overlay);
+    
+    // Trigger animation after a small delay (for DOM to update)
+    setTimeout(() => {
+        overlay.classList.add('visible');
+    }, 10);
+    
+    // Add event listeners for login form buttons
+    document.getElementById('login-btn').addEventListener('click', function() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        const user = USERS.find(u => u.username === username && u.password === password);
+        
+        if (user) {
+            loginUser(user);
+            closeLoginForm(overlay);
+        } else {
+            document.getElementById('login-error').style.display = 'block';
+        }
+    });
+    
+    document.getElementById('cancel-btn').addEventListener('click', function() {
+        closeLoginForm(overlay);
+    });
+    
+    // Close form when clicking outside
+    overlay.addEventListener('click', function(event) {
+        if (event.target === overlay) {
+            closeLoginForm(overlay);
+        }
+    });
+}
+
+// Close login form with animation
+function closeLoginForm(overlay) {
+    overlay.classList.add('closing');
+    overlay.classList.remove('visible');
+    
+    // Remove from DOM after animation completes
+    setTimeout(() => {
+        document.body.removeChild(overlay);
+    }, 300); // Match this with CSS transition duration
+}
