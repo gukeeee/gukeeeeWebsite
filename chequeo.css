@@ -32,9 +32,7 @@ header {
     height: 35px;
 }
 .class-dropdown {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative; /* Changed from absolute to relative */
     display: flex;
     align-items: center;
 }
@@ -42,21 +40,21 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: auto;
 }
-.profile-button {
-    padding: 6px 15px;
+.profile-button, .home-button {
+    padding: 8px 15px; /* Matched to nav-button padding */
     border: none;
-    background-color: #007bff; /* Changed to blue from purple */
+    background-color: #007bff; /* Kept blue color as requested */
     color: white;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
-    font-family: "Poppins", sans-serif; /* Added Poppins font */
+    font-family: "Poppins", sans-serif;
     transition: all 0.3s ease;
+    margin-left: 10px; /* Added margin-left to match nav-button */
 }
-.profile-button:hover {
+.profile-button:hover, .home-button:hover {
     transform: translateY(-2px);
     background-color: #0056b3; /* Darker blue on hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -64,6 +62,11 @@ header {
 .profile-info {
     display: flex;
     align-items: center;
+    gap: 10px;
+}
+/* Navigation buttons container - added for consistency with index.html */
+.nav-buttons {
+    display: flex;
     gap: 10px;
 }
 .container {
@@ -77,6 +80,8 @@ header {
     overflow-y: auto;
     text-align: center;
     margin-top: 20px;
+    overflow-x: hidden; /* Added to prevent horizontal scrolling */
+    max-width: 100%; /* Added for consistency with index.html */
 }
 h1 {
     font-family: "Poppins", sans-serif;
@@ -104,13 +109,13 @@ input.empty {
     border-color: GoldenRod;
 }
 .blue-button, .red-button {
-    padding: 3px 8px; /* Reduced padding to make buttons less thick */
+    padding: 8px 15px; /* Updated to match nav-button padding */
     border: none;
     color: white;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: bold; /* Already bold, but ensuring consistency */
+    font-weight: bold;
     margin: 3px 6px;
     font-family: "Poppins", sans-serif;
 }
@@ -118,7 +123,7 @@ input.empty {
 /* Make h4 elements in buttons have the same boldness as nav-button */
 .blue-button h4, .red-button h4 {
     margin: 5px 0;
-    font-weight: bold; /* Match the boldness of index.html buttons */
+    font-weight: bold;
 }
 .blue-button {
     background-color: #007bff;
@@ -203,33 +208,33 @@ form {
     border-radius: 4px;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    font-weight: bold; /* Added bold text */
-    transition: all 0.3s ease; /* Added transition */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Initial shadow */
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 #login-btn {
-    background-color: #4CAF50; /* Green color */
+    background-color: #4CAF50;
 }
 #login-btn:hover {
-    background-color: #388E3C; /* Darker green when hovered */
-    transform: translateY(-2px); /* Slight upward movement */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    background-color: #388E3C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 #login-btn:active {
-    transform: translateY(1px); /* Downward movement when clicked */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Reduced shadow when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 #cancel-btn {
-    background-color: #f44336; /* Red color */
+    background-color: #f44336;
 }
 #cancel-btn:hover {
-    background-color: #d32f2f; /* Darker red when hovered */
-    transform: translateY(-2px); /* Slight upward movement */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 #cancel-btn:active {
-    transform: translateY(1px); /* Downward movement when clicked */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Reduced shadow when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 #login-error {
     color: red;
@@ -244,24 +249,6 @@ form {
 a {
   margin: 0;
   padding: 0;
-  text-decoration: none; /* Optional: removes underline */
-  border: none; /* Optional: removes any border if present */
-}
-/* Home button styles */
-.home-button {
-    padding: 6px 15px;
-    border: none;
-    background-color: #007bff; /* Blue button */
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: "Poppins", sans-serif;
-    transition: all 0.3s ease;
-}
-.home-button:hover {
-    transform: translateY(-2px);
-    background-color: #0056b3; /* Darker blue on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+  border: none;
 }
