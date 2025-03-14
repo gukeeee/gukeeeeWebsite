@@ -416,33 +416,43 @@
             history.pushState({sport: currentSport}, '', newUrl);
         }
         
-        // Function to parse URL for direct navigation
-        function parseUrl() {
-            // Check if we were redirected with a path parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectPath = urlParams.get('path');
+        // Check for redirect data from 404.html
+        function checkForRedirect() {
+            // Check if we were redirected with specific sport/team parameters
+            const redirectSport = sessionStorage.getItem('redirectSport');
+            const redirectTeam = sessionStorage.getItem('redirectTeam');
             
-            if (redirectPath) {
-                // Process the redirected path
-                const pathRegex = /\/sports\/([^\/]+)(?:\/([^\/]+))?/;
-                const match = redirectPath.match(pathRegex);
+            if (redirectSport) {
+                // Clear storage to prevent future redirects
+                sessionStorage.removeItem('redirectSport');
                 
-                if (match) {
-                    const urlSportName = match[1].toLowerCase();
-                    const team = match[2];
-                    processSportAndTeam(urlSportName, team);
+                // Convert URL sport name to internal sport value
+                const sport = getInternalSportValue(redirectSport);
+                
+                // If sport is valid in our configuration
+                if (sportConfig[sport]) {
+                    // Set dropdown to correct sport
+                    sportSelector.value = sport;
+                    localStorage.setItem('current_sport', sport);
                     
-                    // Update URL to clean version without query parameters
-                    const basePath = getBasePath();
-                    const newUrl = team ? 
-                        `${basePath}sports/${urlSportName}/${team}` : 
-                        `${basePath}sports/${urlSportName}`;
-                    history.replaceState(null, '', newUrl);
+                    // If team is also specified, load it
+                    if (redirectTeam) {
+                        sessionStorage.removeItem('redirectTeam');
+                        updateTeam(sport, redirectTeam);
+                        return true;
+                    }
                     
+                    // Otherwise just set up the UI for the sport
+                    setupSportUI(sport);
                     return true;
                 }
             }
             
+            return false;
+        }
+        
+        // Function to parse URL for direct navigation
+        function parseUrl() {
             // Regular URL parsing for direct navigation
             const path = window.location.pathname;
             const basePath = getBasePath().replace(/\/$/, ''); // Remove trailing slash
@@ -497,15 +507,26 @@
             }
         });
         
-        // Initialize based on URL or localStorage
-        const urlParsed = parseUrl();
-        
-        // If URL wasn't in the expected format, fall back to localStorage
-        if (!urlParsed) {
-            let initialSport = localStorage.getItem('current_sport') || 'soccer';
-            sportSelector.value = initialSport;
-            setupSportUI(initialSport);
-        }
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // First check for redirect data
+            const redirectHandled = checkForRedirect();
+            
+            // If no redirect data, try parsing the URL
+            if (!redirectHandled) {
+                const urlParsed = parseUrl();
+                
+                // If URL wasn't in the expected format, fall back to localStorage
+                if (!urlParsed) {
+                    let initialSport = localStorage.getItem('current_sport') || 'soccer';
+                    sportSelector.value = initialSport;
+                    setupSportUI(initialSport);
+                }
+            }
+            
+            // Debug info
+            console.log('Page initialized successfully');
+        });
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
