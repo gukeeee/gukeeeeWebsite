@@ -363,8 +363,7 @@
             if (teamToLoad) {
                 // Update display and iframe
                 currentTeam.textContent = 'Currently watching: ' + teamToLoad;
-                sportsFrame.src = config.baseUrl + teamToLoad + '.html';
-                
+                sportsFrame.src = config.baseUrl + teamToLoad + '.html';                
                 // Update the input field with the team name
                 teamInput.value = teamToLoad;
             } else {
@@ -442,7 +441,7 @@
                     }
                     
                     // Otherwise just set up the UI for the sport
-                    setupSportUI(sport);
+                    setupSportUI(sport, redirectTeam);
                     return true;
                 }
             }
