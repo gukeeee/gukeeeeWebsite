@@ -299,28 +299,47 @@
             
             // Display the lowercase, no-spaces version for "currently watching"
             currentTeam.textContent = 'Currently watching: ' + formattedTeam;
+            
+            // ADDED: Update the input field with the team name
+            teamInput.value = team;
+            
+            // ADDED: Update URL without page reload (pushState)
+            const newUrl = `/sports/${sport}/${formattedTeam}`;
+            history.pushState({sport, team: formattedTeam}, '', newUrl);
         }
         
         // Function to set up the UI for the current sport
-        function setupSportUI(sport) {
+        function setupSportUI(sport, specificTeam = null) {
             const config = sportConfig[sport];
             
             // Update the title and placeholder
             sportTitle.textContent = config.title;
             teamInput.placeholder = config.placeholder;
             
-            // Check if a team is saved in localStorage for this sport
-            const savedTeam = localStorage.getItem(config.storageKey);
+            let teamToLoad;
             
-            // Load the saved team if available
-            if (savedTeam) {
+            // First check if a specific team was provided (from URL)
+            if (specificTeam) {
+                teamToLoad = specificTeam;
+                localStorage.setItem(config.storageKey, teamToLoad);
+            } else {
+                // Otherwise check localStorage
+                teamToLoad = localStorage.getItem(config.storageKey);
+            }
+            
+            // Load the team if available
+            if (teamToLoad) {
                 // Update display and iframe
-                currentTeam.textContent = 'Currently watching: ' + savedTeam;
-                sportsFrame.src = config.baseUrl + savedTeam + '.html';
+                currentTeam.textContent = 'Currently watching: ' + teamToLoad;
+                sportsFrame.src = config.baseUrl + teamToLoad + '.html';
+                
+                // ADDED: Update the input field with the team name
+                teamInput.value = teamToLoad;
             } else {
                 // Clear current team display if no saved team
                 currentTeam.textContent = 'Enter a team name to start watching';
                 sportsFrame.src = '';
+                teamInput.value = '';
             }
         }
         
@@ -336,12 +355,66 @@
             currentTeam.textContent = 'Enter a team name to start watching';
             teamInput.value = '';
             sportsFrame.src = '';
+            
+            // Update URL (removing team from URL)
+            const newUrl = `/sports/${currentSport}`;
+            history.pushState({sport: currentSport}, '', newUrl);
         }
         
-        // Initialize with the default sport (first one in dropdown)
-        let initialSport = localStorage.getItem('current_sport') || 'soccer';
-        sportSelector.value = initialSport;
-        setupSportUI(initialSport);
+        // ADDED: Function to parse URL for direct navigation
+        function parseUrl() {
+            const path = window.location.pathname;
+            
+            // Check for URL pattern like /sports/soccer/arsenal
+            const pathRegex = /\/sports\/([^\/]+)(?:\/([^\/]+))?/;
+            const match = path.match(pathRegex);
+            
+            if (match) {
+                const sport = match[1];
+                const team = match[2];
+                
+                // Make sure the sport is valid
+                if (sportConfig[sport]) {
+                    // Set dropdown to correct sport
+                    sportSelector.value = sport;
+                    localStorage.setItem('current_sport', sport);
+                    
+                    // If team is specified, load it
+                    if (team) {
+                        setupSportUI(sport, team);
+                    } else {
+                        setupSportUI(sport);
+                    }
+                    
+                    return true; // URL was successfully parsed
+                }
+            }
+            
+            return false; // URL didn't match expected pattern
+        }
+        
+        // ADDED: Handle browser back/forward navigation
+        window.addEventListener('popstate', function(event) {
+            if (event.state) {
+                const { sport, team } = event.state;
+                if (sport) {
+                    sportSelector.value = sport;
+                    setupSportUI(sport, team);
+                }
+            } else {
+                parseUrl();
+            }
+        });
+        
+        // Initialize based on URL or localStorage
+        const urlParsed = parseUrl();
+        
+        // If URL wasn't in the expected format, fall back to localStorage
+        if (!urlParsed) {
+            let initialSport = localStorage.getItem('current_sport') || 'soccer';
+            sportSelector.value = initialSport;
+            setupSportUI(initialSport);
+        }
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
@@ -350,6 +423,14 @@
             localStorage.setItem('current_sport', selectedSport);
             // Set up UI for selected sport
             setupSportUI(selectedSport);
+            
+            // Update URL when sport changes
+            const currentTeamValue = localStorage.getItem(sportConfig[selectedSport].storageKey);
+            const newUrl = currentTeamValue ? 
+                `/sports/${selectedSport}/${currentTeamValue}` : 
+                `/sports/${selectedSport}`;
+                
+            history.pushState({sport: selectedSport, team: currentTeamValue}, '', newUrl);
         });
         
         // Update button click event
