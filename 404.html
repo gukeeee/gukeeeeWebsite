@@ -103,7 +103,7 @@
             // Clean the path by removing multiple slashes and ensuring it starts with a single slash
             let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/');
 
-            // Check if the URL matches a sports pattern (e.g., /sports/basketball/warriors)
+            // Match sports URLs (e.g., /sports/basketball/warriors)
             const sportsPattern = /^\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
             const sportsMatch = cleanPath.match(sportsPattern);
 
@@ -118,8 +118,8 @@
                     sessionStorage.setItem('redirectTeam', team);
                 }
 
-                // Redirect to the root (/)
-                window.location.href = '/';
+                // Redirect to **/sports** (NOT /sports/sports)
+                window.location.href = '/sports';
             } else {
                 // If it's not a sports-related URL, show the 404 message
                 document.addEventListener('DOMContentLoaded', function() {
@@ -129,7 +129,7 @@
 
             // Expose navigateToHome function globally for button click
             window.navigateToHome = function() {
-                window.location.href = '/';
+                window.location.href = '/sports';
             };
         })();
     </script>
@@ -156,7 +156,7 @@
         <h1>404 - Page Not Found</h1>
         <p>The page you're looking for doesn't exist or has been moved.</p>
         <a href="javascript:void(0)" onclick="navigateToHome()">
-            <button class="home-button">Go Home</button>
+            <button class="home-button">Go to Sports</button>
         </a>
     </div>
 </body>
