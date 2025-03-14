@@ -96,30 +96,30 @@
     </style>
     <script>
         (function() {
-            // Get the base path based on hostname
+            // Get base path (for GitHub Pages, Cloudflare Pages, etc.)
             function getBasePath() {
-                if (window.location.hostname === 'gukeeee.github.io') {
-                    return '/'; // Root domain for GitHub Pages
-                } else if (window.location.hostname === 'gukeeee.pages.dev') {
-                    return ''; // For Cloudflare Pages
+                const hostname = window.location.hostname;
+                if (hostname === 'gukeeee.github.io') {
+                    return '/sports';  // GitHub Pages root
+                } else if (hostname === 'gukeeee.pages.dev') {
+                    return '/sports';  // Cloudflare Pages root
                 } else {
-                    // For project pages, get the repository name from the path
+                    // For project pages, get the repository name
                     const pathSegments = window.location.pathname.split('/');
-                    return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
+                    return pathSegments[1] ? `/${pathSegments[1]}/sports` : '/sports';
                 }
             }
 
-            // Navigation helper function with correct base path
+            // Navigation helper function
             function navigateToHome() {
-                const basePath = getBasePath();
-                window.location.href = basePath || '/';
+                window.location.href = getBasePath();
             }
 
-            // Get the current path and clean it
+            // Get the full path before redirection
             const path = window.location.pathname;
-            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/'); // Ensures a single leading slash and removes duplicate slashes
+            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/'); // Normalize slashes
 
-            // Corrected sports pattern
+            // Match sports URLs
             const sportsPattern = /^\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
             const sportsMatch = cleanPath.match(sportsPattern);
 
@@ -134,10 +134,10 @@
                     sessionStorage.setItem('redirectTeam', team);
                 }
 
-                // Redirect to "/sports" (without any extra path)
-                window.location.href = '/sports';
+                // Redirect to **/sports** ONLY
+                window.location.href = getBasePath();
             } else {
-                // If it's not a valid sports path, show the 404 page
+                // If it's not a valid sports path, show 404
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('error-container').style.display = 'block';
                 });
@@ -153,7 +153,7 @@
     <header>
         <div class="header-container">
             <a href="javascript:void(0)" onclick="navigateToHome()">
-                <img src="gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
+                <img src="/gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
             </a>
             
             <div style="width: 120px;">
