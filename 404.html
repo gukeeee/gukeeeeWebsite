@@ -95,31 +95,15 @@
         }
     </style>
     <script>
+        // This script handles redirects for deep links
         (function() {
-            // Get base path (for GitHub Pages, Cloudflare Pages, etc.)
-            function getBasePath() {
-                const hostname = window.location.hostname;
-                if (hostname === 'gukeeee.github.io') {
-                    return '/sports';  // GitHub Pages root
-                } else if (hostname === 'gukeeee.pages.dev') {
-                    return '/sports';  // Cloudflare Pages root
-                } else {
-                    // For project pages, get the repository name
-                    const pathSegments = window.location.pathname.split('/');
-                    return pathSegments[1] ? `/${pathSegments[1]}/sports` : '/sports';
-                }
-            }
-
-            // Navigation helper function
-            function navigateToHome() {
-                window.location.href = getBasePath();
-            }
-
             // Get the full path before redirection
             const path = window.location.pathname;
-            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/'); // Normalize slashes
+            
+            // Clean the path by removing multiple slashes and ensuring it starts with a single slash
+            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/');
 
-            // Match sports URLs
+            // Check if the URL matches a sports pattern (e.g., /sports/basketball/warriors)
             const sportsPattern = /^\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
             const sportsMatch = cleanPath.match(sportsPattern);
 
@@ -128,23 +112,25 @@
                 const sport = sportsMatch[1];
                 const team = sportsMatch[2] || '';
 
-                // Store session parameters
+                // Store values in sessionStorage for later use
                 sessionStorage.setItem('redirectSport', sport);
                 if (team) {
                     sessionStorage.setItem('redirectTeam', team);
                 }
 
-                // Redirect to **/sports** ONLY
-                window.location.href = getBasePath();
+                // Redirect to the root (/)
+                window.location.href = '/';
             } else {
-                // If it's not a valid sports path, show 404
+                // If it's not a sports-related URL, show the 404 message
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('error-container').style.display = 'block';
                 });
             }
 
-            // Expose navigateToHome globally
-            window.navigateToHome = navigateToHome;
+            // Expose navigateToHome function globally for button click
+            window.navigateToHome = function() {
+                window.location.href = '/';
+            };
         })();
     </script>
 </head>
@@ -153,7 +139,7 @@
     <header>
         <div class="header-container">
             <a href="javascript:void(0)" onclick="navigateToHome()">
-                <img src="/gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
+                <img src="gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
             </a>
             
             <div style="width: 120px;">
