@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sports Streamer</title>
-    <!-- Use absolute path for favicon -->
-    <link rel="icon" type="image/png" href="/logo.png">
-    <!-- Base tag to ensure all relative URLs resolve correctly -->
-    <base href="https://gukeeee.pages.dev/">
+    <!-- Use relative path for favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -197,8 +196,8 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <a href="https://gukeeee.pages.dev/">
-                <img src="https://gukeeee.pages.dev/gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
+            <a href="javascript:void(0)" onclick="navigateToHome()">
+                <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
             </a>
             
             <div class="sport-dropdown">
@@ -206,12 +205,12 @@
                     <option value="soccer">Soccer</option>
                     <option value="nba">Basketball</option>
                     <option value="nfl">Football</option>
-<!--                     <option value="mlb">Baseball</option>
+                    <!-- <option value="mlb">Baseball</option>
                     <option value="nhl">Hockey</option> -->
                 </select>
             </div>
             
-            <a href="https://gukeeee.pages.dev/">
+            <a href="javascript:void(0)" onclick="navigateToHome()">
                 <button class="home-button">Home</button>
             </a>
         </div>
@@ -250,6 +249,23 @@
         const clearButton = document.getElementById('clearButton');
         const sportsFrame = document.getElementById('sportsFrame');
         const currentTeam = document.getElementById('currentTeam');
+        
+        // Get repository base path based on hostname
+        function getBasePath() {
+            if (window.location.hostname === 'gukeeee.github.io') {
+                return '/'; // Root domain
+            } else {
+                // For project pages, get the repository name from the path
+                const pathSegments = window.location.pathname.split('/');
+                return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
+            }
+        }
+        
+        // Navigation helper function with correct base path
+        function navigateToHome() {
+            const basePath = getBasePath();
+            window.location.href = basePath;
+        }
         
         // Sport-specific configuration
         const sportConfig = {
@@ -318,8 +334,11 @@
             // Get the URL-friendly sport name
             const urlSportName = getUrlSportName(sport);
             
+            // Get base path for GitHub Pages
+            const basePath = getBasePath();
+            
             // Update URL without page reload (pushState)
-            const newUrl = `/sports/${urlSportName}/${formattedTeam}`;
+            const newUrl = `${basePath}sports/${urlSportName}/${formattedTeam}`;
             history.pushState({sport, team: formattedTeam}, '', newUrl);
         }
         
@@ -389,44 +408,80 @@
             // Get the URL-friendly sport name
             const urlSportName = getUrlSportName(currentSport);
             
+            // Get base path for GitHub Pages
+            const basePath = getBasePath();
+            
             // Update URL (removing team from URL)
-            const newUrl = `/sports/${urlSportName}`;
+            const newUrl = `${basePath}sports/${urlSportName}`;
             history.pushState({sport: currentSport}, '', newUrl);
         }
         
         // Function to parse URL for direct navigation
         function parseUrl() {
-            const path = window.location.pathname;
+            // Check if we were redirected with a path parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectPath = urlParams.get('path');
             
-            // Check for URL pattern like /sports/soccer/arsenal or /sports/basketball/warriors
-            const pathRegex = /\/sports\/([^\/]+)(?:\/([^\/]+))?/;
+            if (redirectPath) {
+                // Process the redirected path
+                const pathRegex = /\/sports\/([^\/]+)(?:\/([^\/]+))?/;
+                const match = redirectPath.match(pathRegex);
+                
+                if (match) {
+                    const urlSportName = match[1].toLowerCase();
+                    const team = match[2];
+                    processSportAndTeam(urlSportName, team);
+                    
+                    // Update URL to clean version without query parameters
+                    const basePath = getBasePath();
+                    const newUrl = team ? 
+                        `${basePath}sports/${urlSportName}/${team}` : 
+                        `${basePath}sports/${urlSportName}`;
+                    history.replaceState(null, '', newUrl);
+                    
+                    return true;
+                }
+            }
+            
+            // Regular URL parsing for direct navigation
+            const path = window.location.pathname;
+            const basePath = getBasePath().replace(/\/$/, ''); // Remove trailing slash
+            
+            // Create regex pattern with optional base path
+            const pathRegex = new RegExp(`${basePath}\/sports\/([^\/]+)(?:\/([^\/]+))?`);
             const match = path.match(pathRegex);
             
             if (match) {
                 const urlSportName = match[1].toLowerCase();
                 const team = match[2];
-                
-                // Convert URL sport name to internal value (e.g., basketball -> nba)
-                const sport = getInternalSportValue(urlSportName);
-                
-                // Make sure the sport is valid in our configuration
-                if (sportConfig[sport]) {
-                    // Set dropdown to correct sport
-                    sportSelector.value = sport;
-                    localStorage.setItem('current_sport', sport);
-                    
-                    // If team is specified, load it
-                    if (team) {
-                        setupSportUI(sport, team);
-                    } else {
-                        setupSportUI(sport);
-                    }
-                    
-                    return true; // URL was successfully parsed
-                }
+                return processSportAndTeam(urlSportName, team);
             }
             
-            return false; // URL didn't match expected pattern
+            return false;
+        }
+        
+        // Helper function to process sport and team from URL
+        function processSportAndTeam(urlSportName, team) {
+            // Convert URL sport name to internal value (e.g., basketball -> nba)
+            const sport = getInternalSportValue(urlSportName);
+            
+            // Make sure the sport is valid in our configuration
+            if (sportConfig[sport]) {
+                // Set dropdown to correct sport
+                sportSelector.value = sport;
+                localStorage.setItem('current_sport', sport);
+                
+                // If team is specified, load it
+                if (team) {
+                    setupSportUI(sport, team);
+                } else {
+                    setupSportUI(sport);
+                }
+                
+                return true; // URL was successfully parsed
+            }
+            
+            return false;
         }
         
         // Handle browser back/forward navigation
@@ -463,11 +518,14 @@
             // Get URL-friendly sport name
             const urlSportName = getUrlSportName(selectedSport);
             
+            // Get base path for GitHub Pages
+            const basePath = getBasePath();
+            
             // Update URL when sport changes
             const currentTeamValue = localStorage.getItem(sportConfig[selectedSport].storageKey);
             const newUrl = currentTeamValue ? 
-                `/sports/${urlSportName}/${currentTeamValue}` : 
-                `/sports/${urlSportName}`;
+                `${basePath}sports/${urlSportName}/${currentTeamValue}` : 
+                `${basePath}sports/${urlSportName}`;
                 
             history.pushState({sport: selectedSport, team: currentTeamValue}, '', newUrl);
         });
