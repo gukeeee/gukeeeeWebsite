@@ -20,7 +20,7 @@
             }
 
             // ✅ FIX: Redirect to "/sports" without adding "sports" twice
-            window.location.href = '/';
+            window.location.href = '/sports';
         } else {
             document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('error-container').style.display = 'block';
@@ -29,7 +29,7 @@
 
         // Expose navigateToHome function globally for button click
         window.navigateToHome = function() {
-            window.location.href = '/';
+            window.location.href = '/sports';
         };
     })();
 </script>
