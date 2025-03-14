@@ -87,6 +87,19 @@
     </div>
     
     <script>
+        // Add this script to the beginning of your original script in index.html
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have a redirect path saved from 404.html
+            const redirectPath = sessionStorage.getItem('redirectPath');
+            if (redirectPath) {
+                // Clear it so we don't redirect again on refresh
+                sessionStorage.removeItem('redirectPath');
+        
+                // Handle the path as if it was directly accessed
+                // History will be handled by your normal URL parsing code
+                window.history.replaceState(null, '', redirectPath);
+            }
+        });
         // Any JavaScript you might need
         window.onload = function() {
             console.log("Homepage loaded successfully");
