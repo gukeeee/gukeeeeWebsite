@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sports Streamer</title>
-    <!-- Use relative path for favicon -->
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -196,7 +194,7 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <a href="javascript:void(0)" onclick="navigateToHome()">
+            <a href="https://gukeeee.pages.dev/">
                 <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
             </a>
             
@@ -205,12 +203,12 @@
                     <option value="soccer">Soccer</option>
                     <option value="nba">Basketball</option>
                     <option value="nfl">Football</option>
-                    <!-- <option value="mlb">Baseball</option>
+<!--                     <option value="mlb">Baseball</option>
                     <option value="nhl">Hockey</option> -->
                 </select>
             </div>
             
-            <a href="javascript:void(0)" onclick="navigateToHome()">
+            <a href="https://gukeeee.pages.dev/">
                 <button class="home-button">Home</button>
             </a>
         </div>
@@ -250,23 +248,6 @@
         const sportsFrame = document.getElementById('sportsFrame');
         const currentTeam = document.getElementById('currentTeam');
         
-        // Get repository base path based on hostname
-        function getBasePath() {
-            if (window.location.hostname === 'gukeeee.github.io') {
-                return '/'; // Root domain
-            } else {
-                // For project pages, get the repository name from the path
-                const pathSegments = window.location.pathname.split('/');
-                return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
-            }
-        }
-        
-        // Navigation helper function with correct base path
-        function navigateToHome() {
-            const basePath = getBasePath();
-            window.location.href = basePath;
-        }
-        
         // Sport-specific configuration
         const sportConfig = {
             soccer: {
@@ -301,76 +282,45 @@
             }
         };
         
-        // Mapping from URL identifiers to internal sport values
-        const sportUrlMap = {
-            'soccer': 'soccer',
-            'basketball': 'nba',
-            'football': 'nfl',
-            'baseball': 'mlb',
-            'hockey': 'nhl'
-        };
-        
-        // Update URL without page reload (pushState)
+        // Function to update iframe source
         function updateTeam(sport, team) {
+            // Get current sport configuration
             const config = sportConfig[sport];
+            
+            // Convert to lowercase and remove spaces
             const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
-            const urlSportName = getUrlSportName(sport);
-            const basePath = getBasePath().replace(/\/$/, '');  // Ensure no trailing slash
-
+            
             // Construct the full URL
-            const newUrl = `${basePath}/sports/${urlSportName}/${formattedTeam}`;
-    
-            // Update the URL without reloading the page
-            history.pushState({ sport, team: formattedTeam }, '', newUrl);
-        }
-
-        
-        // Get URL-friendly sport name from internal sport value
-        function getUrlSportName(sportValue) {
-            for (const [urlName, value] of Object.entries(sportUrlMap)) {
-                if (value === sportValue) {
-                    return urlName;
-                }
-            }
-            return sportValue; // Fallback to the original value
-        }
-        
-        // Get internal sport value from URL-friendly name
-        function getInternalSportValue(urlSportName) {
-            return sportUrlMap[urlSportName.toLowerCase()] || urlSportName;
+            const fullUrl = config.baseUrl + formattedTeam + '.html';
+            
+            // Update iframe, localStorage, and display
+            sportsFrame.src = fullUrl;
+            localStorage.setItem(config.storageKey, formattedTeam);
+            
+            // Display the lowercase, no-spaces version for "currently watching"
+            currentTeam.textContent = 'Currently watching: ' + formattedTeam;
         }
         
         // Function to set up the UI for the current sport
-        function setupSportUI(sport, specificTeam = null) {
+        function setupSportUI(sport) {
             const config = sportConfig[sport];
             
             // Update the title and placeholder
             sportTitle.textContent = config.title;
             teamInput.placeholder = config.placeholder;
             
-            let teamToLoad;
+            // Check if a team is saved in localStorage for this sport
+            const savedTeam = localStorage.getItem(config.storageKey);
             
-            // First check if a specific team was provided (from URL)
-            if (specificTeam) {
-                teamToLoad = specificTeam;
-                localStorage.setItem(config.storageKey, teamToLoad);
-            } else {
-                // Otherwise check localStorage
-                teamToLoad = localStorage.getItem(config.storageKey);
-            }
-            
-            // Load the team if available
-            if (teamToLoad) {
+            // Load the saved team if available
+            if (savedTeam) {
                 // Update display and iframe
-                currentTeam.textContent = 'Currently watching: ' + teamToLoad;
-                sportsFrame.src = config.baseUrl + teamToLoad + '.html';                
-                // Update the input field with the team name
-                teamInput.value = teamToLoad;
+                currentTeam.textContent = 'Currently watching: ' + savedTeam;
+                sportsFrame.src = config.baseUrl + savedTeam + '.html';
             } else {
                 // Clear current team display if no saved team
                 currentTeam.textContent = 'Enter a team name to start watching';
                 sportsFrame.src = '';
-                teamInput.value = '';
             }
         }
         
@@ -386,146 +336,12 @@
             currentTeam.textContent = 'Enter a team name to start watching';
             teamInput.value = '';
             sportsFrame.src = '';
-            
-            // Get the URL-friendly sport name
-            const urlSportName = getUrlSportName(currentSport);
-            
-            // Get base path for GitHub Pages
-            const basePath = getBasePath();
-            
-            // Update URL (removing team from URL)
-            const newUrl = `${basePath}sports/${urlSportName}`;
-            history.pushState({sport: currentSport}, '', newUrl);
         }
         
-        // Check for redirect data from 404.html
-        function checkForRedirect() {
-            // Check if we were redirected with specific sport/team parameters
-            const redirectSport = sessionStorage.getItem('redirectSport');
-            const redirectTeam = sessionStorage.getItem('redirectTeam');
-            
-            if (redirectSport) {
-                // Clear storage to prevent future redirects
-                sessionStorage.removeItem('redirectSport');
-                
-                // Convert URL sport name to internal sport value
-                const sport = getInternalSportValue(redirectSport);
-                
-                // If sport is valid in our configuration
-                if (sportConfig[sport]) {
-                    // Set dropdown to correct sport
-                    sportSelector.value = sport;
-                    localStorage.setItem('current_sport', sport);
-                    
-                    // If team is also specified, load it
-                    if (redirectTeam) {
-                        sessionStorage.removeItem('redirectTeam');
-                        
-                        // Use the existing sport value
-                        updateTeam(sport, redirectTeam);
-                        
-                        // Get the URL-friendly sport name for proper URL formatting
-                        const urlSportName = getUrlSportName(sport);
-                        
-                        // Get base path for GitHub Pages
-                        const basePath = getBasePath();
-                        
-                        // Format the URL correctly to avoid duplication
-                        const formattedTeam = redirectTeam.toLowerCase().replace(/\s+/g, '');
-                        const newUrl = `${basePath}sports/${urlSportName}/${formattedTeam}`;
-                        
-                        // Replace current URL to fix any potential duplication
-                        history.replaceState({sport, team: formattedTeam}, '', newUrl);
-                        
-                        return true;
-                    }
-                    
-                    // Otherwise just set up the UI for the sport
-                    setupSportUI(sport, redirectTeam);
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-        
-        // Function to parse URL for direct navigation
-        function parseUrl() {
-            // Regular URL parsing for direct navigation
-            const path = window.location.pathname;
-            const basePath = getBasePath().replace(/\/$/, ''); // Remove trailing slash
-            
-            // Create regex pattern with optional base path that avoids duplicate 'sports'
-            // This pattern will match '/sports/soccer/team' but not '/sports/sports/soccer/team'
-            const pathRegex = new RegExp(`${basePath}\\/sports\\/([^\\/]+)(?:\\/([^\\/]+))?$`);
-            const match = path.match(pathRegex);
-            
-            if (match) {
-                const urlSportName = match[1].toLowerCase();
-                const team = match[2];
-                return processSportAndTeam(urlSportName, team);
-            }
-            
-            return false;
-        }
-        
-        // Helper function to process sport and team from URL
-        function processSportAndTeam(urlSportName, team) {
-            // Convert URL sport name to internal value (e.g., basketball -> nba)
-            const sport = getInternalSportValue(urlSportName);
-            
-            // Make sure the sport is valid in our configuration
-            if (sportConfig[sport]) {
-                // Set dropdown to correct sport
-                sportSelector.value = sport;
-                localStorage.setItem('current_sport', sport);
-                
-                // If team is specified, load it
-                if (team) {
-                    setupSportUI(sport, team);
-                } else {
-                    setupSportUI(sport);
-                }
-                
-                return true; // URL was successfully parsed
-            }
-            
-            return false;
-        }
-        
-        // Handle browser back/forward navigation
-        window.addEventListener('popstate', function(event) {
-            if (event.state) {
-                const { sport, team } = event.state;
-                if (sport) {
-                    sportSelector.value = sport;
-                    setupSportUI(sport, team);
-                }
-            } else {
-                parseUrl();
-            }
-        });
-        
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            // First check for redirect data
-            const redirectHandled = checkForRedirect();
-            
-            // If no redirect data, try parsing the URL
-            if (!redirectHandled) {
-                const urlParsed = parseUrl();
-                
-                // If URL wasn't in the expected format, fall back to localStorage
-                if (!urlParsed) {
-                    let initialSport = localStorage.getItem('current_sport') || 'soccer';
-                    sportSelector.value = initialSport;
-                    setupSportUI(initialSport);
-                }
-            }
-            
-            // Debug info
-            console.log('Page initialized successfully');
-        });
+        // Initialize with the default sport (first one in dropdown)
+        let initialSport = localStorage.getItem('current_sport') || 'soccer';
+        sportSelector.value = initialSport;
+        setupSportUI(initialSport);
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
@@ -534,20 +350,6 @@
             localStorage.setItem('current_sport', selectedSport);
             // Set up UI for selected sport
             setupSportUI(selectedSport);
-            
-            // Get URL-friendly sport name
-            const urlSportName = getUrlSportName(selectedSport);
-            
-            // Get base path for GitHub Pages
-            const basePath = getBasePath();
-            
-            // Update URL when sport changes
-            const currentTeamValue = localStorage.getItem(sportConfig[selectedSport].storageKey);
-            const newUrl = currentTeamValue ? 
-                `${basePath}sports/${urlSportName}/${currentTeamValue}` : 
-                `${basePath}sports/${urlSportName}`;
-                
-            history.pushState({sport: selectedSport, team: currentTeamValue}, '', newUrl);
         });
         
         // Update button click event
