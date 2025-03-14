@@ -69,15 +69,11 @@
 <body>
     <header>
         <div class="header-container">
-            <img src="https://gukeeee.pages.dev/gukeeee-logo-purple.png" alt="Gukeeee Logo" class="logo">
+            <img src="gukeeee-logo-purple.png" alt="Gukeeee Logo" class="logo">
             
             <div class="nav-buttons">
-                <a href="https://gukeeee.pages.dev/chequeo">
-                    <button class="nav-button">Chequeo</button>
-                </a>
-                <a href="https://gukeeee.pages.dev/sports">
-                    <button class="nav-button">Sports</button>
-                </a>
+                <button class="nav-button" onclick="navigateTo('chequeo')">Chequeo</button>
+                <button class="nav-button" onclick="navigateTo('sports')">Sports</button>
             </div>
         </div>
     </header>
@@ -87,20 +83,44 @@
     </div>
     
     <script>
-        // Add this script to the beginning of your original script in index.html
+        // Get repository base path based on hostname
+        function getBasePath() {
+            if (window.location.hostname === 'gukeeee.github.io') {
+                return '/'; // Root domain
+            } else {
+                // For project pages, get the repository name from the path
+                const pathSegments = window.location.pathname.split('/');
+                return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
+            }
+        }
+        
+        // Navigation helper function that adds the correct base path
+        function navigateTo(path) {
+            const basePath = getBasePath();
+            window.location.href = `${basePath}${path}`;
+        }
+        
+        // Check for redirects from 404.html
         document.addEventListener('DOMContentLoaded', function() {
             // Check if we have a redirect path saved from 404.html
             const redirectPath = sessionStorage.getItem('redirectPath');
             if (redirectPath) {
                 // Clear it so we don't redirect again on refresh
                 sessionStorage.removeItem('redirectPath');
-        
-                // Handle the path as if it was directly accessed
-                // History will be handled by your normal URL parsing code
-                window.history.replaceState(null, '', redirectPath);
+                
+                // Check if path starts with /sports
+                if (redirectPath.includes('/sports')) {
+                    // Handle deep linking to sports page
+                    const basePath = getBasePath();
+                    window.location.href = `${basePath}sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
+                } else {
+                    // For other paths, just update history state
+                    window.history.replaceState(null, '', redirectPath);
+                }
             }
         });
-        // Any JavaScript you might need
+        
+        // Any other JavaScript you might need
         window.onload = function() {
             console.log("Homepage loaded successfully");
         };
