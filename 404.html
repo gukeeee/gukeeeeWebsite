@@ -74,7 +74,9 @@
             // Get the base path based on hostname
             function getBasePath() {
                 if (window.location.hostname === 'gukeeee.github.io') {
-                    return '/'; // Root domain
+                    return '/'; // Root domain for GitHub Pages
+                } else if (window.location.hostname === 'gukeeee.pages.dev') {
+                    return ''; // For Cloudflare Pages
                 } else {
                     // For project pages, get the repository name from the path
                     const pathSegments = window.location.pathname.split('/');
@@ -88,7 +90,7 @@
             
             // Check if this is a sports URL pattern - fix the regex to avoid duplicate "sports"
             // The pattern should match '/sports/soccer/team' but not '/sports/sports/soccer/team'
-            const sportsRegex = new RegExp(`${basePath}\\/sports\\/([^\\/]+)(?:\\/([^\\/]+))?$`);
+            const sportsRegex = new RegExp(`^${basePath}\\/sports\\/([^\\/]+)(?:\\/([^\\/]+))?$`);
             const sportsMatch = path.match(sportsRegex);
             
             if (sportsMatch) {
