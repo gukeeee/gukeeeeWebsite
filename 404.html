@@ -7,24 +7,31 @@
     <script>
         // This script handles redirects for deep links on GitHub Pages
         (function() {
-            // Get repository name from the path if not at root domain
-            const pathSegments = window.location.pathname.split('/');
-            const repoName = window.location.hostname === 'gukeeee.github.io' ? '' : `/${pathSegments[1]}`;
-            
-            // Save the full path before redirection
+            // Get the full path before redirection
             const path = window.location.pathname;
             const search = window.location.search;
             
-            // Don't redirect if we're already on the main page
-            if (path === `${repoName}/` || path === `${repoName}/index.html`) {
-                return;
+            // Check if this is a sports URL pattern
+            const sportsMatch = path.match(/\/sports\/([^\/]+)(?:\/([^\/]+))?/);
+            
+            if (sportsMatch) {
+                // Extract sport and team (if available)
+                const sport = sportsMatch[1];
+                const team = sportsMatch[2] || '';
+                
+                // Store direct parameters instead of just the path
+                sessionStorage.setItem('redirectSport', sport);
+                if (team) {
+                    sessionStorage.setItem('redirectTeam', team);
+                }
+                
+                // Redirect to the sports page directly
+                window.location.href = '/sports.html';
+            } else {
+                // For non-sports paths, just store the path and redirect to index
+                sessionStorage.setItem('redirectPath', path + search);
+                window.location.href = '/';
             }
-            
-            // Store the path in sessionStorage for the main page to use
-            sessionStorage.setItem('redirectPath', path + search);
-            
-            // Redirect to the main page with the correct base path
-            window.location.href = `${repoName}/`;
         })();
     </script>
 </head>
