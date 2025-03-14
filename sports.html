@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sports Streamer</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Use absolute path for favicon -->
+    <link rel="icon" type="image/png" href="/logo.png">
+    <!-- Base tag to ensure all relative URLs resolve correctly -->
+    <base href="https://gukeeee.pages.dev/">
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -195,7 +198,7 @@
     <header>
         <div class="header-container">
             <a href="https://gukeeee.pages.dev/">
-                <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
+                <img src="https://gukeeee.pages.dev/gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
             </a>
             
             <div class="sport-dropdown">
@@ -282,6 +285,15 @@
             }
         };
         
+        // Mapping from URL identifiers to internal sport values
+        const sportUrlMap = {
+            'soccer': 'soccer',
+            'basketball': 'nba',
+            'football': 'nfl',
+            'baseball': 'mlb',
+            'hockey': 'nhl'
+        };
+        
         // Function to update iframe source
         function updateTeam(sport, team) {
             // Get current sport configuration
@@ -300,12 +312,30 @@
             // Display the lowercase, no-spaces version for "currently watching"
             currentTeam.textContent = 'Currently watching: ' + formattedTeam;
             
-            // ADDED: Update the input field with the team name
+            // Update the input field with the team name
             teamInput.value = team;
             
-            // ADDED: Update URL without page reload (pushState)
-            const newUrl = `/sports/${sport}/${formattedTeam}`;
+            // Get the URL-friendly sport name
+            const urlSportName = getUrlSportName(sport);
+            
+            // Update URL without page reload (pushState)
+            const newUrl = `/sports/${urlSportName}/${formattedTeam}`;
             history.pushState({sport, team: formattedTeam}, '', newUrl);
+        }
+        
+        // Get URL-friendly sport name from internal sport value
+        function getUrlSportName(sportValue) {
+            for (const [urlName, value] of Object.entries(sportUrlMap)) {
+                if (value === sportValue) {
+                    return urlName;
+                }
+            }
+            return sportValue; // Fallback to the original value
+        }
+        
+        // Get internal sport value from URL-friendly name
+        function getInternalSportValue(urlSportName) {
+            return sportUrlMap[urlSportName.toLowerCase()] || urlSportName;
         }
         
         // Function to set up the UI for the current sport
@@ -333,7 +363,7 @@
                 currentTeam.textContent = 'Currently watching: ' + teamToLoad;
                 sportsFrame.src = config.baseUrl + teamToLoad + '.html';
                 
-                // ADDED: Update the input field with the team name
+                // Update the input field with the team name
                 teamInput.value = teamToLoad;
             } else {
                 // Clear current team display if no saved team
@@ -356,24 +386,30 @@
             teamInput.value = '';
             sportsFrame.src = '';
             
+            // Get the URL-friendly sport name
+            const urlSportName = getUrlSportName(currentSport);
+            
             // Update URL (removing team from URL)
-            const newUrl = `/sports/${currentSport}`;
+            const newUrl = `/sports/${urlSportName}`;
             history.pushState({sport: currentSport}, '', newUrl);
         }
         
-        // ADDED: Function to parse URL for direct navigation
+        // Function to parse URL for direct navigation
         function parseUrl() {
             const path = window.location.pathname;
             
-            // Check for URL pattern like /sports/soccer/arsenal
+            // Check for URL pattern like /sports/soccer/arsenal or /sports/basketball/warriors
             const pathRegex = /\/sports\/([^\/]+)(?:\/([^\/]+))?/;
             const match = path.match(pathRegex);
             
             if (match) {
-                const sport = match[1];
+                const urlSportName = match[1].toLowerCase();
                 const team = match[2];
                 
-                // Make sure the sport is valid
+                // Convert URL sport name to internal value (e.g., basketball -> nba)
+                const sport = getInternalSportValue(urlSportName);
+                
+                // Make sure the sport is valid in our configuration
                 if (sportConfig[sport]) {
                     // Set dropdown to correct sport
                     sportSelector.value = sport;
@@ -393,7 +429,7 @@
             return false; // URL didn't match expected pattern
         }
         
-        // ADDED: Handle browser back/forward navigation
+        // Handle browser back/forward navigation
         window.addEventListener('popstate', function(event) {
             if (event.state) {
                 const { sport, team } = event.state;
@@ -424,11 +460,14 @@
             // Set up UI for selected sport
             setupSportUI(selectedSport);
             
+            // Get URL-friendly sport name
+            const urlSportName = getUrlSportName(selectedSport);
+            
             // Update URL when sport changes
             const currentTeamValue = localStorage.getItem(sportConfig[selectedSport].storageKey);
             const newUrl = currentTeamValue ? 
-                `/sports/${selectedSport}/${currentTeamValue}` : 
-                `/sports/${selectedSport}`;
+                `/sports/${urlSportName}/${currentTeamValue}` : 
+                `/sports/${urlSportName}`;
                 
             history.pushState({sport: selectedSport, team: currentTeamValue}, '', newUrl);
         });
