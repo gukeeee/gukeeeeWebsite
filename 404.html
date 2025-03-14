@@ -134,8 +134,8 @@
                     sessionStorage.setItem('redirectTeam', team);
                 }
 
-                // Redirect correctly without duplicating "/sports/"
-                window.location.href = '/sports.html';
+                // Redirect to "/sports" (without any extra path)
+                window.location.href = '/sports';
             } else {
                 // If it's not a valid sports path, show the 404 page
                 document.addEventListener('DOMContentLoaded', function() {
