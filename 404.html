@@ -95,7 +95,6 @@
         }
     </style>
     <script>
-        // This script handles redirects for deep links
         (function() {
             // Get the base path based on hostname
             function getBasePath() {
@@ -113,65 +112,38 @@
             // Navigation helper function with correct base path
             function navigateToHome() {
                 const basePath = getBasePath();
-                if (basePath) {
-                    window.location.href = basePath;
-                } else {
-                    window.location.href = '/';
-                }
+                window.location.href = basePath || '/';
             }
 
-            // Get the full path before redirection
+            // Get the current path and clean it
             const path = window.location.pathname;
-            
-            // Let's clean the path for analysis - simplify handling by removing multiple slashes
-            // and ensuring it starts with a slash
-            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/');
-            
-            // Check if this is a sports URL pattern
-            // This should match /sports/soccer/team but not /sports/sports/soccer/team
+            let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/'); // Ensures a single leading slash and removes duplicate slashes
+
+            // Corrected sports pattern
             const sportsPattern = /^\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
             const sportsMatch = cleanPath.match(sportsPattern);
-            
-            // Check for duplicate sports pattern
-            const duplicateSportsPattern = /^\/sports\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
-            const duplicateSportsMatch = cleanPath.match(duplicateSportsPattern);
-            
+
             if (sportsMatch) {
-                // Regular sports URL, extract sport and team
+                // Extract sport and optional team
                 const sport = sportsMatch[1];
                 const team = sportsMatch[2] || '';
-                
-                // Store direct parameters
+
+                // Store session parameters
                 sessionStorage.setItem('redirectSport', sport);
                 if (team) {
                     sessionStorage.setItem('redirectTeam', team);
                 }
-                
-                // Redirect to the sports page
+
+                // Redirect correctly without duplicating "/sports/"
                 window.location.href = '/sports.html';
-            } 
-            else if (duplicateSportsMatch) {
-                // Duplicate sports URL, extract sport and team
-                const sport = duplicateSportsMatch[1];
-                const team = duplicateSportsMatch[2] || '';
-                
-                // Store direct parameters
-                sessionStorage.setItem('redirectSport', sport);
-                if (team) {
-                    sessionStorage.setItem('redirectTeam', team);
-                }
-                
-                // Redirect to the sports page
-                window.location.href = '/sports.html';
-            }
-            else {
-                // If it's not a valid sports path, just display the 404 page
+            } else {
+                // If it's not a valid sports path, show the 404 page
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('error-container').style.display = 'block';
                 });
             }
 
-            // Expose navigateToHome to the global scope so it can be called from HTML
+            // Expose navigateToHome globally
             window.navigateToHome = navigateToHome;
         })();
     </script>
