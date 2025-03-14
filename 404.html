@@ -7,18 +7,24 @@
     <script>
         // This script handles redirects for deep links on GitHub Pages
         (function() {
-            // Save the path before redirection
+            // Get repository name from the path if not at root domain
+            const pathSegments = window.location.pathname.split('/');
+            const repoName = window.location.hostname === 'gukeeee.github.io' ? '' : `/${pathSegments[1]}`;
+            
+            // Save the full path before redirection
             const path = window.location.pathname;
             const search = window.location.search;
             
             // Don't redirect if we're already on the main page
-            if (path === '/' || path === '/index.html') {
+            if (path === `${repoName}/` || path === `${repoName}/index.html`) {
                 return;
             }
             
-            // Redirect to the main page with the original path in sessionStorage
+            // Store the path in sessionStorage for the main page to use
             sessionStorage.setItem('redirectPath', path + search);
-            window.location.href = '/';
+            
+            // Redirect to the main page with the correct base path
+            window.location.href = `${repoName}/`;
         })();
     </script>
 </head>
