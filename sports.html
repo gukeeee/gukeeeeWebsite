@@ -310,37 +310,20 @@
             'hockey': 'nhl'
         };
         
-        // Function to update iframe source
+        // Update URL without page reload (pushState)
         function updateTeam(sport, team) {
-            // Get current sport configuration
             const config = sportConfig[sport];
-            
-            // Convert to lowercase and remove spaces
             const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
-            
-            // Construct the full URL
-            const fullUrl = config.baseUrl + formattedTeam + '.html';
-            
-            // Update iframe, localStorage, and display
-            sportsFrame.src = fullUrl;
-            localStorage.setItem(config.storageKey, formattedTeam);
-            
-            // Display the lowercase, no-spaces version for "currently watching"
-            currentTeam.textContent = 'Currently watching: ' + formattedTeam;
-            
-            // Update the input field with the team name
-            teamInput.value = team;
-            
-            // Get the URL-friendly sport name
             const urlSportName = getUrlSportName(sport);
-            
-            // Get base path for GitHub Pages
-            const basePath = getBasePath();
-            
-            // Update URL without page reload (pushState)
-            const newUrl = `${basePath}sports/${urlSportName}/${formattedTeam}`;
-            history.pushState({sport, team: formattedTeam}, '', newUrl);
+            const basePath = getBasePath().replace(/\/$/, '');  // Ensure no trailing slash
+
+            // Construct the full URL
+            const newUrl = `${basePath}/sports/${urlSportName}/${formattedTeam}`;
+    
+            // Update the URL without reloading the page
+            history.pushState({ sport, team: formattedTeam }, '', newUrl);
         }
+
         
         // Get URL-friendly sport name from internal sport value
         function getUrlSportName(sportValue) {
