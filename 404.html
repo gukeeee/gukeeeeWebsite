@@ -95,33 +95,29 @@
         }
     </style>
     <script>
-        // This script handles redirects for deep links
         (function() {
-            // Get the full path before redirection
             const path = window.location.pathname;
             
-            // Clean the path by removing multiple slashes and ensuring it starts with a single slash
+            // Normalize path (remove extra slashes)
             let cleanPath = '/' + path.replace(/^\/+/, '').replace(/\/+/g, '/');
 
-            // Match sports URLs (e.g., /sports/basketball/warriors)
+            // Match sports URLs
             const sportsPattern = /^\/sports\/([^\/]+)(?:\/([^\/]+))?$/;
             const sportsMatch = cleanPath.match(sportsPattern);
 
             if (sportsMatch) {
-                // Extract sport and optional team
                 const sport = sportsMatch[1];
                 const team = sportsMatch[2] || '';
 
-                // Store values in sessionStorage for later use
+                // Store values for potential use later
                 sessionStorage.setItem('redirectSport', sport);
                 if (team) {
                     sessionStorage.setItem('redirectTeam', team);
                 }
 
-                // Redirect to **/sports** (NOT /sports/sports)
-                window.location.href = '/sports';
+                // 🚨 TEMP FIX: Redirect to `/test` instead of `/sports`
+                window.location.href = '/test';
             } else {
-                // If it's not a sports-related URL, show the 404 message
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('error-container').style.display = 'block';
                 });
@@ -129,25 +125,22 @@
 
             // Expose navigateToHome function globally for button click
             window.navigateToHome = function() {
-                window.location.href = '/sports';
+                window.location.href = '/test';
             };
         })();
     </script>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="header-container">
             <a href="javascript:void(0)" onclick="navigateToHome()">
                 <img src="gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
             </a>
             
-            <div style="width: 120px;">
-                <!-- Empty div to maintain spacing similar to sports.html -->
-            </div>
+            <div style="width: 120px;"></div>
             
             <a href="javascript:void(0)" onclick="navigateToHome()">
-                <button class="home-button">Home</button>
+                <button class="home-button">Test Redirect</button>
             </a>
         </div>
     </header>
@@ -156,7 +149,7 @@
         <h1>404 - Page Not Found</h1>
         <p>The page you're looking for doesn't exist or has been moved.</p>
         <a href="javascript:void(0)" onclick="navigateToHome()">
-            <button class="home-button">Go to Sports</button>
+            <button class="home-button">Go to Test</button>
         </a>
     </div>
 </body>
