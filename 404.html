@@ -88,9 +88,9 @@
             const path = window.location.pathname;
             const basePath = getBasePath().replace(/\/$/, ''); // Remove trailing slash
             
-            // Check if this is a sports URL pattern - fix the regex to avoid duplicate "sports"
+            // Check if this is a sports URL pattern - use negative lookahead to avoid duplicate "sports"
             // The pattern should match '/sports/soccer/team' but not '/sports/sports/soccer/team'
-            const sportsRegex = new RegExp(`^${basePath}\\/sports\\/([^\\/]+)(?:\\/([^\\/]+))?$`);
+            const sportsRegex = new RegExp(`^${basePath}\\/sports\\/(?!sports\\/)([^\\/]+)(?:\\/([^\\/]+))?$`);
             const sportsMatch = path.match(sportsRegex);
             
             if (sportsMatch) {
@@ -105,7 +105,9 @@
                 }
                 
                 // Redirect to the sports page with correct base path
-                window.location.href = `${basePath}/sports.html`;
+                // Construct the path carefully to avoid duplicate 'sports'
+                const redirectPath = basePath ? `${basePath}/sports.html` : '/sports.html';
+                window.location.href = redirectPath;
             } else {
                 // If it's not a valid sports path, just display the 404 page
                 // (No redirect here - we'll stay on the 404 page)
