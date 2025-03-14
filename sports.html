@@ -438,7 +438,23 @@
                     // If team is also specified, load it
                     if (redirectTeam) {
                         sessionStorage.removeItem('redirectTeam');
+                        
+                        // Use the existing sport value
                         updateTeam(sport, redirectTeam);
+                        
+                        // Get the URL-friendly sport name for proper URL formatting
+                        const urlSportName = getUrlSportName(sport);
+                        
+                        // Get base path for GitHub Pages
+                        const basePath = getBasePath();
+                        
+                        // Format the URL correctly to avoid duplication
+                        const formattedTeam = redirectTeam.toLowerCase().replace(/\s+/g, '');
+                        const newUrl = `${basePath}sports/${urlSportName}/${formattedTeam}`;
+                        
+                        // Replace current URL to fix any potential duplication
+                        history.replaceState({sport, team: formattedTeam}, '', newUrl);
+                        
                         return true;
                     }
                     
@@ -457,8 +473,9 @@
             const path = window.location.pathname;
             const basePath = getBasePath().replace(/\/$/, ''); // Remove trailing slash
             
-            // Create regex pattern with optional base path
-            const pathRegex = new RegExp(`${basePath}\/sports\/([^\/]+)(?:\/([^\/]+))?`);
+            // Create regex pattern with optional base path that avoids duplicate 'sports'
+            // This pattern will match '/sports/soccer/team' but not '/sports/sports/soccer/team'
+            const pathRegex = new RegExp(`${basePath}\\/sports\\/([^\\/]+)(?:\\/([^\\/]+))?$`);
             const match = path.match(pathRegex);
             
             if (match) {
