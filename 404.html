@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Streamer</title>
+    <script>
+        // This script handles redirects for deep links on GitHub Pages
+        (function() {
+            // Save the path before redirection
+            const path = window.location.pathname;
+            const search = window.location.search;
+            
+            // Don't redirect if we're already on the main page
+            if (path === '/' || path === '/index.html') {
+                return;
+            }
+            
+            // Redirect to the main page with the original path in sessionStorage
+            sessionStorage.setItem('redirectPath', path + search);
+            window.location.href = '/';
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
