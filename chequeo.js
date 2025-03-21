@@ -268,7 +268,7 @@ async function fetchQuestions(className) {
         questions = [];
         
         // Skip header rows (first 3 rows)
-        for (let i = 3; i < rows.length; i++) {
+        for (let i = 2; i < rows.length; i++) {
             const row = rows[i];
             
             // Skip empty rows
