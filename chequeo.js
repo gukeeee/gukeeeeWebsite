@@ -425,6 +425,7 @@ window.onload = function() {
     document.getElementById('clear-button').addEventListener('click', clearAnswers);
     
     // Set up keyboard shortcuts for teachers only if logged in
+    // Set up keyboard shortcuts for teachers only if logged in
     document.addEventListener("keydown", function (event) {
         if (isLoggedIn && (event.ctrlKey || event.metaKey) && event.shiftKey) {
             event.preventDefault();
