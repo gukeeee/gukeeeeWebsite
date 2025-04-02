@@ -68,7 +68,7 @@
         }
 
         #sport-selector {
-            width: 120px;
+            width: 140px;
             font-size: 14px;
             padding: 5px;
             border-radius: 8px;
@@ -188,6 +188,20 @@
             text-decoration: none;
             border: none;
         }
+        
+        .team-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .march-madness-message {
+            font-size: 16px;
+            color: #ff9800;
+            font-weight: 500;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -203,6 +217,7 @@
                     <option value="soccer">Soccer</option>
                     <option value="nba">Basketball</option>
                     <option value="nfl">Football</option>
+                    <option value="marchmadness">March Madness</option>
 <!--                     <option value="mlb">Baseball</option>
                     <option value="nhl">Hockey</option> -->
                 </select>
@@ -216,15 +231,22 @@
     
     <div class="container">
         <h1 id="sport-title">Sports Streamer</h1>
-        <input 
-            type="text" 
-            id="teamInput" 
-            class="team-input" 
-            placeholder="Team name (e.g. Arsenal)" 
-        />
-        <button id="updateButton" class="green-button">Watch Team</button>
-        <button id="clearButton" class="clear-button">Clear Team</button>
-        <div id="currentTeam" class="current-team"></div>
+        <div id="team-controls" class="team-controls">
+            <input 
+                type="text" 
+                id="teamInput" 
+                class="team-input" 
+                placeholder="Team name (e.g. Arsenal)" 
+            />
+            <div>
+                <button id="updateButton" class="green-button">Watch Team</button>
+                <button id="clearButton" class="clear-button">Clear Team</button>
+            </div>
+            <div id="currentTeam" class="current-team"></div>
+        </div>
+        <div id="march-madness-message" class="march-madness-message" style="display: none;">
+            Streaming all NCAA March Madness games
+        </div>
     </div>
     
     <div class="iframe-container">
@@ -247,6 +269,8 @@
         const clearButton = document.getElementById('clearButton');
         const sportsFrame = document.getElementById('sportsFrame');
         const currentTeam = document.getElementById('currentTeam');
+        const teamControls = document.getElementById('team-controls');
+        const marchMadnessMessage = document.getElementById('march-madness-message');
         
         // Sport-specific configuration
         const sportConfig = {
@@ -254,31 +278,43 @@
                 baseUrl: 'https://givemereddit.org/soccer/',
                 title: 'Soccer Streamer',
                 placeholder: 'Team name (e.g. Arsenal)',
-                storageKey: 'soccer_team'
+                storageKey: 'soccer_team',
+                requiresTeam: true
             },
             nba: {
                 baseUrl: 'https://givemereddit.org/nba/',
                 title: 'Basketball Streamer',
                 placeholder: 'Team name (e.g. Warriors)',
-                storageKey: 'basketball_team'
+                storageKey: 'basketball_team',
+                requiresTeam: true
             },
             nfl: {
                 baseUrl: 'https://givemereddit.org/nfl/',
                 title: 'Football Streamer',
                 placeholder: 'Team name (e.g. 49ers)',
-                storageKey: 'football_team'
+                storageKey: 'football_team',
+                requiresTeam: true
+            },
+            marchmadness: {
+                baseUrl: 'https://top.rnbastreams.com/mens-college-basketball-live-streams',
+                title: 'March Madness Streamer',
+                placeholder: '',
+                storageKey: 'marchmadness',
+                requiresTeam: false
             },
             mlb: {
                 baseUrl: 'https://mlbwebcast.com/stream/',
                 title: 'Baseball Streamer',
                 placeholder: 'Team name (e.g. Giants)',
-                storageKey: 'baseball_team'
+                storageKey: 'baseball_team',
+                requiresTeam: true
             },
             nhl: {
                 baseUrl: 'https://nhlwebcast.com/stream/',
                 title: 'Hockey Streamer',
                 placeholder: 'Team name (e.g. Sharks)',
-                storageKey: 'hockey_team'
+                storageKey: 'hockey_team',
+                requiresTeam: true
             }
         };
         
@@ -287,40 +323,58 @@
             // Get current sport configuration
             const config = sportConfig[sport];
             
-            // Convert to lowercase and remove spaces
-            const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
-            
-            // Construct the full URL
-            const fullUrl = config.baseUrl + formattedTeam + '.html';
-            
-            // Update iframe, localStorage, and display
-            sportsFrame.src = fullUrl;
-            localStorage.setItem(config.storageKey, formattedTeam);
-            
-            // Display the lowercase, no-spaces version for "currently watching"
-            currentTeam.textContent = 'Currently watching: ' + formattedTeam;
+            if (config.requiresTeam) {
+                // Convert to lowercase and remove spaces
+                const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
+                
+                // Construct the full URL
+                const fullUrl = config.baseUrl + formattedTeam + '.html';
+                
+                // Update iframe, localStorage, and display
+                sportsFrame.src = fullUrl;
+                localStorage.setItem(config.storageKey, formattedTeam);
+                
+                // Display the lowercase, no-spaces version for "currently watching"
+                currentTeam.textContent = 'Currently watching: ' + formattedTeam;
+            } else {
+                // Direct URL sports like March Madness
+                sportsFrame.src = config.baseUrl;
+            }
         }
         
         // Function to set up the UI for the current sport
         function setupSportUI(sport) {
             const config = sportConfig[sport];
             
-            // Update the title and placeholder
+            // Update the title
             sportTitle.textContent = config.title;
-            teamInput.placeholder = config.placeholder;
             
-            // Check if a team is saved in localStorage for this sport
-            const savedTeam = localStorage.getItem(config.storageKey);
-            
-            // Load the saved team if available
-            if (savedTeam) {
-                // Update display and iframe
-                currentTeam.textContent = 'Currently watching: ' + savedTeam;
-                sportsFrame.src = config.baseUrl + savedTeam + '.html';
+            // Show/hide UI elements based on whether the sport requires a team input
+            if (config.requiresTeam) {
+                teamControls.style.display = 'flex';
+                marchMadnessMessage.style.display = 'none';
+                teamInput.placeholder = config.placeholder;
+                
+                // Check if a team is saved in localStorage for this sport
+                const savedTeam = localStorage.getItem(config.storageKey);
+                
+                // Load the saved team if available
+                if (savedTeam) {
+                    // Update display and iframe
+                    currentTeam.textContent = 'Currently watching: ' + savedTeam;
+                    sportsFrame.src = config.baseUrl + savedTeam + '.html';
+                } else {
+                    // Clear current team display if no saved team
+                    currentTeam.textContent = 'Enter a team name to start watching';
+                    sportsFrame.src = '';
+                }
             } else {
-                // Clear current team display if no saved team
-                currentTeam.textContent = 'Enter a team name to start watching';
-                sportsFrame.src = '';
+                // For sports that don't require team input (March Madness)
+                teamControls.style.display = 'none';
+                marchMadnessMessage.style.display = 'block';
+                
+                // Directly load the stream
+                sportsFrame.src = config.baseUrl;
             }
         }
         
@@ -329,16 +383,18 @@
             const currentSport = sportSelector.value;
             const config = sportConfig[currentSport];
             
-            // Clear localStorage for this sport
-            localStorage.removeItem(config.storageKey);
-            
-            // Reset the UI
-            currentTeam.textContent = 'Enter a team name to start watching';
-            teamInput.value = '';
-            sportsFrame.src = '';
+            if (config.requiresTeam) {
+                // Clear localStorage for this sport
+                localStorage.removeItem(config.storageKey);
+                
+                // Reset the UI
+                currentTeam.textContent = 'Enter a team name to start watching';
+                teamInput.value = '';
+                sportsFrame.src = '';
+            }
         }
         
-        // Initialize with the default sport (first one in dropdown)
+        // Initialize with the default sport (first one in dropdown or saved preference)
         let initialSport = localStorage.getItem('current_sport') || 'soccer';
         sportSelector.value = initialSport;
         setupSportUI(initialSport);
@@ -354,9 +410,14 @@
         
         // Update button click event
         updateButton.addEventListener('click', function() {
-            const newTeam = teamInput.value.trim();
-            if (newTeam) {
-                updateTeam(sportSelector.value, newTeam);
+            const currentSport = sportSelector.value;
+            const config = sportConfig[currentSport];
+            
+            if (config.requiresTeam) {
+                const newTeam = teamInput.value.trim();
+                if (newTeam) {
+                    updateTeam(currentSport, newTeam);
+                }
             }
         });
         
@@ -368,9 +429,14 @@
         // Allow pressing Enter to update the team
         teamInput.addEventListener('keyup', function(event) {
             if (event.key === 'Enter') {
-                const newTeam = teamInput.value.trim();
-                if (newTeam) {
-                    updateTeam(sportSelector.value, newTeam);
+                const currentSport = sportSelector.value;
+                const config = sportConfig[currentSport];
+                
+                if (config.requiresTeam) {
+                    const newTeam = teamInput.value.trim();
+                    if (newTeam) {
+                        updateTeam(currentSport, newTeam);
+                    }
                 }
             }
         });
