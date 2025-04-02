@@ -168,18 +168,20 @@
             font-weight: 500;
         }
 
-        iframe {
-            border: none;
-            width: 100%;
-            height: 75vh;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
         .iframe-container {
             width: 90%;
             max-width: 1500px;
-            height: 75vh;
+            height: calc(100vh - 180px); /* Dynamic height calculation */
+            margin-bottom: 20px;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: auto; /* Allow scrolling within iframe */
         }
 
         a {
@@ -249,12 +251,12 @@
         </div>
     </div>
     
-    <div class="iframe-container">
+    <div id="iframe-container" class="iframe-container">
         <iframe 
             id="sportsFrame"
             frameborder="0" 
             allowfullscreen 
-            scrolling="no" 
+            scrolling="yes" 
             allowtransparency 
             sandbox="allow-scripts allow-same-origin">
         </iframe>
@@ -268,6 +270,7 @@
         const updateButton = document.getElementById('updateButton');
         const clearButton = document.getElementById('clearButton');
         const sportsFrame = document.getElementById('sportsFrame');
+        const iframeContainer = document.getElementById('iframe-container');
         const currentTeam = document.getElementById('currentTeam');
         const teamControls = document.getElementById('team-controls');
         const marchMadnessMessage = document.getElementById('march-madness-message');
@@ -376,6 +379,23 @@
                 // Directly load the stream
                 sportsFrame.src = config.baseUrl;
             }
+            
+            // Adjust iframe container height
+            adjustIframeHeight();
+        }
+        
+        // Function to adjust iframe height based on window size
+        function adjustIframeHeight() {
+            const windowHeight = window.innerHeight;
+            const headerHeight = document.querySelector('header').offsetHeight;
+            const containerHeight = document.querySelector('.container').offsetHeight;
+            const margin = 40; // Total top and bottom margins
+            
+            // Calculate available height
+            const availableHeight = windowHeight - headerHeight - containerHeight - margin;
+            
+            // Set iframe container height
+            iframeContainer.style.height = availableHeight + 'px';
         }
         
         // Function to clear the current team selection
@@ -398,6 +418,12 @@
         let initialSport = localStorage.getItem('current_sport') || 'soccer';
         sportSelector.value = initialSport;
         setupSportUI(initialSport);
+        
+        // Adjust iframe height on window resize
+        window.addEventListener('resize', adjustIframeHeight);
+        
+        // Initial height adjustment
+        adjustIframeHeight();
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
