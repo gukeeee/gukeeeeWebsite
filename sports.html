@@ -81,13 +81,12 @@
         .container {
             background-color: #ffffff;
             padding: 20px;
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
+            border-radius: 16px; /* Rounded corners on all sides */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 90%;
+            width: 95%;
             max-width: 1500px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             margin-top: 20px;
         }
 
@@ -98,13 +97,19 @@
             color: #2e7d32; /* Darker green for title */
         }
 
+        .team-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         .team-input {
             padding: 8px;
-            margin: 10px 0;
-            width: 60%;
-            max-width: 300px;
+            margin: 0;
+            width: 250px;
             box-sizing: border-box;
-            display: inline-block;
             border-radius: 8px;
             border: 1px solid #81c784; /* Light green border */
             font-size: 14px;
@@ -123,6 +128,11 @@
             box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
         }
 
+        .buttons-container {
+            display: flex;
+            gap: 8px;
+        }
+
         .green-button {
             padding: 8px 15px;
             border: none;
@@ -132,8 +142,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
-            margin: 10px 6px;
             font-family: "Poppins", sans-serif;
+            height: 35px;
         }
 
         .green-button:hover {
@@ -151,8 +161,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
-            margin: 10px 6px;
             font-family: "Poppins", sans-serif;
+            height: 35px;
         }
 
         .clear-button:hover {
@@ -166,12 +176,14 @@
             color: #4caf50; /* Green text */
             margin-top: 5px;
             font-weight: 500;
+            width: 100%;
+            text-align: center;
         }
 
         .iframe-container {
-            width: 90%;
+            width: 95%;
             max-width: 1500px;
-            height: calc(100vh - 180px); /* Dynamic height calculation */
+            height: calc(100vh - 150px); /* Increased height */
             margin-bottom: 20px;
         }
 
@@ -189,13 +201,6 @@
             padding: 0;
             text-decoration: none;
             border: none;
-        }
-        
-        .team-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
         
         .sport-message {
@@ -240,12 +245,12 @@
                 class="team-input" 
                 placeholder="Team name (e.g. Arsenal)" 
             />
-            <div>
+            <div class="buttons-container">
                 <button id="updateButton" class="green-button">Watch Team</button>
                 <button id="clearButton" class="clear-button">Clear Team</button>
             </div>
-            <div id="currentTeam" class="current-team"></div>
         </div>
+        <div id="currentTeam" class="current-team"></div>
         <div id="sport-message" class="sport-message" style="display: none;">
             Streaming all games
         </div>
@@ -310,7 +315,7 @@
                 message: 'Streaming all NCAA March Madness games'
             },
             mlb: {
-                baseUrl: 'https://mlbbite.net/',
+                baseUrl: 'https://mlbwebcast.com/',
                 title: 'Baseball Streamer',
                 placeholder: '',
                 storageKey: 'baseball_stream',
@@ -318,7 +323,7 @@
                 message: 'Streaming all MLB baseball games'
             },
             nhl: {
-                baseUrl: 'https://reddit.nhlbite.com/live8',
+                baseUrl: 'https://nhlwebcast.com/%C3%85/',
                 title: 'Hockey Streamer',
                 placeholder: '',
                 storageKey: 'hockey_stream',
@@ -361,6 +366,7 @@
             // Show/hide UI elements based on whether the sport requires a team input
             if (config.requiresTeam) {
                 teamControls.style.display = 'flex';
+                currentTeam.style.display = 'block';
                 sportMessage.style.display = 'none';
                 teamInput.placeholder = config.placeholder;
                 
@@ -380,6 +386,7 @@
             } else {
                 // For sports that don't require team input (March Madness, MLB, NHL)
                 teamControls.style.display = 'none';
+                currentTeam.style.display = 'none';
                 sportMessage.style.display = 'block';
                 sportMessage.textContent = config.message;
                 
