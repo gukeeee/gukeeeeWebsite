@@ -224,9 +224,9 @@
                     <option value="soccer">Soccer</option>
                     <option value="nba">Basketball</option>
                     <option value="nfl">Football</option>
-                    <option value="collegebball">College Basketball</option>
-                    <option value="collegefball">College Football</option>
-                    <option value="mlb">Baseball</option>
+<!--                     <option value="collegebball">College Basketball</option> -->
+<!--                     <option value="collegefball">College Football</option> -->
+<!--                     <option value="mlb">Baseball</option> -->
                     <option value="nhl">Hockey</option>
                 </select>
             </div>
@@ -308,20 +308,20 @@
                 message: ''
             },
             collegebball: {
-                baseUrl: 'https://crackstreams.cx/cfbstreams/live',
-                title: 'College Football Streamer',
-                placeholder: '',
-                storageKey: 'collegefball',
-                requiresTeam: false,
-                message: 'Streaming all College Football games'
-            },
-            collegefball: {
                 baseUrl: 'https://crackstreams.cx/ncaabstreams/live',
                 title: 'College Basketball Streamer',
                 placeholder: '',
                 storageKey: 'collegebball',
                 requiresTeam: false,
                 message: 'Streaming all College Basketball games'
+            },
+            collegefball: {
+                baseUrl: 'https://crackstreams.cx/cfbstreams/live',
+                title: 'College Football Streamer',
+                placeholder: '',
+                storageKey: 'collegefball',
+                requiresTeam: false,
+                message: 'Streaming all College Football games'
             },
             mlb: {
                 baseUrl: 'https://thetvapp.to/mlb',
