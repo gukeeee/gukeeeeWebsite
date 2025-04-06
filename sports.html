@@ -224,7 +224,8 @@
                     <option value="soccer">Soccer</option>
                     <option value="nba">Basketball</option>
                     <option value="nfl">Football</option>
-                    <option value="marchmadness">March Madness</option>
+                    <option value="collegebball">College Basketball</option>
+                    <option value="collegefball">College Football</option>
                     <option value="mlb">Baseball</option>
                     <option value="nhl">Hockey</option>
                 </select>
@@ -306,16 +307,24 @@
                 requiresTeam: true,
                 message: ''
             },
-            marchmadness: {
-                baseUrl: 'https://top.rnbastreams.com/mens-college-basketball-live-streams',
-                title: 'March Madness Streamer',
+            collegebball: {
+                baseUrl: 'https://crackstreams.cx/cfbstreams/live',
+                title: 'College Football Streamer',
                 placeholder: '',
-                storageKey: 'marchmadness',
+                storageKey: 'collegefball',
                 requiresTeam: false,
-                message: 'Streaming all NCAA March Madness games'
+                message: 'Streaming all College Football games'
+            },
+            collegefball: {
+                baseUrl: 'https://crackstreams.cx/ncaabstreams/live',
+                title: 'College Basketball Streamer',
+                placeholder: '',
+                storageKey: 'collegebball',
+                requiresTeam: false,
+                message: 'Streaming all College Basketball games'
             },
             mlb: {
-                baseUrl: 'https://the.streameast.app/mlb/streams',
+                baseUrl: 'https://thetvapp.to/mlb',
                 title: 'Baseball Streamer',
                 placeholder: '',
                 storageKey: 'baseball_stream',
