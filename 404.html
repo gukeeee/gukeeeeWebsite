@@ -67,6 +67,12 @@
             background-color: #d32f2f; /* Darker red on hover */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
+
+        #redirect-message {
+            font-size: 14px;
+            margin-top: 15px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -75,6 +81,62 @@
         <h1>404 - Page Not Found</h1>
         <p>The page you're looking for doesn't exist or has been moved.</p>
         <a href="/" class="home-button">Go Home</a>
+        <div id="redirect-message"></div>
     </div>
+
+    <script>
+        // Function to check if we're on a sports path
+        function checkSportsPath() {
+            const path = window.location.pathname;
+            const pathParts = path.split('/').filter(part => part.length > 0);
+            
+            // Sport mapping from the sports page
+            const sportMapping = {
+                'soccer': 'soccer',
+                'basketball': 'nba',
+                'football': 'nfl',
+                'hockey': 'nhl',
+                'collegebasketball': 'collegebball',
+                'collegefootball': 'collegefball',
+                'baseball': 'mlb'
+            };
+            
+            // Check if we're at a sports URL with parameters
+            if (pathParts.length >= 2 && pathParts[0] === 'sports') {
+                // Get the sport name from path
+                const sportName = pathParts[1];
+                let sportValue = sportMapping[sportName];
+                
+                // If we found a valid sport
+                if (sportValue) {
+                    // Get team name if present
+                    const teamName = pathParts.length >= 3 ? pathParts[2] : '';
+                    
+                    // Store parameters for after redirect
+                    localStorage.setItem('param_sport', sportValue);
+                    if (teamName) {
+                        localStorage.setItem('param_team', teamName);
+                    }
+                    
+                    // Show redirect message
+                    document.getElementById('redirect-message').textContent = 'Redirecting to sports page...';
+                    
+                    // Redirect to sports page
+                    setTimeout(function() {
+                        window.location.href = '/sports';
+                    }, 1000);
+                    
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Run check when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            checkSportsPath();
+        });
+    </script>
 </body>
 </html>
