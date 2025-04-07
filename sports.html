@@ -183,8 +183,9 @@
         .iframe-container {
             width: 95%;
             max-width: 1500px;
-            height: calc(100vh - 150px); /* Increased height */
+            height: 80vh; /* Use a percentage of viewport height */
             margin-bottom: 20px;
+            overflow: visible; /* Allow content to be visible outside the container */
         }
 
         iframe {
@@ -242,65 +243,75 @@
             font-family: "Poppins", sans-serif;
             text-align: center;
         }
+
+        #page-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px; /* Add extra space at the bottom */
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <a href="https://gukeeee.pages.dev/">
-                <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
-            </a>
-            
-            <div class="sport-dropdown">
-                <select id="sport-selector">
-                    <option value="soccer">Soccer</option>
-                    <option value="nba">Basketball</option>
-                    <option value="nfl">Football</option>
+    <div id="page-container">
+        <!-- Header -->
+        <header>
+            <div class="header-container">
+                <a href="https://gukeeee.pages.dev/">
+                    <img src="gukeeee-logo-green.png" alt="Gukeeee Logo" class="logo">
+                </a>
+                
+                <div class="sport-dropdown">
+                    <select id="sport-selector">
+                        <option value="soccer">Soccer</option>
+                        <option value="nba">Basketball</option>
+                        <option value="nfl">Football</option>
 <!--                     <option value="collegebball">College Basketball</option> -->
 <!--                     <option value="collegefball">College Football</option> -->
 <!--                     <option value="mlb">Baseball</option> -->
-                    <option value="nhl">Hockey</option>
-                </select>
+                        <option value="nhl">Hockey</option>
+                    </select>
+                </div>
+                
+                <a href="https://gukeeee.pages.dev/">
+                    <button class="home-button">Home</button>
+                </a>
             </div>
-            
-            <a href="https://gukeeee.pages.dev/">
-                <button class="home-button">Home</button>
-            </a>
-        </div>
-    </header>
-    
-    <div class="container">
-        <h1 id="sport-title">Sports Streamer</h1>
-        <div id="team-controls" class="team-controls">
-            <input 
-                type="text" 
-                id="teamInput" 
-                class="team-input" 
-                placeholder="Team name (e.g. Arsenal)" 
-            />
-            <div class="buttons-container">
-                <button id="updateButton" class="green-button">Watch Team</button>
-                <button id="clearButton" class="clear-button">Clear Team</button>
+        </header>
+        
+        <div class="container">
+            <h1 id="sport-title">Sports Streamer</h1>
+            <div id="team-controls" class="team-controls">
+                <input 
+                    type="text" 
+                    id="teamInput" 
+                    class="team-input" 
+                    placeholder="Team name (e.g. Arsenal)" 
+                />
+                <div class="buttons-container">
+                    <button id="updateButton" class="green-button">Watch Team</button>
+                    <button id="clearButton" class="clear-button">Clear Team</button>
+                </div>
             </div>
+            <div id="currentTeam" class="current-team"></div>
+            <div id="sport-message" class="sport-message" style="display: none;">
+                Streaming all games
+            </div>
+            <button id="shareButton" class="share-button">Share This Stream</button>
+            <input type="text" id="shareLink" readonly>
         </div>
-        <div id="currentTeam" class="current-team"></div>
-        <div id="sport-message" class="sport-message" style="display: none;">
-            Streaming all games
+        
+        <div id="iframe-container" class="iframe-container">
+            <iframe 
+                id="sportsFrame"
+                frameborder="0" 
+                allowfullscreen 
+                scrolling="yes" 
+                allowtransparency 
+                sandbox="allow-scripts allow-same-origin">
+            </iframe>
         </div>
-        <button id="shareButton" class="share-button">Share This Stream</button>
-        <input type="text" id="shareLink" readonly>
-    </div>
-    
-    <div id="iframe-container" class="iframe-container">
-        <iframe 
-            id="sportsFrame"
-            frameborder="0" 
-            allowfullscreen 
-            scrolling="yes" 
-            allowtransparency 
-            sandbox="allow-scripts allow-same-origin">
-        </iframe>
     </div>
 
     <script>
@@ -318,12 +329,26 @@
         const shareButton = document.getElementById('shareButton');
         const shareLink = document.getElementById('shareLink');
         
-        // Map sport codes to their dropdown values
+        // Map friendly sport names to their dropdown values
         const sportMapping = {
             'soccer': 'soccer',
             'basketball': 'nba',
             'football': 'nfl',
-            'hockey': 'nhl'
+            'hockey': 'nhl',
+            'collegebasketball': 'collegebball',
+            'collegefootball': 'collegefball',
+            'baseball': 'mlb'
+        };
+
+        // Map dropdown values to friendly names
+        const reverseSportMapping = {
+            'soccer': 'soccer',
+            'nba': 'basketball',
+            'nfl': 'football',
+            'nhl': 'hockey',
+            'collegebball': 'collegebasketball',
+            'collegefball': 'collegefootball',
+            'mlb': 'baseball'
         };
         
         // Sport-specific configuration
@@ -334,8 +359,7 @@
                 placeholder: 'Team name (e.g. Arsenal)',
                 storageKey: 'soccer_team',
                 requiresTeam: true,
-                message: '',
-                friendlyName: 'soccer'
+                message: ''
             },
             nba: {
                 baseUrl: 'https://givemereddit.org/nba/',
@@ -343,8 +367,7 @@
                 placeholder: 'Team name (e.g. Warriors)',
                 storageKey: 'basketball_team',
                 requiresTeam: true,
-                message: '',
-                friendlyName: 'basketball'
+                message: ''
             },
             nfl: {
                 baseUrl: 'https://givemereddit.org/nfl/',
@@ -352,44 +375,39 @@
                 placeholder: 'Team name (e.g. 49ers)',
                 storageKey: 'football_team',
                 requiresTeam: true,
-                message: '',
-                friendlyName: 'football'
+                message: ''
             },
             collegebball: {
                 baseUrl: 'https://crackstreams.cx/ncaabstreams/live',
                 title: 'College Basketball Streamer',
                 placeholder: '',
-                storageKey: 'collegebball',
+                storageKey: 'collegebball_team',
                 requiresTeam: false,
-                message: 'Streaming all College Basketball games',
-                friendlyName: 'collegebasketball'
+                message: 'Streaming all College Basketball games'
             },
             collegefball: {
                 baseUrl: 'https://crackstreams.cx/cfbstreams/live',
                 title: 'College Football Streamer',
                 placeholder: '',
-                storageKey: 'collegefball',
+                storageKey: 'collegefball_team',
                 requiresTeam: false,
-                message: 'Streaming all College Football games',
-                friendlyName: 'collegefootball'
+                message: 'Streaming all College Football games'
             },
             mlb: {
                 baseUrl: 'https://thetvapp.to/mlb',
                 title: 'Baseball Streamer',
                 placeholder: '',
-                storageKey: 'baseball_stream',
+                storageKey: 'baseball_team',
                 requiresTeam: false,
-                message: 'Streaming all MLB baseball games',
-                friendlyName: 'baseball'
+                message: 'Streaming all MLB baseball games'
             },
             nhl: {
                 baseUrl: 'https://nhlstreams.io/',
                 title: 'Hockey Streamer',
                 placeholder: '',
-                storageKey: 'hockey_stream',
+                storageKey: 'hockey_team',
                 requiresTeam: false,
-                message: 'Streaming all NHL hockey games',
-                friendlyName: 'hockey'
+                message: 'Streaming all NHL hockey games'
             }
         };
         
@@ -464,101 +482,37 @@
                 sportsFrame.src = config.baseUrl;
                 updateShareLink(sport, '');
             }
-            
-            // Adjust iframe container height
-            adjustIframeHeight();
         }
         
         // Function to update the share link
         function updateShareLink(sport, team) {
-            const config = sportConfig[sport];
             let url = 'https://gukeeee.pages.dev/sports';
+            const friendlySportName = reverseSportMapping[sport];
             
-            if (config.requiresTeam && team) {
-                url = `https://gukeeee.pages.dev/sports/${config.friendlyName}/${team}`;
-            } else if (!config.requiresTeam) {
-                url = `https://gukeeee.pages.dev/sports/${config.friendlyName}`;
+            if (friendlySportName) {
+                url = `https://gukeeee.pages.dev/sports/${friendlySportName}`;
+                
+                if (sportConfig[sport].requiresTeam && team) {
+                    url += `/${team}`;
+                }
             }
             
             shareLink.value = url;
         }
         
-        // Function to adjust iframe height based on window size
-        function adjustIframeHeight() {
-            const windowHeight = window.innerHeight;
-            const headerHeight = document.querySelector('header').offsetHeight;
-            const containerHeight = document.querySelector('.container').offsetHeight;
-            const margin = 40; // Total top and bottom margins
+        // Function to handle URL parameters
+        function handleURLParameters() {
+            // This function is called directly when on sports.html
             
-            // Calculate available height
-            const availableHeight = windowHeight - headerHeight - containerHeight - margin;
-            
-            // Set iframe container height
-            iframeContainer.style.height = availableHeight + 'px';
-        }
-        
-        // Function to clear the current team selection
-        function clearTeamSelection() {
-            const currentSport = sportSelector.value;
-            const config = sportConfig[currentSport];
-            
-            if (config.requiresTeam) {
-                // Clear localStorage for this sport
-                localStorage.removeItem(config.storageKey);
-                
-                // Reset the UI
-                currentTeam.textContent = 'Enter a team name to start watching';
-                teamInput.value = '';
-                sportsFrame.src = '';
-                updateShareLink(currentSport, '');
-            }
-        }
-        
-        // Function to parse URL parameters and set sport/team
-        function parseURLParameters() {
-            const path = window.location.pathname;
-            const pathParts = path.split('/').filter(part => part.length > 0);
-            
-            // Check if we're at a sports URL with parameters
-            if (pathParts.length >= 2 && pathParts[0] === 'sports') {
-                // Get the sport name from path
-                const sportName = pathParts[1];
-                let sportValue = null;
-                
-                // Map friendly name to sport value
-                for (const [key, config] of Object.entries(sportConfig)) {
-                    if (config.friendlyName === sportName) {
-                        sportValue = key;
-                        break;
-                    }
-                }
-                
-                // If we found a valid sport
-                if (sportValue) {
-                    // Get team name if present
-                    const teamName = pathParts.length >= 3 ? pathParts[2] : '';
-                    
-                    // Store parameters for after redirect
-                    localStorage.setItem('param_sport', sportValue);
-                    localStorage.setItem('param_team', teamName);
-                    
-                    // Redirect to base sports page
-                    if (path !== '/sports') {
-                        window.location.href = 'https://gukeeee.pages.dev/sports';
-                        return true; // Indicate we're redirecting
-                    }
-                }
-            }
-            
-            // Check for stored parameters after redirect
+            // Get saved parameters from localStorage
             const paramSport = localStorage.getItem('param_sport');
             const paramTeam = localStorage.getItem('param_team');
             
-            if (paramSport) {
+            if (paramSport && sportConfig[paramSport]) {
                 // Set sport selector
                 sportSelector.value = paramSport;
                 
-                // Apply the sport
+                // Apply the sport UI
                 setupSportUI(paramSport);
                 
                 // If team is specified and required for this sport
@@ -576,10 +530,48 @@
             return false; // No parameters applied
         }
         
+        // Function to check if we're on a 404 page and should be redirected
+        function checkAndRedirect() {
+            const path = window.location.pathname;
+            const pathParts = path.split('/').filter(part => part.length > 0);
+            
+            // Check if we're at a sports URL with parameters
+            if (pathParts.length >= 2 && pathParts[0] === 'sports') {
+                // Get the sport name from path
+                const sportName = pathParts[1];
+                let sportValue = sportMapping[sportName];
+                
+                // If we found a valid sport
+                if (sportValue && sportConfig[sportValue]) {
+                    // Get team name if present
+                    const teamName = pathParts.length >= 3 ? pathParts[2] : '';
+                    
+                    // Store parameters for after redirect
+                    localStorage.setItem('param_sport', sportValue);
+                    if (teamName) {
+                        localStorage.setItem('param_team', teamName);
+                    }
+                    
+                    // If this URL would lead to a 404, redirect to base sports page
+                    if (path !== '/sports' && path !== '/sports.html') {
+                        window.location.href = 'https://gukeeee.pages.dev/sports';
+                        return true; // Indicate we're redirecting
+                    }
+                }
+            }
+            
+            return false; // No redirect needed
+        }
+        
         // Initialize
         function init() {
-            // Try to parse URL parameters first
-            const parametersApplied = parseURLParameters();
+            // Check if we need to redirect first
+            if (checkAndRedirect()) {
+                return; // Don't continue initialization if redirecting
+            }
+            
+            // Try to apply URL parameters
+            const parametersApplied = handleURLParameters();
             
             // If no parameters, use default or saved preference
             if (!parametersApplied) {
@@ -587,15 +579,9 @@
                 sportSelector.value = initialSport;
                 setupSportUI(initialSport);
             }
-            
-            // Adjust iframe height
-            adjustIframeHeight();
         }
         
         // Event listeners
-        
-        // Adjust iframe height on window resize
-        window.addEventListener('resize', adjustIframeHeight);
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
@@ -623,6 +609,23 @@
         clearButton.addEventListener('click', function() {
             clearTeamSelection();
         });
+        
+        // Function to clear the current team selection
+        function clearTeamSelection() {
+            const currentSport = sportSelector.value;
+            const config = sportConfig[currentSport];
+            
+            if (config.requiresTeam) {
+                // Clear localStorage for this sport
+                localStorage.removeItem(config.storageKey);
+                
+                // Reset the UI
+                currentTeam.textContent = 'Enter a team name to start watching';
+                teamInput.value = '';
+                sportsFrame.src = '';
+                updateShareLink(currentSport, '');
+            }
+        }
         
         // Allow pressing Enter to update the team
         teamInput.addEventListener('keyup', function(event) {
@@ -658,8 +661,8 @@
             }
         });
         
-        // Initialize the page
-        init();
+        // Run on page load
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
