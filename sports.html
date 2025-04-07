@@ -209,6 +209,39 @@
             font-weight: 500;
             margin: 10px 0;
         }
+
+        .share-button {
+            padding: 6px 15px;
+            border: none;
+            background-color: #2196F3; /* Blue button */
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            background-color: #1565C0; /* Darker blue on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #shareLink {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            padding: 8px;
+            margin: 10px auto;
+            border-radius: 8px;
+            border: 1px solid #81c784;
+            font-size: 14px;
+            font-family: "Poppins", sans-serif;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -255,6 +288,8 @@
         <div id="sport-message" class="sport-message" style="display: none;">
             Streaming all games
         </div>
+        <button id="shareButton" class="share-button">Share This Stream</button>
+        <input type="text" id="shareLink" readonly>
     </div>
     
     <div id="iframe-container" class="iframe-container">
@@ -280,6 +315,16 @@
         const currentTeam = document.getElementById('currentTeam');
         const teamControls = document.getElementById('team-controls');
         const sportMessage = document.getElementById('sport-message');
+        const shareButton = document.getElementById('shareButton');
+        const shareLink = document.getElementById('shareLink');
+        
+        // Map sport codes to their dropdown values
+        const sportMapping = {
+            'soccer': 'soccer',
+            'basketball': 'nba',
+            'football': 'nfl',
+            'hockey': 'nhl'
+        };
         
         // Sport-specific configuration
         const sportConfig = {
@@ -289,7 +334,8 @@
                 placeholder: 'Team name (e.g. Arsenal)',
                 storageKey: 'soccer_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                friendlyName: 'soccer'
             },
             nba: {
                 baseUrl: 'https://givemereddit.org/nba/',
@@ -297,7 +343,8 @@
                 placeholder: 'Team name (e.g. Warriors)',
                 storageKey: 'basketball_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                friendlyName: 'basketball'
             },
             nfl: {
                 baseUrl: 'https://givemereddit.org/nfl/',
@@ -305,7 +352,8 @@
                 placeholder: 'Team name (e.g. 49ers)',
                 storageKey: 'football_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                friendlyName: 'football'
             },
             collegebball: {
                 baseUrl: 'https://crackstreams.cx/ncaabstreams/live',
@@ -313,7 +361,8 @@
                 placeholder: '',
                 storageKey: 'collegebball',
                 requiresTeam: false,
-                message: 'Streaming all College Basketball games'
+                message: 'Streaming all College Basketball games',
+                friendlyName: 'collegebasketball'
             },
             collegefball: {
                 baseUrl: 'https://crackstreams.cx/cfbstreams/live',
@@ -321,7 +370,8 @@
                 placeholder: '',
                 storageKey: 'collegefball',
                 requiresTeam: false,
-                message: 'Streaming all College Football games'
+                message: 'Streaming all College Football games',
+                friendlyName: 'collegefootball'
             },
             mlb: {
                 baseUrl: 'https://thetvapp.to/mlb',
@@ -329,7 +379,8 @@
                 placeholder: '',
                 storageKey: 'baseball_stream',
                 requiresTeam: false,
-                message: 'Streaming all MLB baseball games'
+                message: 'Streaming all MLB baseball games',
+                friendlyName: 'baseball'
             },
             nhl: {
                 baseUrl: 'https://nhlstreams.io/',
@@ -337,7 +388,8 @@
                 placeholder: '',
                 storageKey: 'hockey_stream',
                 requiresTeam: false,
-                message: 'Streaming all NHL hockey games'
+                message: 'Streaming all NHL hockey games',
+                friendlyName: 'hockey'
             }
         };
         
@@ -359,10 +411,16 @@
                 
                 // Display the lowercase, no-spaces version for "currently watching"
                 currentTeam.textContent = 'Currently watching: ' + formattedTeam;
+                
+                // Update team input field
+                teamInput.value = formattedTeam;
             } else {
                 // Direct URL sports like March Madness
                 sportsFrame.src = config.baseUrl;
             }
+            
+            // Update share link
+            updateShareLink(sport, team);
         }
         
         // Function to set up the UI for the current sport
@@ -387,10 +445,13 @@
                     // Update display and iframe
                     currentTeam.textContent = 'Currently watching: ' + savedTeam;
                     sportsFrame.src = config.baseUrl + savedTeam + '.html';
+                    teamInput.value = savedTeam;
+                    updateShareLink(sport, savedTeam);
                 } else {
                     // Clear current team display if no saved team
                     currentTeam.textContent = 'Enter a team name to start watching';
                     sportsFrame.src = '';
+                    updateShareLink(sport, '');
                 }
             } else {
                 // For sports that don't require team input (March Madness, MLB, NHL)
@@ -401,10 +462,25 @@
                 
                 // Directly load the stream
                 sportsFrame.src = config.baseUrl;
+                updateShareLink(sport, '');
             }
             
             // Adjust iframe container height
             adjustIframeHeight();
+        }
+        
+        // Function to update the share link
+        function updateShareLink(sport, team) {
+            const config = sportConfig[sport];
+            let url = 'https://gukeeee.pages.dev/sports';
+            
+            if (config.requiresTeam && team) {
+                url = `https://gukeeee.pages.dev/sports/${config.friendlyName}/${team}`;
+            } else if (!config.requiresTeam) {
+                url = `https://gukeeee.pages.dev/sports/${config.friendlyName}`;
+            }
+            
+            shareLink.value = url;
         }
         
         // Function to adjust iframe height based on window size
@@ -434,19 +510,92 @@
                 currentTeam.textContent = 'Enter a team name to start watching';
                 teamInput.value = '';
                 sportsFrame.src = '';
+                updateShareLink(currentSport, '');
             }
         }
         
-        // Initialize with the default sport (first one in dropdown or saved preference)
-        let initialSport = localStorage.getItem('current_sport') || 'soccer';
-        sportSelector.value = initialSport;
-        setupSportUI(initialSport);
+        // Function to parse URL parameters and set sport/team
+        function parseURLParameters() {
+            const path = window.location.pathname;
+            const pathParts = path.split('/').filter(part => part.length > 0);
+            
+            // Check if we're at a sports URL with parameters
+            if (pathParts.length >= 2 && pathParts[0] === 'sports') {
+                // Get the sport name from path
+                const sportName = pathParts[1];
+                let sportValue = null;
+                
+                // Map friendly name to sport value
+                for (const [key, config] of Object.entries(sportConfig)) {
+                    if (config.friendlyName === sportName) {
+                        sportValue = key;
+                        break;
+                    }
+                }
+                
+                // If we found a valid sport
+                if (sportValue) {
+                    // Get team name if present
+                    const teamName = pathParts.length >= 3 ? pathParts[2] : '';
+                    
+                    // Store parameters for after redirect
+                    localStorage.setItem('param_sport', sportValue);
+                    localStorage.setItem('param_team', teamName);
+                    
+                    // Redirect to base sports page
+                    if (path !== '/sports') {
+                        window.location.href = 'https://gukeeee.pages.dev/sports';
+                        return true; // Indicate we're redirecting
+                    }
+                }
+            }
+            
+            // Check for stored parameters after redirect
+            const paramSport = localStorage.getItem('param_sport');
+            const paramTeam = localStorage.getItem('param_team');
+            
+            if (paramSport) {
+                // Set sport selector
+                sportSelector.value = paramSport;
+                
+                // Apply the sport
+                setupSportUI(paramSport);
+                
+                // If team is specified and required for this sport
+                if (paramTeam && sportConfig[paramSport].requiresTeam) {
+                    updateTeam(paramSport, paramTeam);
+                }
+                
+                // Clear the stored parameters
+                localStorage.removeItem('param_sport');
+                localStorage.removeItem('param_team');
+                
+                return true; // Indicate we applied parameters
+            }
+            
+            return false; // No parameters applied
+        }
+        
+        // Initialize
+        function init() {
+            // Try to parse URL parameters first
+            const parametersApplied = parseURLParameters();
+            
+            // If no parameters, use default or saved preference
+            if (!parametersApplied) {
+                let initialSport = localStorage.getItem('current_sport') || 'soccer';
+                sportSelector.value = initialSport;
+                setupSportUI(initialSport);
+            }
+            
+            // Adjust iframe height
+            adjustIframeHeight();
+        }
+        
+        // Event listeners
         
         // Adjust iframe height on window resize
         window.addEventListener('resize', adjustIframeHeight);
-        
-        // Initial height adjustment
-        adjustIframeHeight();
         
         // Sport selector change event
         sportSelector.addEventListener('change', function() {
@@ -489,6 +638,28 @@
                 }
             }
         });
+        
+        // Share button click event
+        shareButton.addEventListener('click', function() {
+            // Show the share link
+            shareLink.style.display = 'block';
+            
+            // Select the link text
+            shareLink.select();
+            shareLink.setSelectionRange(0, 99999); // For mobile devices
+            
+            // Copy the link
+            try {
+                navigator.clipboard.writeText(shareLink.value);
+                alert('Share link copied to clipboard!');
+            } catch (err) {
+                // Fallback if clipboard API fails
+                alert('Please manually copy the share link displayed.');
+            }
+        });
+        
+        // Initialize the page
+        init();
     </script>
 </body>
 </html>
