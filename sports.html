@@ -231,6 +231,34 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
+        /* New styles for the reload button */
+        .reload-button {
+            padding: 6px 15px;
+            border: none;
+            background-color: #9c27b0; /* Purple button */
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: "Poppins", sans-serif;
+            transition: all 0.3s ease;
+            margin: 10px 0 0 10px;
+        }
+
+        .reload-button:hover {
+            transform: translateY(-2px);
+            background-color: #7b1fa2; /* Darker purple on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
         #shareLink {
             display: none;
             width: 100%;
@@ -298,7 +326,10 @@
             <div id="sport-message" class="sport-message" style="display: none;">
                 Streaming all games
             </div>
-            <button id="shareButton" class="share-button">Share This Stream</button>
+            <div class="button-row">
+                <button id="shareButton" class="share-button">Share This Stream</button>
+                <button id="reloadButton" class="reload-button">Reload Stream</button>
+            </div>
             <input type="text" id="shareLink" readonly>
         </div>
         
@@ -328,6 +359,7 @@
         const sportMessage = document.getElementById('sport-message');
         const shareButton = document.getElementById('shareButton');
         const shareLink = document.getElementById('shareLink');
+        const reloadButton = document.getElementById('reloadButton');
         
         // Map friendly sport names to their dropdown values
         const sportMapping = {
@@ -500,6 +532,17 @@
             shareLink.value = url;
         }
         
+        // Function to reload the current stream
+        function reloadStream() {
+            if (sportsFrame.src) {
+                const currentSrc = sportsFrame.src;
+                sportsFrame.src = '';
+                setTimeout(() => {
+                    sportsFrame.src = currentSrc;
+                }, 100);
+            }
+        }
+        
         // Function to handle URL parameters
         function handleURLParameters() {
             // This function is called directly when on sports.html
@@ -659,6 +702,11 @@
                 // Fallback if clipboard API fails
                 alert('Please manually copy the share link displayed.');
             }
+        });
+
+        // Reload button click event
+        reloadButton.addEventListener('click', function() {
+            reloadStream();
         });
         
         // Run on page load
