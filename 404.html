@@ -67,26 +67,10 @@
             background-color: #d32f2f; /* Darker red on hover */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-
-        #redirect-message {
-            font-size: 14px;
-            margin-top: 15px;
-            color: #888;
-        }
     </style>
-</head>
-<body>
-    <div class="container">
-        <img src="/gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
-        <h1>404 - Page Not Found</h1>
-        <p>The page you're looking for doesn't exist or has been moved.</p>
-        <a href="/" class="home-button">Go Home</a>
-        <div id="redirect-message"></div>
-    </div>
-
     <script>
-        // Function to check if we're on a sports path
-        function checkSportsPath() {
+        // Check for sports URLs and redirect instantly
+        (function() {
             const path = window.location.pathname;
             const pathParts = path.split('/').filter(part => part.length > 0);
             
@@ -118,25 +102,22 @@
                         localStorage.setItem('param_team', teamName);
                     }
                     
-                    // Show redirect message
-                    document.getElementById('redirect-message').textContent = 'Redirecting to sports page...';
+                    // Redirect immediately to sports page
+                    window.location.href = '/sports';
                     
-                    // Redirect to sports page
-                    setTimeout(function() {
-                        window.location.href = '/sports';
-                    }, 1000);
-                    
-                    return true;
+                    // Prevent page from rendering
+                    document.documentElement.style.display = 'none';
                 }
             }
-            
-            return false;
-        }
-        
-        // Run check when page loads
-        window.addEventListener('DOMContentLoaded', function() {
-            checkSportsPath();
-        });
+        })();
     </script>
+</head>
+<body>
+    <div class="container">
+        <img src="/gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
+        <h1>404 - Page Not Found</h1>
+        <p>The page you're looking for doesn't exist or has been moved.</p>
+        <a href="/" class="home-button">Go Home</a>
+    </div>
 </body>
 </html>
