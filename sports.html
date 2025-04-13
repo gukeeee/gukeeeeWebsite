@@ -391,7 +391,8 @@
                 placeholder: 'Team name (e.g. Arsenal)',
                 storageKey: 'soccer_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                suffix: '' // No suffix for soccer
             },
             nba: {
                 baseUrl: 'https://topstreams.info/nba/',
@@ -399,7 +400,8 @@
                 placeholder: 'Team name (e.g. Warriors)',
                 storageKey: 'basketball_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                suffix: '' // No suffix for NBA
             },
             nfl: {
                 baseUrl: 'https://givemereddit.org/nfl/',
@@ -407,7 +409,8 @@
                 placeholder: 'Team name (e.g. 49ers)',
                 storageKey: 'football_team',
                 requiresTeam: true,
-                message: ''
+                message: '',
+                suffix: '.html' // Only NFL has .html suffix
             },
             collegebball: {
                 baseUrl: 'https://crackstreams.cx/ncaabstreams/live',
@@ -415,7 +418,8 @@
                 placeholder: '',
                 storageKey: 'collegebball_team',
                 requiresTeam: false,
-                message: 'Streaming all College Basketball games'
+                message: 'Streaming all College Basketball games',
+                suffix: ''
             },
             collegefball: {
                 baseUrl: 'https://crackstreams.cx/cfbstreams/live',
@@ -423,7 +427,8 @@
                 placeholder: '',
                 storageKey: 'collegefball_team',
                 requiresTeam: false,
-                message: 'Streaming all College Football games'
+                message: 'Streaming all College Football games',
+                suffix: ''
             },
             mlb: {
                 baseUrl: 'https://thetvapp.to/mlb',
@@ -431,7 +436,8 @@
                 placeholder: '',
                 storageKey: 'baseball_team',
                 requiresTeam: false,
-                message: 'Streaming all MLB baseball games'
+                message: 'Streaming all MLB baseball games',
+                suffix: ''
             },
             nhl: {
                 baseUrl: 'https://nhlstreams.io/',
@@ -439,7 +445,8 @@
                 placeholder: '',
                 storageKey: 'hockey_team',
                 requiresTeam: false,
-                message: 'Streaming all NHL hockey games'
+                message: 'Streaming all NHL hockey games',
+                suffix: ''
             }
         };
         
@@ -452,8 +459,8 @@
                 // Convert to lowercase and remove spaces
                 const formattedTeam = team.toLowerCase().replace(/\s+/g, '');
                 
-                // Construct the full URL
-                const fullUrl = config.baseUrl + formattedTeam + '.html';
+                // Construct the full URL with the appropriate suffix for the sport
+                const fullUrl = config.baseUrl + formattedTeam + config.suffix;
                 
                 // Update iframe, localStorage, and display
                 sportsFrame.src = fullUrl;
@@ -494,7 +501,7 @@
                 if (savedTeam) {
                     // Update display and iframe
                     currentTeam.textContent = 'Currently watching: ' + savedTeam;
-                    sportsFrame.src = config.baseUrl + savedTeam + '.html';
+                    sportsFrame.src = config.baseUrl + savedTeam + config.suffix;
                     teamInput.value = savedTeam;
                     updateShareLink(sport, savedTeam);
                 } else {
