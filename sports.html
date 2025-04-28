@@ -259,17 +259,54 @@
             margin-top: 10px;
         }
 
-        #shareLink {
-            display: none;
+        /* Share link container styling */
+        .share-link-container {
+            position: relative;
             width: 100%;
             max-width: 500px;
-            padding: 8px;
             margin: 10px auto;
+            display: none;
+        }
+
+        #shareLink {
+            width: 100%;
+            padding: 8px;
             border-radius: 8px;
             border: 1px solid #81c784;
             font-size: 14px;
             font-family: "Poppins", sans-serif;
             text-align: center;
+            padding-right: 35px; /* Make room for the close button */
+        }
+
+        /* Close button styling */
+        .close-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background-color: #f44336; /* Red background */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 3px;
+        }
+
+        .close-button:hover {
+            transform: translateY(-2px);
+            background-color: #d32f2f; /* Darker red on hover */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-button i {
+            font-size: 16px;
         }
 
         #page-container {
@@ -280,6 +317,8 @@
             padding-bottom: 50px; /* Add extra space at the bottom */
         }
     </style>
+    <!-- Add Font Awesome for the X icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div id="page-container">
@@ -330,7 +369,13 @@
                 <button id="shareButton" class="share-button">Share This Stream</button>
                 <button id="reloadButton" class="reload-button">Reload Stream</button>
             </div>
-            <input type="text" id="shareLink" readonly>
+            <!-- Updated share link with close button -->
+            <div class="share-link-container" id="shareLinkContainer">
+                <input type="text" id="shareLink" readonly>
+                <button class="close-button" id="closeShareLink">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         
         <div id="iframe-container" class="iframe-container">
@@ -360,6 +405,8 @@
         const shareButton = document.getElementById('shareButton');
         const shareLink = document.getElementById('shareLink');
         const reloadButton = document.getElementById('reloadButton');
+        const shareLinkContainer = document.getElementById('shareLinkContainer');
+        const closeShareLink = document.getElementById('closeShareLink');
         
         // Map friendly sport names to their dropdown values
         const sportMapping = {
@@ -694,8 +741,8 @@
         
         // Share button click event
         shareButton.addEventListener('click', function() {
-            // Show the share link
-            shareLink.style.display = 'block';
+            // Show the share link container
+            shareLinkContainer.style.display = 'block';
             
             // Select the link text
             shareLink.select();
@@ -709,6 +756,11 @@
                 // Fallback if clipboard API fails
                 alert('Please manually copy the share link displayed.');
             }
+        });
+
+        // Close button for share link
+        closeShareLink.addEventListener('click', function() {
+            shareLinkContainer.style.display = 'none';
         });
 
         // Reload button click event
