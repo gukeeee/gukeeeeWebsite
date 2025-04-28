@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
@@ -9,122 +9,163 @@
     <link rel="stylesheet" href="chequeo.css">
     <link rel="manifest" href="manifest.json">
     <style>
-        body {
-            background-color: #e4d0ff; /* Light purple background */
+      body {
+        background-color: #e4d0ff;
+        /* Light purple background */
+      }
+
+      .main-title {
+        font-size: 4rem;
+        font-weight: 700;
+        color: #8A2BE2;
+        text-align: center;
+        margin-top: 5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        animation: pulse 2s infinite;
+      }
+
+      .nav-button {
+        padding: 8px 15px;
+        border: none;
+        background-color: #8A2BE2;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: "Poppins", sans-serif;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+      }
+
+      .nav-button:hover {
+        transform: translateY(-2px);
+        background-color: #6A1B9A;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Prevent horizontal scrolling in container */
+      .container {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
         }
-        
-        .main-title {
-            font-size: 4rem;
-            font-weight: 700;
-            color: #8A2BE2;
-            text-align: center;
-            margin-top: 5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: pulse 2s infinite;
+
+        50% {
+          transform: scale(1.05);
         }
-        
-        .nav-button {
-            padding: 8px 15px;
-            border: none;
-            background-color: #8A2BE2;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            font-family: "Poppins", sans-serif;
-            transition: all 0.3s ease;
-            margin-left: 10px;
+
+        100% {
+          transform: scale(1);
         }
-        
-        .nav-button:hover {
-            transform: translateY(-2px);
-            background-color: #6A1B9A;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        /* Prevent horizontal scrolling in container */
-        .container {
-            overflow-x: hidden;
-            max-width: 100%;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
+      }
+
+      #install-button {
+        padding: 8px 15px;
+        border: none;
+        background-color: #8A2BE2;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: "Poppins", sans-serif;
+        transition: all 0.3s ease;
+        margin: 20px auto;
+        display: none;
+        /* keep hidden until ready */
+      }
+
+      #install-button:hover {
+        background-color: #6A1B9A;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <div class="header-container">
-            <img src="gukeeee-logo-purple.png" alt="Gukeeee Logo" class="logo">
-            
-            <div class="nav-buttons">
-                <button class="nav-button" onclick="navigateTo('chequeo')">Chequeo</button>
-                <button class="nav-button" onclick="navigateTo('sports')">Sports</button>
-            </div>
+      <div class="header-container">
+        <img src="gukeeee-logo-purple.png" alt="Gukeeee Logo" class="logo">
+        <div class="nav-buttons">
+          <button class="nav-button" onclick="navigateTo('chequeo')">Chequeo</button>
+          <button class="nav-button" onclick="navigateTo('sports')">Sports</button>
         </div>
+      </div>
     </header>
-    
     <div class="container">
-        <h1 class="main-title">gukeeee</h1>
+      <h1 class="main-title">gukeeee</h1>
     </div>
-    
+    <button id="install-button" style="display:none;">Install App</button>
     <script>
-        // Get repository base path based on hostname
-        function getBasePath() {
-            if (window.location.hostname === 'gukeeee.github.io') {
-                return '/'; // Root domain
-            } else {
-                // For project pages, get the repository name from the path
-                const pathSegments = window.location.pathname.split('/');
-                return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
-            }
+      // Get repository base path based on hostname
+      function getBasePath() {
+        if (window.location.hostname === 'gukeeee.github.io') {
+          return '/'; // Root domain
+        } else {
+          // For project pages, get the repository name from the path
+          const pathSegments = window.location.pathname.split('/');
+          return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
         }
-        
-        // Navigation helper function that adds the correct base path
-        function navigateTo(path) {
+      }
+      // Navigation helper function that adds the correct base path
+      function navigateTo(path) {
+        const basePath = getBasePath();
+        window.location.href = `${basePath}${path}`;
+      }
+      // Check for redirects from 404.html
+      document.addEventListener('DOMContentLoaded', function() {
+        // Check if we have a redirect path saved from 404.html
+        const redirectPath = sessionStorage.getItem('redirectPath');
+        if (redirectPath) {
+          // Clear it so we don't redirect again on refresh
+          sessionStorage.removeItem('redirectPath');
+          // Check if path starts with /sports
+          if (redirectPath.includes('/sports')) {
+            // Handle deep linking to sports page
             const basePath = getBasePath();
-            window.location.href = `${basePath}${path}`;
+            window.location.href = `${basePath}sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
+          } else {
+            // For other paths, just update history state
+            window.history.replaceState(null, '', redirectPath);
+          }
         }
-        
-        // Check for redirects from 404.html
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if we have a redirect path saved from 404.html
-            const redirectPath = sessionStorage.getItem('redirectPath');
-            if (redirectPath) {
-                // Clear it so we don't redirect again on refresh
-                sessionStorage.removeItem('redirectPath');
-                
-                // Check if path starts with /sports
-                if (redirectPath.includes('/sports')) {
-                    // Handle deep linking to sports page
-                    const basePath = getBasePath();
-                    window.location.href = `${basePath}sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
-                } else {
-                    // For other paths, just update history state
-                    window.history.replaceState(null, '', redirectPath);
-                }
+      });
+      // Any other JavaScript you might need
+      window.onload = function() {
+        console.log("Homepage loaded successfully");
+      };
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then(() => console.log('Service Worker Registered'));
+      }
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent automatic prompt
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show your custom install button
+        const installButton = document.getElementById('install-button');
+        installButton.style.display = 'block';
+        installButton.addEventListener('click', () => {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the A2HS prompt');
+            } else {
+              console.log('User dismissed the A2HS prompt');
             }
+            deferredPrompt = null;
+          });
         });
-        
-        // Any other JavaScript you might need
-        window.onload = function() {
-            console.log("Homepage loaded successfully");
-        };
+      });
     </script>
-</body>
+  </body>
 </html>
