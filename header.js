@@ -5,22 +5,19 @@
    ========================================================================== */
 
 (function () {
-  function getBasePath() {
-    if (window.location.hostname === "gukeeee.github.io") return "/";
-    const pathSegments = window.location.pathname.split("/");
-    return pathSegments[1] && !pathSegments[1].includes(".") ? `/${pathSegments[1]}/` : "/";
-  }
-
+  // The site is always served from its domain root (CNAME / Cloudflare Pages
+  // root deploy), so plain root-relative paths are correct everywhere and
+  // never need a computed "base path" prefix.
   function navigateTo(path) {
-    window.location.href = `${getBasePath()}${path}`;
+    window.location.href = path;
   }
   window.navigateTo = navigateTo;
 
   const NAV_LINKS = [
-    { key: "home", label: "Home", path: "" },
-    { key: "chequeo", label: "Chequeo", path: "chequeo" },
-    { key: "sports", label: "Sports", path: "sports" },
-    { key: "verbos", label: "Prueba de Verbos", path: "verbos" },
+    { key: "home", label: "Home", path: "/" },
+    { key: "chequeo", label: "Chequeo", path: "/chequeo.html" },
+    { key: "sports", label: "Sports", path: "/sports.html" },
+    { key: "verbos", label: "Prueba de Verbos", path: "/verbos.html" },
   ];
 
   function renderHeader() {
@@ -31,8 +28,8 @@
     mount.innerHTML = `
       <header class="site-header">
         <div class="site-header__inner">
-          <a class="site-header__logo" href="${getBasePath()}">
-            <img src="${getBasePath()}logo.png" alt="Gukeeee">
+          <a class="site-header__logo" href="/">
+            <img src="/logo.png" alt="Gukeeee">
             <span>gukeeee</span>
           </a>
           <button type="button" class="site-header__menu-toggle" id="nav-toggle" aria-label="Menu">&#9776;</button>

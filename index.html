@@ -55,7 +55,7 @@
       #install-button { margin-top: var(--space-5); display: none; }
     </style>
   </head>
-  <body>
+  <body data-theme="home">
     <div id="site-header" data-active="home"></div>
 
     <main class="hero">
@@ -65,17 +65,17 @@
       <button id="install-button" class="btn btn-primary">Instalar app</button>
 
       <div class="hero__cards">
-        <a class="hero-card card" onclick="navigateTo('chequeo')">
+        <a class="hero-card card" href="/chequeo.html">
           <div class="hero-card__icon">📝</div>
           <div class="hero-card__title">Chequeo</div>
           <div class="hero-card__desc">Practica y revisa tus respuestas de clase.</div>
         </a>
-        <a class="hero-card card" onclick="navigateTo('verbos')">
+        <a class="hero-card card" href="/verbos.html">
           <div class="hero-card__icon">🔤</div>
           <div class="hero-card__title">Prueba de Verbos</div>
           <div class="hero-card__desc">Busca conjugaciones y practica verbos.</div>
         </a>
-        <a class="hero-card card" onclick="navigateTo('sports')">
+        <a class="hero-card card" href="/sports.html">
           <div class="hero-card__icon">🏆</div>
           <div class="hero-card__title">Sports</div>
           <div class="hero-card__desc">Mira tus equipos favoritos en vivo.</div>
@@ -94,10 +94,7 @@
         if (redirectPath) {
           sessionStorage.removeItem('redirectPath');
           if (redirectPath.includes('/sports')) {
-            const basePath = window.location.hostname === 'gukeeee.github.io'
-              ? '/'
-              : (window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}/` : '/');
-            window.location.href = `${basePath}sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
+            window.location.href = `/sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
           } else {
             window.history.replaceState(null, '', redirectPath);
           }

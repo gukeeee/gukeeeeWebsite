@@ -9,13 +9,9 @@
    ========================================================================== */
 
 const VerbStore = (function () {
-  // Fill these in once the admin creates the verbs.json gist (see the setup
-  // notes in the admin panel). Until then the page runs in a clear
-  // "not configured" state instead of throwing.
-  //   GIST_ID     - the id from the gist's URL (gist.github.com/<user>/<GIST_ID>)
-  //   RAW_URL     - the exact "Raw" link for verbs.json inside that gist
-  const GIST_ID = "";
-  const RAW_URL = "";
+  const GIST_ID = "c3b6e0babed8fee02455f9036fe8cde7";
+  const RAW_URL = "https://gist.githubusercontent.com/gukeeee/c3b6e0babed8fee02455f9036fe8cde7/raw/verbs";
+  const GIST_FILENAME = "verbs"; // the file inside the gist is named "verbs", not "verbs.json"
 
   const API_URL = GIST_ID ? `https://api.github.com/gists/${GIST_ID}` : null;
 
@@ -88,7 +84,7 @@ const VerbStore = (function () {
         Authorization: `token ${token}`,
         Accept: "application/vnd.github+json",
       },
-      body: JSON.stringify({ files: { "verbs.json": { content: JSON.stringify({ verbs }, null, 2) } } }),
+      body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify({ verbs }, null, 2) } } }),
     });
     if (!res.ok) {
       const body = await res.text();

@@ -15,9 +15,9 @@
   --color-text-muted: #666a80;
   --color-text-faint: #9498ab;
 
-  --color-primary: #6c5ce7;
-  --color-primary-dark: #4b3fc4;
-  --color-primary-light: #efecfe;
+  --color-primary: #7c3aed;
+  --color-primary-dark: #5b21b6;
+  --color-primary-light: #efe4ff;
 
   --color-accent: var(--color-primary);
   --color-accent-dark: var(--color-primary-dark);
@@ -48,21 +48,29 @@
   --header-height: 64px;
 }
 
-/* Per-page accent themes, applied via <body data-theme="..."> */
+/* Per-page themes, applied via <body data-theme="...">. Each page keeps a
+   visibly colored background (not just a differently-colored link) so the
+   site still reads as distinct, colorful sections the way it always has. */
+body[data-theme="home"] {
+  --color-bg: #efe4ff;
+}
 body[data-theme="chequeo"] {
   --color-accent: #2f80ed;
   --color-accent-dark: #1c5fc0;
   --color-accent-light: #e8f1fd;
+  --color-bg: #e3edfd;
 }
 body[data-theme="sports"] {
   --color-accent: #16a35a;
   --color-accent-dark: #0d7d44;
   --color-accent-light: #e6f7ee;
+  --color-bg: #e1f5e9;
 }
 body[data-theme="verbos"] {
   --color-accent: #0f9aa8;
   --color-accent-dark: #0b7580;
   --color-accent-light: #e3f6f8;
+  --color-bg: #e0f4f6;
 }
 
 * { box-sizing: border-box; }
