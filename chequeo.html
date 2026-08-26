@@ -6,42 +6,33 @@
     <title>Chequeo de Verbos</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="chequeo.css">
 </head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <a href="https://gukeeee.pages.dev/">
-                <img src="gukeeee-logo.png" alt="Gukeeee Logo" class="logo">
-            </a>
-            
-            <div class="class-dropdown">
-                <select id="class-selector" class="dropdown">
+<body data-theme="chequeo">
+    <div id="site-header" data-active="chequeo"></div>
+
+    <main class="page page--narrow">
+        <div class="card">
+            <div class="row between" style="margin-bottom: var(--space-4);">
+                <h1 style="margin:0;">Chequeo de Verbos</h1>
+                <select id="class-selector" class="input" style="width:auto;">
                     <option value="Clase 6">Clase 6</option>
                     <option value="Clase 7">Clase 7</option>
                 </select>
             </div>
-            
-            <div class="nav-buttons">
-                <button id="sign-in-btn" class="profile-button">Iniciar sesión</button>
-                <a href="https://gukeeee.pages.dev/">
-                    <button class="home-button">Home</button>
-                </a>
+
+            <form id="quiz-form" class="stack"></form>
+            <div class="row" style="margin-top: var(--space-4);">
+                <button type="button" class="btn btn-primary" id="check-button">Revisa sus respuestas</button>
+                <button type="button" class="btn btn-danger" id="clear-button">Borra sus respuestas</button>
             </div>
+            <div id="result" class="result" style="margin-top: var(--space-4); font-weight: 700;"></div>
         </div>
-    </header>
-    
-    <div class="container">
-        <h1>Chequeo de Verbos</h1>
-        
-        <form id="quiz-form"></form>
-        <br>
-        <button type="button" class="blue-button" id="check-button"><h4>Revisa sus respuestas</h4></button>
-        <button type="button" class="red-button" id="clear-button"><h4>Borra sus respuestas</h4></button>
-        <div id="result" class="result"></div>
-    </div>
-    
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="header.js"></script>
     <script src="chequeo.js"></script>
 </body>
 </html>

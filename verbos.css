@@ -1,0 +1,139 @@
+/* Page-specific styling for Prueba de Verbos — shared components live in theme.css */
+
+/* ---- Admin panel ---- */
+#admin-section summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: var(--space-2) 0;
+}
+.admin-verb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-alt);
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+}
+.admin-verb-row .infinitive { font-weight: 700; min-width: 90px; }
+.admin-verb-row .meaning { color: var(--color-text-muted); font-size: 0.85rem; flex: 1; }
+.admin-override-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-2);
+    max-height: 340px;
+    overflow-y: auto;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    margin: var(--space-3) 0;
+}
+.admin-override-grid .field { margin-bottom: 0; }
+.admin-override-grid label { font-size: 0.68rem; }
+.admin-override-grid input.was-changed { border-color: var(--color-danger); }
+
+/* ---- Lookup ---- */
+#lookup-table-wrap .data-table td.is-irregular { color: var(--color-danger); }
+
+/* ---- Practice ---- */
+.verb-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    max-height: 160px;
+    overflow-y: auto;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    margin: var(--space-3) 0;
+}
+.verb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--color-surface-alt);
+    font-size: 0.82rem;
+    cursor: pointer;
+    user-select: none;
+}
+.verb-chip input { margin: 0; }
+
+.drill-card {
+    text-align: center;
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-accent-light);
+}
+.drill-card__prompt {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+.drill-card__meta {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    font-size: 0.9rem;
+}
+.drill-card input {
+    max-width: 260px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.1rem;
+}
+.drill-feedback { min-height: 24px; margin-top: var(--space-3); font-weight: 700; }
+.drill-feedback.correct { color: var(--color-success); }
+.drill-feedback.incorrect { color: var(--color-danger); }
+.drill-score { margin-top: var(--space-4); color: var(--color-text-muted); font-size: 0.85rem; }
+
+/* ---- Test simulation ---- */
+.test-timer {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--space-4);
+    font-variant-numeric: tabular-nums;
+}
+.test-timer.is-low { color: var(--color-danger); }
+
+table.test-grid { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
+table.test-grid th, table.test-grid td {
+    border: 1px solid var(--color-border);
+    padding: 6px;
+    text-align: center;
+    vertical-align: middle;
+}
+table.test-grid thead th {
+    background: var(--color-surface-alt);
+    font-size: 0.72rem;
+}
+table.test-grid td.tense-label {
+    text-align: left;
+    font-weight: 600;
+    background: var(--color-surface-alt);
+    white-space: nowrap;
+    position: sticky;
+    left: 0;
+}
+.test-cell-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 3px;
+}
+.test-cell-group input {
+    width: 100%;
+    padding: 4px 5px;
+    font-size: 0.76rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    text-align: center;
+}
+.test-cell-group input.correct { background: #e6f7ef; border-color: var(--color-success); }
+.test-cell-group input.incorrect { background: #fdf1f3; border-color: var(--color-danger); }
+.test-cell-group .person-tag { font-size: 0.6rem; color: var(--color-text-faint); display: block; }
+
+.test-summary { text-align: center; margin-top: var(--space-4); font-weight: 700; }

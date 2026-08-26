@@ -3,167 +3,120 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>gukeeee</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="chequeo.css">
+    <link rel="stylesheet" href="theme.css">
     <link rel="manifest" href="manifest.json">
     <style>
-      body {
-        background-color: #e4d0ff;
-        /* Light purple background */
-      }
-
-      .main-title {
-        font-size: 4rem;
-        font-weight: 700;
-        color: #8A2BE2;
+      .hero {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: var(--space-7) var(--space-5);
         text-align: center;
-        margin-top: 5rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        animation: pulse 2s infinite;
       }
-
-      .nav-button {
-        padding: 8px 15px;
-        border: none;
-        background-color: #8A2BE2;
-        color: white;
-        border-radius: 8px;
+      .hero__eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--color-accent);
+        margin-bottom: var(--space-3);
+      }
+      .hero__title {
+        font-size: clamp(2.6rem, 7vw, 4.2rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--color-primary), #a29bfe);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: var(--space-4);
+      }
+      .hero__subtitle {
+        color: var(--color-text-muted);
+        font-size: 1.05rem;
+        margin-bottom: var(--space-6);
+      }
+      .hero__cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--space-4);
+        margin-top: var(--space-6);
+      }
+      .hero-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
         cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
-        font-family: "Poppins", sans-serif;
-        transition: all 0.3s ease;
-        margin-left: 10px;
       }
-
-      .nav-button:hover {
-        transform: translateY(-2px);
-        background-color: #6A1B9A;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      }
-
-      .nav-buttons {
-        display: flex;
-        gap: 10px;
-      }
-
-      /* Prevent horizontal scrolling in container */
-      .container {
-        overflow-x: hidden;
-        max-width: 100%;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-
-        50% {
-          transform: scale(1.05);
-        }
-
-        100% {
-          transform: scale(1);
-        }
-      }
-
-      #install-button {
-        padding: 8px 15px;
-        border: none;
-        background-color: #8A2BE2;
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
-        font-family: "Poppins", sans-serif;
-        transition: all 0.3s ease;
-        margin: 20px auto;
-        display: none;
-        /* keep hidden until ready */
-      }
-
-      #install-button:hover {
-        background-color: #6A1B9A;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      }
+      .hero-card__icon { font-size: 1.6rem; margin-bottom: var(--space-2); }
+      .hero-card__title { font-weight: 700; margin-bottom: 4px; }
+      .hero-card__desc { font-size: 0.82rem; color: var(--color-text-muted); }
+      #install-button { margin-top: var(--space-5); display: none; }
     </style>
   </head>
   <body>
-    <header>
-      <div class="header-container">
-        <img src="gukeeee-logo-purple.png" alt="Gukeeee Logo" class="logo">
-        <div class="nav-buttons">
-          <button class="nav-button" onclick="navigateTo('chequeo')">Chequeo</button>
-          <button class="nav-button" onclick="navigateTo('sports')">Sports</button>
-        </div>
+    <div id="site-header" data-active="home"></div>
+
+    <main class="hero">
+      <div class="hero__eyebrow">Bienvenido</div>
+      <h1 class="hero__title">gukeeee</h1>
+      <p class="hero__subtitle">Un solo lugar para tus chequeos de español, tus streams de deportes y tu práctica de verbos.</p>
+      <button id="install-button" class="btn btn-primary">Instalar app</button>
+
+      <div class="hero__cards">
+        <a class="hero-card card" onclick="navigateTo('chequeo')">
+          <div class="hero-card__icon">📝</div>
+          <div class="hero-card__title">Chequeo</div>
+          <div class="hero-card__desc">Practica y revisa tus respuestas de clase.</div>
+        </a>
+        <a class="hero-card card" onclick="navigateTo('verbos')">
+          <div class="hero-card__icon">🔤</div>
+          <div class="hero-card__title">Prueba de Verbos</div>
+          <div class="hero-card__desc">Busca conjugaciones y practica verbos.</div>
+        </a>
+        <a class="hero-card card" onclick="navigateTo('sports')">
+          <div class="hero-card__icon">🏆</div>
+          <div class="hero-card__title">Sports</div>
+          <div class="hero-card__desc">Mira tus equipos favoritos en vivo.</div>
+        </a>
       </div>
-    </header>
-    <div class="container">
-      <h1 class="main-title">gukeeee</h1>
-      <button id="install-button" style="display:none;">Install App</button>
-    </div>
+    </main>
+
+    <p class="footer-note">gukeeee</p>
+
+    <script src="auth.js"></script>
+    <script src="header.js"></script>
     <script>
-      // Get repository base path based on hostname
-      function getBasePath() {
-        if (window.location.hostname === 'gukeeee.github.io') {
-          return '/'; // Root domain
-        } else {
-          // For project pages, get the repository name from the path
-          const pathSegments = window.location.pathname.split('/');
-          return pathSegments[1] ? `/${pathSegments[1]}/` : '/';
-        }
-      }
-      // Navigation helper function that adds the correct base path
-      function navigateTo(path) {
-        const basePath = getBasePath();
-        window.location.href = `${basePath}${path}`;
-      }
-      // Check for redirects from 404.html
-      document.addEventListener('DOMContentLoaded', function() {
-        // Check if we have a redirect path saved from 404.html
+      // Check for redirects saved by 404.html for deep links that aren't the sports page
+      document.addEventListener('DOMContentLoaded', function () {
         const redirectPath = sessionStorage.getItem('redirectPath');
         if (redirectPath) {
-          // Clear it so we don't redirect again on refresh
           sessionStorage.removeItem('redirectPath');
-          // Check if path starts with /sports
           if (redirectPath.includes('/sports')) {
-            // Handle deep linking to sports page
-            const basePath = getBasePath();
+            const basePath = window.location.hostname === 'gukeeee.github.io'
+              ? '/'
+              : (window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}/` : '/');
             window.location.href = `${basePath}sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
           } else {
-            // For other paths, just update history state
             window.history.replaceState(null, '', redirectPath);
           }
         }
       });
-      // Any other JavaScript you might need
-      window.onload = function() {
-        console.log("Homepage loaded successfully");
-      };
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js').then(() => console.log('Service Worker Registered'));
       }
+
       let deferredPrompt;
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent automatic prompt
         e.preventDefault();
         deferredPrompt = e;
-        // Show your custom install button
         const installButton = document.getElementById('install-button');
-        installButton.style.display = 'block';
+        installButton.style.display = 'inline-flex';
         installButton.addEventListener('click', () => {
           deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('User accepted the A2HS prompt');
-            } else {
-              console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-          });
+          deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
         });
       });
     </script>

@@ -5,67 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <style>
         body {
-            font-family: "Poppins", sans-serif;
-            background-color: #ffebee; /* Light red background */
-            color: #000000;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding: var(--space-5);
         }
-
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .notfound-card {
             width: 90%;
-            max-width: 500px;
+            max-width: 480px;
+            padding: var(--space-7) var(--space-5);
         }
-
-        .logo {
-            height: 60px;
-            margin-bottom: 20px;
+        .notfound-card .logo {
+            height: 56px;
+            margin-bottom: var(--space-4);
         }
-
-        h1 {
-            font-family: "Poppins", sans-serif;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #d32f2f; /* Dark red for title */
+        .notfound-card h1 {
+            color: var(--color-danger);
+            font-size: 1.8rem;
         }
-
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        .home-button {
-            padding: 10px 25px;
-            border: none;
-            background-color: #f44336; /* Red button */
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            font-family: "Poppins", sans-serif;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .home-button:hover {
-            transform: translateY(-2px);
-            background-color: #d32f2f; /* Darker red on hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        .notfound-card p {
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-5);
         }
     </style>
     <script>
@@ -73,7 +37,7 @@
         (function() {
             const path = window.location.pathname;
             const pathParts = path.split('/').filter(part => part.length > 0);
-            
+
             // Sport mapping from the sports page
             const sportMapping = {
                 'soccer': 'soccer',
@@ -84,27 +48,27 @@
                 'collegefootball': 'collegefball',
                 'baseball': 'mlb'
             };
-            
+
             // Check if we're at a sports URL with parameters
             if (pathParts.length >= 2 && pathParts[0] === 'sports') {
                 // Get the sport name from path
                 const sportName = pathParts[1];
                 let sportValue = sportMapping[sportName];
-                
+
                 // If we found a valid sport
                 if (sportValue) {
                     // Get team name if present
                     const teamName = pathParts.length >= 3 ? pathParts[2] : '';
-                    
+
                     // Store parameters for after redirect
                     localStorage.setItem('param_sport', sportValue);
                     if (teamName) {
                         localStorage.setItem('param_team', teamName);
                     }
-                    
+
                     // Redirect immediately to sports page
                     window.location.href = '/sports';
-                    
+
                     // Prevent page from rendering
                     document.documentElement.style.display = 'none';
                 }
@@ -113,11 +77,11 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="card notfound-card">
         <img src="/gukeeee-logo-red.png" alt="Gukeeee Logo" class="logo">
-        <h1>404 - Page Not Found</h1>
-        <p>The page you're looking for doesn't exist or has been moved.</p>
-        <a href="/" class="home-button">Go Home</a>
+        <h1>404 - Página no encontrada</h1>
+        <p>La página que buscas no existe o fue movida.</p>
+        <a href="/" class="btn btn-primary">Ir al inicio</a>
     </div>
 </body>
 </html>
