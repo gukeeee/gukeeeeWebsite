@@ -14,20 +14,20 @@ const Conjugator = (function () {
   const PERSONS = ["yo", "tu", "el", "nosotros", "ellos"];
 
   const TENSES = [
-    { key: "presente", label: "Present" },
-    { key: "presenteProgresivo", label: "Present Progressive" },
-    { key: "preterito", label: "Preterite" },
-    { key: "imperfecto", label: "Imperfect" },
-    { key: "futuro", label: "Future" },
-    { key: "condicional", label: "Conditional" },
-    { key: "presenteSubjuntivo", label: "Present Subjunctive" },
-    { key: "imperfectoSubjuntivo", label: "Imperfect Subjunctive" },
-    { key: "preteritoPerfecto", label: "Present Perfect" },
-    { key: "pluscuamperfecto", label: "Past Perfect" },
-    { key: "futuroPerfecto", label: "Future Perfect" },
-    { key: "condicionalPerfecto", label: "Conditional Perfect" },
-    { key: "preteritoPerfectoSubjuntivo", label: "Present Perfect Subjunctive" },
-    { key: "pluscuamperfectoSubjuntivo", label: "Past Perfect Subjunctive" },
+    { key: "presente", label: "Present (Presente)" },
+    { key: "presenteProgresivo", label: "Present Progressive (Presente Progresivo)" },
+    { key: "preterito", label: "Preterite (Pretérito)" },
+    { key: "imperfecto", label: "Imperfect (Imperfecto)" },
+    { key: "futuro", label: "Future (Futuro)" },
+    { key: "condicional", label: "Conditional (Condicional)" },
+    { key: "presenteSubjuntivo", label: "Present Subjunctive (Presente de Subjuntivo)" },
+    { key: "imperfectoSubjuntivo", label: "Imperfect Subjunctive (Imperfecto de Subjuntivo)" },
+    { key: "preteritoPerfecto", label: "Present Perfect (Pretérito Perfecto)" },
+    { key: "pluscuamperfecto", label: "Past Perfect (Pluscuamperfecto)" },
+    { key: "futuroPerfecto", label: "Future Perfect (Futuro Perfecto)" },
+    { key: "condicionalPerfecto", label: "Conditional Perfect (Condicional Perfecto)" },
+    { key: "preteritoPerfectoSubjuntivo", label: "Present Perfect Subjunctive (Pretérito Perfecto de Subjuntivo)" },
+    { key: "pluscuamperfectoSubjuntivo", label: "Past Perfect Subjunctive (Pluscuamperfecto de Subjuntivo)" },
   ];
 
   const IMPERATIVE_LABELS = { tuAff: "Tú (affirmative)", tuNeg: "Tú (negative)", ud: "Ud.", nosotros: "Nosotros" };

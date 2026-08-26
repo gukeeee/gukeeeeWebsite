@@ -29,7 +29,7 @@ const PRONOUNS = [
 const QUESTION_POOL = [...Conjugator.TENSES.map((t) => t.key), "mandato"];
 
 function tenseLabel(key) {
-  if (key === "mandato") return "Command";
+  if (key === "mandato") return "Command (Mandato)";
   const t = Conjugator.TENSES.find((x) => x.key === key);
   return t ? t.label : key;
 }
@@ -317,7 +317,7 @@ function generateAdminPreview(existingRecord) {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <h4 style="margin: var(--space-3) 0 var(--space-2);">Commands</h4>
+    <h4 style="margin: var(--space-3) 0 var(--space-2);">Commands (Mandatos)</h4>
     <div class="table-scroll">
       <table class="data-table admin-conjugation-table">
         <thead><tr><th>Tú (affirmative)</th><th>Tú (negative)</th><th>Ud.</th><th>Nosotros</th></tr></thead>
@@ -450,7 +450,7 @@ function renderLookupTable(record) {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <h4 style="margin-top: var(--space-4);">Commands</h4>
+    <h4 style="margin-top: var(--space-4);">Commands (Mandatos)</h4>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Tú (affirmative)</th><th>Tú (negative)</th><th>Ud.</th><th>Nosotros</th></tr></thead>
@@ -577,7 +577,7 @@ function pickDrillQuestion() {
     return {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
       infinitive: verb.infinitive,
-      tenseName: "Command",
+      tenseName: "Command (Mandato)",
       answer: cell.value,
       alt: null,
     };
