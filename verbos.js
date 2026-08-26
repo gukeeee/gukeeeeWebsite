@@ -117,6 +117,28 @@ function playFeedbackSound(correct) {
   }
 }
 
+/* ---------------------------------- celebration ---------------------------------- */
+/* A lightweight CSS confetti burst — no library, cleans up after itself. */
+
+const CONFETTI_COLORS = ["#ff5e7e", "#ffd166", "#06d6a0", "#4cc9f0", "#a56bff"];
+
+function celebrate(pieceCount = 40) {
+  const container = document.createElement("div");
+  container.className = "confetti-burst";
+  for (let i = 0; i < pieceCount; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+    piece.style.left = `${Math.random() * 100}vw`;
+    piece.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    piece.style.animationDuration = `${1.6 + Math.random() * 1.2}s`;
+    piece.style.animationDelay = `${Math.random() * 0.3}s`;
+    container.appendChild(piece);
+  }
+  document.body.appendChild(container);
+  setTimeout(() => container.remove(), 3200);
+}
+
 /* ---------------------------------- boot ---------------------------------- */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -125,6 +147,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   document.getElementById("print-lookup-btn").onclick = () => window.print();
+  document.getElementById("random-verb-btn").onclick = () => {
+    if (!verbs.length) return;
+    selectLookupVerb(verbs[Math.floor(Math.random() * verbs.length)]);
+  };
 
   Auth.onChange((user) => {
     userIsAdmin = Auth.isAdmin();
@@ -438,17 +464,68 @@ async function archiveWeek() {
 
 /* ---------------------------------- lookup ---------------------------------- */
 
+let currentLookupId = null;
+
+function selectLookupVerb(record) {
+  if (!record) return;
+  currentLookupId = record.id;
+  const searchInput = document.getElementById("lookup-search");
+  if (searchInput) searchInput.value = record.infinitive;
+  renderLookupTable(record);
+}
+
 function renderLookup() {
-  const select = document.getElementById("lookup-select");
+  const searchInput = document.getElementById("lookup-search");
+  const resultsEl = document.getElementById("lookup-results");
+
   if (!verbs.length) {
-    select.innerHTML = `<option value="">No verbs yet</option>`;
+    searchInput.value = "";
+    resultsEl.innerHTML = "";
+    resultsEl.style.display = "none";
     document.getElementById("lookup-table-wrap").innerHTML = `<div class="empty-state">No verbs added yet.</div>`;
     return;
   }
+
   const sorted = [...verbs].sort((a, b) => a.infinitive.localeCompare(b.infinitive));
-  select.innerHTML = sorted.map((v) => `<option value="${v.id}">${v.infinitive}</option>`).join("");
-  select.onchange = () => renderLookupTable(verbs.find((v) => v.id === select.value));
-  renderLookupTable(sorted[0]);
+  selectLookupVerb(verbs.find((v) => v.id === currentLookupId) || sorted[0]);
+
+  function showResults(query) {
+    const q = query.trim().toLowerCase();
+    const matches = (q ? sorted.filter((v) => v.infinitive.includes(q)) : sorted).slice(0, 8);
+    resultsEl.innerHTML = matches.length
+      ? matches.map((v) => `
+          <div class="lookup-result-item" data-id="${v.id}">
+            ${v.infinitive}${v.isCurrent ? "" : ' <span style="color:var(--color-text-faint);">(past)</span>'}
+          </div>
+        `).join("")
+      : `<div class="lookup-result-empty">No matches</div>`;
+    resultsEl.querySelectorAll(".lookup-result-item").forEach((el) => {
+      // mousedown (not click) so this fires before the input's blur hides the dropdown first.
+      el.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        selectLookupVerb(verbs.find((v) => v.id === el.dataset.id));
+        resultsEl.style.display = "none";
+      });
+    });
+    resultsEl.style.display = "block";
+  }
+
+  searchInput.oninput = () => showResults(searchInput.value);
+  searchInput.onfocus = () => showResults(searchInput.value);
+  searchInput.onblur = () => { resultsEl.style.display = "none"; };
+  searchInput.onkeydown = (e) => {
+    if (e.key === "Enter") {
+      const first = resultsEl.querySelector(".lookup-result-item");
+      if (first) {
+        selectLookupVerb(verbs.find((v) => v.id === first.dataset.id));
+        resultsEl.style.display = "none";
+        searchInput.blur();
+      }
+    } else if (e.key === "Escape") {
+      resultsEl.style.display = "none";
+      searchInput.blur();
+    }
+  };
 }
 
 function renderLookupTable(record) {
@@ -680,7 +757,13 @@ function checkDrillAnswer() {
   const ok = isAnswerCorrect(input.value, q.answer, q.alt);
 
   drillState.total++;
-  if (ok) { drillState.correct++; drillState.streak++; } else { drillState.streak = 0; }
+  if (ok) {
+    drillState.correct++;
+    drillState.streak++;
+    if (drillState.streak % 5 === 0) celebrate(24);
+  } else {
+    drillState.streak = 0;
+  }
 
   input.classList.add(ok ? "is-correct" : "is-incorrect");
   input.disabled = true;
@@ -827,6 +910,9 @@ function gradeTest() {
 
   let correct = 0;
   let total = 0;
+  const missedTenseKeys = new Set();
+  const missedVerbIndices = new Set();
+
   document.querySelectorAll('#test-runner input[data-verb]').forEach((input) => {
     const vi = Number(input.dataset.verb);
     const tenseKey = input.dataset.tense;
@@ -836,10 +922,29 @@ function gradeTest() {
     const ok = isAnswerCorrect(input.value, cellSource.value, alt);
     input.classList.add(ok ? "correct" : "incorrect");
     input.disabled = true;
-    if (ok) correct++;
+    if (ok) { correct++; } else { missedTenseKeys.add(tenseKey); missedVerbIndices.add(vi); }
     total++;
   });
 
   document.getElementById("test-submit").disabled = true;
-  document.getElementById("test-summary").textContent = `Result: ${correct} / ${total} (${((correct / total) * 100).toFixed(1)}%)`;
+  const summary = document.getElementById("test-summary");
+  const pct = ((correct / total) * 100).toFixed(1);
+
+  if (missedTenseKeys.size === 0) {
+    summary.innerHTML = `Result: ${correct} / ${total} (${pct}%) — perfect! 🎉`;
+    celebrate();
+  } else {
+    const reviewVerbs = testState.verbs.filter((_, i) => missedVerbIndices.has(i));
+    const reviewTenses = Array.from(missedTenseKeys);
+    summary.innerHTML = `
+      <div>Result: ${correct} / ${total} (${pct}%)</div>
+      <button class="btn btn-primary btn-sm" id="review-mistakes-btn" style="margin-top: var(--space-3);">
+        🔁 Review mistakes (${total - correct})
+      </button>
+    `;
+    document.getElementById("review-mistakes-btn").onclick = () => {
+      document.getElementById("practice-section").scrollIntoView({ behavior: "smooth", block: "start" });
+      startPracticeDrill(reviewVerbs, reviewTenses);
+    };
+  }
 }

@@ -26,7 +26,11 @@
             <div class="eyebrow">Lookup</div>
             <h2 class="section-title">🔍 Look up a verb</h2>
             <div class="row" style="margin: var(--space-3) 0 var(--space-4);">
-                <select id="lookup-select" class="input" style="max-width:280px;"></select>
+                <div class="lookup-search-wrap">
+                    <input type="text" id="lookup-search" class="input" placeholder="Search a verb..." autocomplete="off">
+                    <div id="lookup-results" class="lookup-results"></div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="random-verb-btn">🎲 Random</button>
                 <button class="btn btn-secondary btn-sm" id="print-lookup-btn">🖨️ Print</button>
             </div>
             <div id="lookup-table-wrap"></div>
