@@ -1,12 +1,36 @@
 /* Page-specific styling for Prueba de Verbos — shared components live in theme.css */
 
 /* ---- Admin panel ---- */
-#admin-section summary {
-    cursor: pointer;
+.admin-panel__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: var(--space-2) 0;
     font-weight: 700;
     font-size: 1.05rem;
-    padding: var(--space-2) 0;
+    color: var(--color-text);
+    font-family: inherit;
 }
+.admin-panel__chevron {
+    display: inline-block;
+    transition: transform 0.25s ease;
+    color: var(--color-text-muted);
+}
+.admin-panel.is-open .admin-panel__chevron { transform: rotate(180deg); }
+
+/* Animating to "auto" height without JS measuring the content: the 0fr/1fr
+   grid-track trick — the inner div's overflow:hidden clips it at 0 height,
+   then the grid track itself transitions to fit content exactly. */
+.admin-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+}
+.admin-panel.is-open .admin-collapse { grid-template-rows: 1fr; }
+.admin-collapse__inner { overflow: hidden; min-height: 0; }
 .admin-verb-row {
     display: flex;
     align-items: center;

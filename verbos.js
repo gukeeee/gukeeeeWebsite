@@ -145,21 +145,45 @@ function applyVerbs(newVerbs) {
 
 /* ---------------------------------- admin ---------------------------------- */
 
+// Persisted across re-renders — renderAdminSection() rebuilds the whole
+// section's DOM after every admin action (save/delete/toggle/archive), so
+// without this the panel would snap shut every time.
+let adminPanelOpen = false;
+
+function adminCollapseHtml(bodyHtml) {
+  return `
+    <div class="admin-panel${adminPanelOpen ? " is-open" : ""}">
+      <button type="button" class="admin-panel__toggle" id="admin-toggle">
+        <span>⚙️ Admin panel</span>
+        <span class="admin-panel__chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="admin-collapse">
+        <div class="admin-collapse__inner">${bodyHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+function bindAdminToggle(el) {
+  el.querySelector("#admin-toggle").addEventListener("click", () => {
+    adminPanelOpen = !adminPanelOpen;
+    el.querySelector(".admin-panel").classList.toggle("is-open", adminPanelOpen);
+  });
+}
+
 function renderAdminSection() {
   const el = document.getElementById("admin-section");
   el.style.display = "block";
 
   if (!VerbStore.isConfigured()) {
-    el.innerHTML = `
-      <details open>
-        <summary>⚙️ Admin panel</summary>
-        <p style="color:var(--color-text-muted);">
-          The verbs Gist isn't configured yet. Create a Gist with a file containing <code>{"verbs": []}</code>,
-          then put its ID and its "Raw" URL into <code>GIST_ID</code> / <code>RAW_URL</code> in
-          <code>verbStore.js</code>.
-        </p>
-      </details>
-    `;
+    el.innerHTML = adminCollapseHtml(`
+      <p style="color:var(--color-text-muted);">
+        The verbs Gist isn't configured yet. Create a Gist with a file containing <code>{"verbs": []}</code>,
+        then put its ID and its "Raw" URL into <code>GIST_ID</code> / <code>RAW_URL</code> in
+        <code>verbStore.js</code>.
+      </p>
+    `);
+    bindAdminToggle(el);
     return;
   }
 
@@ -167,9 +191,7 @@ function renderAdminSection() {
   const current = verbs.filter((v) => v.isCurrent);
   const past = verbs.filter((v) => !v.isCurrent);
 
-  el.innerHTML = `
-    <details>
-      <summary>⚙️ Admin panel</summary>
+  el.innerHTML = adminCollapseHtml(`
       <div class="stack" style="margin-top: var(--space-3);">
         <div class="card" style="background:var(--color-surface-alt); border:none;">
           <strong>GitHub token (yours only)</strong>
@@ -212,8 +234,9 @@ function renderAdminSection() {
           <div id="admin-past-list">${renderAdminVerbList(past)}</div>
         </div>
       </div>
-    </details>
-  `;
+  `);
+
+  bindAdminToggle(el);
 
   el.querySelector("#admin-token-save").addEventListener("click", () => {
     const val = el.querySelector("#admin-token-input").value;
