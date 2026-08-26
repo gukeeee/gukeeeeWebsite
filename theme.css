@@ -431,17 +431,43 @@ table.data-table .is-irregular { color: var(--color-danger); font-weight: 700; }
 .print-only { display: none; }
 
 @media print {
+  @page { size: landscape; margin: 1cm; }
+
   body * { visibility: hidden; }
   #lookup-table-wrap, #lookup-table-wrap * { visibility: visible; }
-  #lookup-table-wrap { position: absolute; top: 0; left: 0; width: 100%; }
+  #lookup-table-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
   .print-only { display: block !important; }
-  table.data-table, table.data-table th, table.data-table td {
+
+  /* The on-screen table relies on horizontal scrolling + nowrap cells —
+     neither works on a printed page, so let it wrap and shrink to fit
+     instead of being clipped at the page edge. */
+  .table-scroll { overflow: visible !important; border: none !important; width: 100% !important; }
+  table.data-table {
+    table-layout: fixed;
+    width: 100% !important;
+    font-size: 10px !important;
+  }
+  table.data-table th, table.data-table td {
+    white-space: normal !important;
+    word-break: break-word;
+    padding: 4px !important;
     color: #000 !important;
     background: #fff !important;
     border-color: #999 !important;
   }
   .tense-es { color: #444 !important; }
-  table.data-table td:first-child, table.data-table th:first-child { background: #fff !important; position: static; }
+  table.data-table td:first-child, table.data-table th:first-child {
+    background: #fff !important;
+    position: static;
+    max-width: none;
+  }
 }
 
 .stack { display: flex; flex-direction: column; gap: var(--space-4); }
