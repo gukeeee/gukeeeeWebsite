@@ -287,32 +287,43 @@
 }
 .test-timer.is-low { color: var(--color-danger); }
 
+/* Worksheet-style header: Nombre/Fecha, then Verbo/Significado/Forma per
+   verb column — modeled directly on the paper test sheet. */
+.test-header-table {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1.3fr;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-4);
+}
+.test-header-cell {
+    padding: var(--space-4);
+    border-right: 1px solid var(--color-border);
+    font-size: 0.85rem;
+}
+.test-header-cell:last-child { border-right: none; }
+.test-header-verb {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+}
+.test-header-forma {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-light);
+    display: inline-block;
+    font-size: 0.85rem;
+}
+
 table.test-grid { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
-table.test-grid th, table.test-grid td {
+table.test-grid td {
     border: 1px solid var(--color-border);
     padding: 8px;
     text-align: center;
     vertical-align: middle;
-}
-table.test-grid thead th {
-    background: var(--color-surface-alt);
-    font-size: 0.72rem;
-}
-/* The verb column headers are the most important thing on this table — the
-   student's whole test hinges on which two verbs and which subjects these
-   are, so they get their own bigger, bolder treatment. */
-table.test-grid thead th.test-verb-header {
-    padding: 14px 10px;
-    background: var(--color-accent-light);
-}
-.test-verb-header__name {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    text-transform: none;
-    letter-spacing: normal;
 }
 table.test-grid td.tense-label {
     text-align: left;
@@ -323,20 +334,9 @@ table.test-grid td.tense-label {
     position: sticky;
     left: 0;
 }
-/* The randomly-assigned subject for that verb, shown under its name in the header. */
-.tense-subject {
-    display: inline-block;
-    margin-top: 6px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    background: var(--bg-surface);
-    color: var(--color-text);
-    font-size: 0.72rem;
-    font-weight: 700;
-}
 
-/* Each of the 14 tense rows only asks for one subject now, so its single
-   box gets to be much bigger/easier to read than the old 5-per-row grid. */
+/* Each row only asks for one subject now, so its single box gets to be much
+   bigger/easier to read than the old multi-box-per-row grid. */
 .test-single-input {
     width: 100%;
     min-width: 110px;
@@ -351,26 +351,10 @@ table.test-grid td.tense-label {
 .test-single-input.correct { background: color-mix(in srgb, var(--color-success) 20%, var(--bg-void)); border-color: var(--color-success); }
 .test-single-input.incorrect { background: color-mix(in srgb, var(--color-danger) 20%, var(--bg-void)); border-color: var(--color-danger); }
 
-/* Mandato still needs all 4 slots — a 2x2 grid instead of the 3-then-1 wrap
-   it'd get from the general-purpose column count. */
-.test-cell-group {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(60px, 1fr));
-    gap: 5px;
-}
-.test-cell-group--mandato { grid-template-columns: repeat(2, 1fr); }
-.test-cell-group input {
-    width: 100%;
-    padding: 6px 7px;
-    font-size: 0.8rem;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    background: var(--bg-void);
-    color: var(--color-text);
-    text-align: center;
-}
-.test-cell-group input.correct { background: color-mix(in srgb, var(--color-success) 20%, var(--bg-void)); border-color: var(--color-success); }
-.test-cell-group input.incorrect { background: color-mix(in srgb, var(--color-danger) 20%, var(--bg-void)); border-color: var(--color-danger); }
-.test-cell-group .person-tag { font-size: 0.62rem; color: var(--color-text-faint); display: block; margin-bottom: 3px; }
-
 .test-summary { text-align: center; margin-top: var(--space-4); font-weight: 700; font-family: var(--font-display); font-size: 1.1rem; }
+
+@media (max-width: 640px) {
+    .test-header-table { grid-template-columns: 1fr; }
+    .test-header-cell { border-right: none; border-bottom: 1px solid var(--color-border); }
+    .test-header-cell:last-child { border-bottom: none; }
+}

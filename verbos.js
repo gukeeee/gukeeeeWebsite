@@ -14,6 +14,14 @@ let verbs = [];
 let userIsAdmin = false;
 
 const MANDATO_SLOTS = ["tuAff", "tuNeg", "ud", "nosotros"];
+// The test sheet lists each command as its own row (matches the paper
+// worksheet), rather than bundling all 4 into one multi-box cell.
+const MANDATO_ROWS = [
+  { slot: "tuAff", label: "Command — Tú" },
+  { slot: "tuNeg", label: "Command — Tú (negative)" },
+  { slot: "ud", label: "Command — Ud." },
+  { slot: "nosotros", label: "Command — Nosotros" },
+];
 const PRONOUNS = [
   { label: "yo", bucket: "yo" },
   { label: "tú", bucket: "tu" },
@@ -264,7 +272,7 @@ function renderAdminSection() {
               <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:160px;">
             </div>
             <div class="field" style="margin:0; flex:1;">
-              <label>Meaning</label>
+              <label>Meaning (auto — edit if wrong)</label>
               <input type="text" id="admin-meaning" class="input" placeholder="to speak">
             </div>
             <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generate conjugation</button>
@@ -324,6 +332,22 @@ function renderAdminVerbList(list) {
   `).join("");
 }
 
+// Auto-fetched (MyMemory's free translation API) instead of typed in by
+// hand — the admin can still edit the field afterward if the translation
+// is off, but this is now the primary path.
+async function fetchMeaning(infinitive) {
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(infinitive)}&langpair=es|en`);
+    const data = await res.json();
+    let text = (data.responseData && data.responseData.translatedText || "").trim().toLowerCase();
+    if (!text) return null;
+    text = text.replace(/[.!?]+$/, "");
+    return text.startsWith("to ") ? text : `to ${text}`;
+  } catch (err) {
+    return null;
+  }
+}
+
 function generateAdminPreview(existingRecord) {
   const infinitiveInput = document.getElementById("admin-infinitive");
   const meaningInput = document.getElementById("admin-meaning");
@@ -334,7 +358,17 @@ function generateAdminPreview(existingRecord) {
     return;
   }
   infinitiveInput.value = infinitive;
-  if (existingRecord) meaningInput.value = existingRecord.meaning || "";
+
+  if (existingRecord) {
+    meaningInput.value = existingRecord.meaning || "";
+  } else {
+    meaningInput.value = "";
+    meaningInput.placeholder = "Looking up...";
+    fetchMeaning(infinitive).then((meaning) => {
+      meaningInput.placeholder = "to speak";
+      if (meaning && !meaningInput.value) meaningInput.value = meaning;
+    });
+  }
 
   let conjugated;
   try {
@@ -875,6 +909,8 @@ function startTest(currentPool, pastPool) {
 }
 
 function buildTestGridHtml(state) {
+  // 14 tense rows (one subject per verb column) + 4 individual mandato rows —
+  // every row is now uniformly "one blank per verb," matching the worksheet.
   const tenseRows = Conjugator.TENSES.map((t) => {
     const verbCells = [0, 1].map((vi) => `
       <td>
@@ -882,51 +918,46 @@ function buildTestGridHtml(state) {
           data-verb="${vi}" data-tense="${t.key}" data-slot="${state.subjects[vi].bucket}">
       </td>
     `).join("");
-
     return `<tr><td class="tense-label">${tenseLabelHtml(t.key)}</td>${verbCells}</tr>`;
   }).join("");
 
-  const mandatoInputs = (vi) => MANDATO_SLOTS.map((slot) => `
-    <div>
-      <span class="person-tag">${Conjugator.IMPERATIVE_LABELS[slot]}</span>
-      <input type="text" autocomplete="off" data-verb="${vi}" data-tense="mandato" data-slot="${slot}">
-    </div>
-  `).join("");
+  const mandatoRows = MANDATO_ROWS.map(({ slot, label }) => {
+    const verbCells = [0, 1].map((vi) => `
+      <td>
+        <input type="text" class="test-single-input" autocomplete="off"
+          data-verb="${vi}" data-tense="mandato" data-slot="${slot}">
+      </td>
+    `).join("");
+    return `<tr><td class="tense-label">${label}</td>${verbCells}</tr>`;
+  }).join("");
 
-  const mandatoRow = `
-    <tr>
-      <td class="tense-label">${tenseLabelHtml("mandato")}</td>
-      <td><div class="test-cell-group test-cell-group--mandato">${mandatoInputs(0)}</div></td>
-      <td><div class="test-cell-group test-cell-group--mandato">${mandatoInputs(1)}</div></td>
-    </tr>
+  const headerCell = (vi) => `
+    <div class="test-header-cell">
+      <div class="test-header-verb">${state.verbs[vi].infinitive}</div>
+      <div class="field" style="margin:0 0 8px;">
+        <label>Significado</label>
+        <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
+      </div>
+      <div class="test-header-forma"><strong>Forma:</strong> ${state.subjects[vi].label}</div>
+    </div>
   `;
 
-  const rows = tenseRows + mandatoRow;
-
-  const meaningFields = [0, 1].map((vi) => `
-    <div class="field" style="margin:0; flex:1; min-width:180px;">
-      <label>${state.verbs[vi].infinitive} — meaning</label>
-      <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
-    </div>
-  `).join("");
+  const student = Auth.getCurrentUser();
+  const dateStr = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
   return `
     <div class="test-timer" id="test-timer">07:00</div>
-    <div class="row" style="margin-bottom: var(--space-4);">${meaningFields}</div>
+    <div class="test-header-table">
+      <div class="test-header-cell">
+        <div><strong>Nombre:</strong> ${student ? student.displayName : ""}</div>
+        <div style="margin-top:6px;"><strong>Fecha:</strong> ${dateStr}</div>
+      </div>
+      ${headerCell(0)}
+      ${headerCell(1)}
+    </div>
     <div class="table-scroll">
       <table class="test-grid">
-        <thead>
-          <tr>
-            <th></th>
-            ${[0, 1].map((vi) => `
-              <th class="test-verb-header">
-                <span class="test-verb-header__name">${state.verbs[vi].infinitive}</span>
-                <span class="tense-subject">${state.subjects[vi].label}</span>
-              </th>
-            `).join("")}
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
+        <tbody>${tenseRows}${mandatoRows}</tbody>
       </table>
     </div>
     <div class="row" style="justify-content:center; margin-top: var(--space-4);">
