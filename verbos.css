@@ -1,5 +1,16 @@
 /* Page-specific styling for Prueba de Verbos — shared components live in theme.css */
 
+#week-banner {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: var(--space-5);
+}
+
 /* ---- Admin panel ---- */
 .admin-panel__toggle {
     display: flex;

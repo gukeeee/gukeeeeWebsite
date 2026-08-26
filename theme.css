@@ -426,6 +426,24 @@ table.data-table .is-irregular { color: var(--color-danger); font-weight: 700; }
   border-radius: var(--radius-md);
 }
 
+/* ---------------------------------- Print ---------------------------------- */
+
+.print-only { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  #lookup-table-wrap, #lookup-table-wrap * { visibility: visible; }
+  #lookup-table-wrap { position: absolute; top: 0; left: 0; width: 100%; }
+  .print-only { display: block !important; }
+  table.data-table, table.data-table th, table.data-table td {
+    color: #000 !important;
+    background: #fff !important;
+    border-color: #999 !important;
+  }
+  .tense-es { color: #444 !important; }
+  table.data-table td:first-child, table.data-table th:first-child { background: #fff !important; position: static; }
+}
+
 .stack { display: flex; flex-direction: column; gap: var(--space-4); }
 .row { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; }
 .row.between { justify-content: space-between; }

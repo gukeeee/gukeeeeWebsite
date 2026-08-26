@@ -124,6 +124,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("config-warning").style.display = "block";
   }
 
+  document.getElementById("print-lookup-btn").onclick = () => window.print();
+
   Auth.onChange((user) => {
     userIsAdmin = Auth.isAdmin();
     document.getElementById("admin-section").style.display = userIsAdmin ? "block" : "none";
@@ -145,10 +147,24 @@ async function refreshVerbs({ forceRefresh = false } = {}) {
 // change "didn't happen".
 function applyVerbs(newVerbs) {
   verbs = newVerbs;
+  renderWeekBanner();
   if (userIsAdmin) renderAdminSection();
   renderLookup();
   renderPracticeSetup();
   renderTestSetup();
+}
+
+// "Week of ..." is derived from the earliest addedAt among verbs currently
+// marked current — i.e. whenever this batch was first added — rather than
+// needing the admin to separately track/set a date.
+function renderWeekBanner() {
+  const banner = document.getElementById("week-banner");
+  const current = verbs.filter((v) => v.isCurrent && v.addedAt);
+  if (!current.length) { banner.style.display = "none"; return; }
+  const earliest = Math.min(...current.map((v) => v.addedAt));
+  const dateStr = new Date(earliest).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+  banner.textContent = `📅 Week of ${dateStr}`;
+  banner.style.display = "block";
 }
 
 /* ---------------------------------- admin ---------------------------------- */
@@ -357,6 +373,10 @@ function resetAdminForm() {
 
 async function saveVerbFromForm(existingRecord) {
   const infinitive = document.getElementById("admin-infinitive").value.trim().toLowerCase();
+
+  const isDuplicate = verbs.some((v) => v.infinitive === infinitive && v.id !== (existingRecord && existingRecord.id));
+  if (isDuplicate && !confirm(`"${infinitive}" is already in the list. Add it again anyway?`)) return;
+
   const overrides = {};
   document.querySelectorAll("#admin-override-wrap input[data-key]").forEach((input) => {
     if (input.value !== input.dataset.generated) overrides[input.dataset.key] = input.value;
@@ -452,6 +472,7 @@ function renderLookupTable(record) {
   }).join("");
 
   wrap.innerHTML = `
+    <h3 class="print-only">${record.infinitive} — Conjugations</h3>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
@@ -496,24 +517,51 @@ function renderPracticeSetup() {
         </label>
       `).join("")}
     </div>
-    <button class="btn btn-primary" id="start-practice">Start practice</button>
+
+    <div class="row between" style="margin: var(--space-4) 0 var(--space-2);">
+      <strong style="font-size:0.85rem;">Tenses</strong>
+      <div class="row" style="gap:6px;">
+        <button class="btn btn-sm btn-ghost" id="tense-pick-all">All</button>
+        <button class="btn btn-sm btn-ghost" id="tense-pick-none">None</button>
+      </div>
+    </div>
+    <div class="verb-picker" id="practice-tense-picker">
+      ${QUESTION_POOL.map((key) => {
+        const { en, es } = tenseLabelParts(key);
+        return `
+          <label class="verb-chip">
+            <input type="checkbox" value="${key}" checked>
+            ${en} <span style="color:var(--color-text-faint); font-style:italic;">(${es})</span>
+          </label>
+        `;
+      }).join("")}
+    </div>
+
+    <button class="btn btn-primary" id="start-practice" style="margin-top: var(--space-3);">Start practice</button>
   `;
 
-  const checkboxes = () => Array.from(setup.querySelectorAll('input[type="checkbox"]'));
-  setup.querySelector("#pick-current").onclick = () => checkboxes().forEach((cb) => {
+  const verbCheckboxes = () => Array.from(setup.querySelectorAll('#practice-verb-picker input[type="checkbox"]'));
+  const tenseCheckboxes = () => Array.from(setup.querySelectorAll('#practice-tense-picker input[type="checkbox"]'));
+
+  setup.querySelector("#pick-current").onclick = () => verbCheckboxes().forEach((cb) => {
     cb.checked = verbs.find((v) => v.id === cb.value).isCurrent;
   });
-  setup.querySelector("#pick-past").onclick = () => checkboxes().forEach((cb) => {
+  setup.querySelector("#pick-past").onclick = () => verbCheckboxes().forEach((cb) => {
     cb.checked = !verbs.find((v) => v.id === cb.value).isCurrent;
   });
-  setup.querySelector("#pick-all").onclick = () => checkboxes().forEach((cb) => { cb.checked = true; });
-  setup.querySelector("#pick-none").onclick = () => checkboxes().forEach((cb) => { cb.checked = false; });
+  setup.querySelector("#pick-all").onclick = () => verbCheckboxes().forEach((cb) => { cb.checked = true; });
+  setup.querySelector("#pick-none").onclick = () => verbCheckboxes().forEach((cb) => { cb.checked = false; });
+
+  setup.querySelector("#tense-pick-all").onclick = () => tenseCheckboxes().forEach((cb) => { cb.checked = true; });
+  setup.querySelector("#tense-pick-none").onclick = () => tenseCheckboxes().forEach((cb) => { cb.checked = false; });
 
   setup.querySelector("#start-practice").onclick = () => {
-    const selectedIds = checkboxes().filter((cb) => cb.checked).map((cb) => cb.value);
-    const selected = verbs.filter((v) => selectedIds.includes(v.id));
-    if (!selected.length) { alert("Select at least one verb."); return; }
-    startPracticeDrill(selected);
+    const selectedIds = verbCheckboxes().filter((cb) => cb.checked).map((cb) => cb.value);
+    const selectedVerbs = verbs.filter((v) => selectedIds.includes(v.id));
+    const selectedTenses = tenseCheckboxes().filter((cb) => cb.checked).map((cb) => cb.value);
+    if (!selectedVerbs.length) { alert("Select at least one verb."); return; }
+    if (!selectedTenses.length) { alert("Select at least one tense."); return; }
+    startPracticeDrill(selectedVerbs, selectedTenses);
   };
 }
 
@@ -523,11 +571,11 @@ function stopDrillTimer() {
   if (drillState && drillState.timerHandle) clearInterval(drillState.timerHandle);
 }
 
-function startPracticeDrill(selectedVerbs) {
+function startPracticeDrill(selectedVerbs, selectedTenses) {
   document.getElementById("practice-setup").style.display = "none";
   const drill = document.getElementById("practice-drill");
   drill.style.display = "block";
-  drillState = { verbs: selectedVerbs, correct: 0, total: 0, streak: 0, startTime: Date.now(), timerHandle: null };
+  drillState = { verbs: selectedVerbs, tenses: selectedTenses, correct: 0, total: 0, streak: 0, startTime: Date.now(), timerHandle: null };
 
   drill.innerHTML = `
     <button class="btn btn-ghost btn-sm drill-back-btn" id="drill-back">← Change selection</button>
@@ -577,7 +625,8 @@ function updateDrillStats() {
 function pickDrillQuestion() {
   const verb = drillState.verbs[Math.floor(Math.random() * drillState.verbs.length)];
   const data = getVerbForms(verb);
-  const tenseKey = QUESTION_POOL[Math.floor(Math.random() * QUESTION_POOL.length)];
+  const pool = drillState.tenses;
+  const tenseKey = pool[Math.floor(Math.random() * pool.length)];
 
   if (tenseKey === "mandato") {
     const slot = MANDATO_SLOTS[Math.floor(Math.random() * MANDATO_SLOTS.length)];
@@ -643,16 +692,12 @@ function checkDrillAnswer() {
   playFeedbackSound(ok);
   updateDrillStats();
 
-  if (ok) {
-    setTimeout(nextDrillQuestion, 650);
-  } else {
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "btn btn-secondary btn-sm";
-    nextBtn.style.marginTop = "10px";
-    nextBtn.textContent = "Next →";
-    nextBtn.onclick = nextDrillQuestion;
-    document.getElementById("drill-card").querySelector(".drill-focus").appendChild(nextBtn);
-  }
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "btn btn-secondary btn-sm";
+  nextBtn.style.marginTop = "10px";
+  nextBtn.textContent = "Next →";
+  nextBtn.onclick = nextDrillQuestion;
+  document.getElementById("drill-card").querySelector(".drill-focus").appendChild(nextBtn);
 }
 
 /* ---------------------------------- test simulation ---------------------------------- */
