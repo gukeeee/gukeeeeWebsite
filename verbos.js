@@ -822,8 +822,8 @@ function renderTestSetup() {
   setup.innerHTML = `
     <p style="color:var(--color-text-muted);">
       The test picks one verb from this week and one from past weeks (or two current verbs if there aren't any
-      past ones yet), asks for each verb's meaning, then covers all 14 tenses — one randomly picked subject per
-      tense — plus every command form. 7 minutes to fill it all in.
+      past ones yet), asks for each verb's meaning, then covers all 14 tenses — each verb gets one randomly
+      picked subject, used across every tense — plus every command form. 7 minutes to fill it all in.
     </p>
     <button class="btn btn-primary" id="start-test">Start test</button>
   `;
@@ -837,18 +837,18 @@ function startTest(currentPool, pastPool) {
     do { verbB = pastPool[Math.floor(Math.random() * pastPool.length)]; } while (verbB.id === verbA.id);
   }
 
-  // All 14 tenses are tested, but each row only asks for one randomly
-  // picked subject (shared by both verb columns) instead of all 5 — except
-  // mandato, which always tests every one of its 4 slots.
-  const tenseAssignments = Conjugator.TENSES.map((t) => ({
-    tenseKey: t.key,
-    pronoun: PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)],
-  }));
+  // All 14 tenses are tested, but each verb column only asks for one
+  // randomly picked subject — the same subject for that verb across every
+  // tense row — instead of all 5. Mandato is unaffected: always all 4 slots.
+  const subjects = [
+    PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)],
+    PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)],
+  ];
 
   testState = {
     verbs: [verbA, verbB],
     forms: [getVerbForms(verbA), getVerbForms(verbB)],
-    tenseAssignments,
+    subjects,
     secondsLeft: TEST_DURATION_SECONDS,
     graded: false,
   };
@@ -875,23 +875,15 @@ function startTest(currentPool, pastPool) {
 }
 
 function buildTestGridHtml(state) {
-  const tenseRows = state.tenseAssignments.map(({ tenseKey, pronoun }) => {
+  const tenseRows = Conjugator.TENSES.map((t) => {
     const verbCells = [0, 1].map((vi) => `
       <td>
         <input type="text" class="test-single-input" autocomplete="off"
-          data-verb="${vi}" data-tense="${tenseKey}" data-slot="${pronoun.bucket}">
+          data-verb="${vi}" data-tense="${t.key}" data-slot="${state.subjects[vi].bucket}">
       </td>
     `).join("");
 
-    return `
-      <tr>
-        <td class="tense-label">
-          ${tenseLabelHtml(tenseKey)}
-          <span class="tense-subject">${pronoun.label}</span>
-        </td>
-        ${verbCells}
-      </tr>
-    `;
+    return `<tr><td class="tense-label">${tenseLabelHtml(t.key)}</td>${verbCells}</tr>`;
   }).join("");
 
   const mandatoInputs = (vi) => MANDATO_SLOTS.map((slot) => `
@@ -924,7 +916,15 @@ function buildTestGridHtml(state) {
     <div class="table-scroll">
       <table class="test-grid">
         <thead>
-          <tr><th></th><th>${state.verbs[0].infinitive}</th><th>${state.verbs[1].infinitive}</th></tr>
+          <tr>
+            <th></th>
+            ${[0, 1].map((vi) => `
+              <th class="test-verb-header">
+                <span class="test-verb-header__name">${state.verbs[vi].infinitive}</span>
+                <span class="tense-subject">${state.subjects[vi].label}</span>
+              </th>
+            `).join("")}
+          </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>

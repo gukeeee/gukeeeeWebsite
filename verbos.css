@@ -298,6 +298,22 @@ table.test-grid thead th {
     background: var(--color-surface-alt);
     font-size: 0.72rem;
 }
+/* The verb column headers are the most important thing on this table — the
+   student's whole test hinges on which two verbs and which subjects these
+   are, so they get their own bigger, bolder treatment. */
+table.test-grid thead th.test-verb-header {
+    padding: 14px 10px;
+    background: var(--color-accent-light);
+}
+.test-verb-header__name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: none;
+    letter-spacing: normal;
+}
 table.test-grid td.tense-label {
     text-align: left;
     font-weight: 600;
@@ -307,15 +323,15 @@ table.test-grid td.tense-label {
     position: sticky;
     left: 0;
 }
-/* The randomly-assigned subject for that row, shown right under the tense name. */
+/* The randomly-assigned subject for that verb, shown under its name in the header. */
 .tense-subject {
     display: inline-block;
-    margin-top: 5px;
-    padding: 2px 9px;
+    margin-top: 6px;
+    padding: 3px 10px;
     border-radius: 999px;
-    background: var(--color-accent-light);
-    color: var(--color-accent);
-    font-size: 0.68rem;
+    background: var(--bg-surface);
+    color: var(--color-text);
+    font-size: 0.72rem;
     font-weight: 700;
 }
 
