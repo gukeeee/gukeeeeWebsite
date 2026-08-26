@@ -303,21 +303,50 @@ table.test-grid td.tense-label {
     font-weight: 600;
     background: var(--color-surface-alt);
     white-space: normal;
-    max-width: 150px;
+    max-width: 170px;
     position: sticky;
     left: 0;
 }
-/* Fixed 3-column grid so 5 persons wrap 3-then-2 (and the 4-slot mandato row
-   wraps 3-then-1) instead of an unpredictable auto-fit wrap. */
+/* The randomly-assigned subject for that row, shown right under the tense name. */
+.tense-subject {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+/* Each of the 14 tense rows only asks for one subject now, so its single
+   box gets to be much bigger/easier to read than the old 5-per-row grid. */
+.test-single-input {
+    width: 100%;
+    min-width: 110px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--bg-void);
+    color: var(--color-text);
+    text-align: center;
+}
+.test-single-input.correct { background: color-mix(in srgb, var(--color-success) 20%, var(--bg-void)); border-color: var(--color-success); }
+.test-single-input.incorrect { background: color-mix(in srgb, var(--color-danger) 20%, var(--bg-void)); border-color: var(--color-danger); }
+
+/* Mandato still needs all 4 slots — a 2x2 grid instead of the 3-then-1 wrap
+   it'd get from the general-purpose column count. */
 .test-cell-group {
     display: grid;
     grid-template-columns: repeat(3, minmax(60px, 1fr));
     gap: 5px;
 }
+.test-cell-group--mandato { grid-template-columns: repeat(2, 1fr); }
 .test-cell-group input {
     width: 100%;
-    padding: 5px 6px;
-    font-size: 0.76rem;
+    padding: 6px 7px;
+    font-size: 0.8rem;
     border-radius: 4px;
     border: 1px solid var(--color-border);
     background: var(--bg-void);
@@ -326,6 +355,6 @@ table.test-grid td.tense-label {
 }
 .test-cell-group input.correct { background: color-mix(in srgb, var(--color-success) 20%, var(--bg-void)); border-color: var(--color-success); }
 .test-cell-group input.incorrect { background: color-mix(in srgb, var(--color-danger) 20%, var(--bg-void)); border-color: var(--color-danger); }
-.test-cell-group .person-tag { font-size: 0.6rem; color: var(--color-text-faint); display: block; margin-bottom: 2px; }
+.test-cell-group .person-tag { font-size: 0.62rem; color: var(--color-text-faint); display: block; margin-bottom: 3px; }
 
 .test-summary { text-align: center; margin-top: var(--space-4); font-weight: 700; font-family: var(--font-display); font-size: 1.1rem; }
