@@ -69,7 +69,7 @@ function getVerbForms(record) {
       ? { value: overrides[key], irregular: true }
       : base.imperative[slot];
   });
-  return { forms, imperative, imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt, infinitive: record.infinitive };
+  return { forms, imperative, imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt, infinitive: record.infinitive, meaning: record.meaning };
 }
 
 function isAnswerCorrect(userValue, correct, alt) {
@@ -259,9 +259,13 @@ function renderAdminSection() {
         <div class="card" id="admin-add-card" style="border:none; background:var(--color-surface-alt);">
           <strong id="admin-add-title">Add verb</strong>
           <div class="row" style="margin:10px 0;">
-            <div class="field" style="margin:0; flex:1;">
+            <div class="field" style="margin:0;">
               <label>Infinitive</label>
               <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:160px;">
+            </div>
+            <div class="field" style="margin:0; flex:1;">
+              <label>Meaning</label>
+              <input type="text" id="admin-meaning" class="input" placeholder="to speak">
             </div>
             <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generate conjugation</button>
           </div>
@@ -307,6 +311,7 @@ function renderAdminVerbList(list) {
   return list.map((v) => `
     <div class="admin-verb-row">
       <span class="infinitive">${v.infinitive}</span>
+      <span class="meaning">${v.meaning || ""}</span>
       <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
       <div class="row" style="gap:6px;">
         <button class="btn btn-sm btn-secondary admin-toggle-current-btn" data-id="${v.id}" data-next="${!v.isCurrent}">
@@ -321,6 +326,7 @@ function renderAdminVerbList(list) {
 
 function generateAdminPreview(existingRecord) {
   const infinitiveInput = document.getElementById("admin-infinitive");
+  const meaningInput = document.getElementById("admin-meaning");
   const infinitive = (existingRecord ? existingRecord.infinitive : infinitiveInput.value).trim().toLowerCase();
 
   if (!/^[a-záéíóúñ]*(ar|er|ir)$/.test(infinitive)) {
@@ -328,6 +334,7 @@ function generateAdminPreview(existingRecord) {
     return;
   }
   infinitiveInput.value = infinitive;
+  if (existingRecord) meaningInput.value = existingRecord.meaning || "";
 
   let conjugated;
   try {
@@ -392,6 +399,7 @@ function generateAdminPreview(existingRecord) {
 
 function resetAdminForm() {
   document.getElementById("admin-infinitive").value = "";
+  document.getElementById("admin-meaning").value = "";
   document.getElementById("admin-override-wrap").innerHTML = "";
   document.getElementById("admin-save-row").style.display = "none";
   document.getElementById("admin-add-title").textContent = "Add verb";
@@ -399,6 +407,7 @@ function resetAdminForm() {
 
 async function saveVerbFromForm(existingRecord) {
   const infinitive = document.getElementById("admin-infinitive").value.trim().toLowerCase();
+  const meaning = document.getElementById("admin-meaning").value.trim();
 
   const isDuplicate = verbs.some((v) => v.infinitive === infinitive && v.id !== (existingRecord && existingRecord.id));
   if (isDuplicate && !confirm(`"${infinitive}" is already in the list. Add it again anyway?`)) return;
@@ -411,6 +420,7 @@ async function saveVerbFromForm(existingRecord) {
   const record = {
     id: existingRecord ? existingRecord.id : undefined,
     infinitive,
+    meaning,
     isCurrent: existingRecord ? existingRecord.isCurrent : true,
     overrides,
   };
@@ -491,11 +501,15 @@ function renderLookup() {
 
   function showResults(query) {
     const q = query.trim().toLowerCase();
-    const matches = (q ? sorted.filter((v) => v.infinitive.includes(q)) : sorted).slice(0, 8);
+    const matches = (q
+      ? sorted.filter((v) => v.infinitive.includes(q) || (v.meaning || "").toLowerCase().includes(q))
+      : sorted
+    ).slice(0, 8);
     resultsEl.innerHTML = matches.length
       ? matches.map((v) => `
           <div class="lookup-result-item" data-id="${v.id}">
-            ${v.infinitive}${v.isCurrent ? "" : ' <span style="color:var(--color-text-faint);">(past)</span>'}
+            ${v.infinitive}${v.meaning ? ` <span style="color:var(--color-text-faint);">— ${v.meaning}</span>` : ""}
+            ${v.isCurrent ? "" : ' <span style="color:var(--color-text-faint);">(past)</span>'}
           </div>
         `).join("")
       : `<div class="lookup-result-empty">No matches</div>`;
@@ -549,7 +563,7 @@ function renderLookupTable(record) {
   }).join("");
 
   wrap.innerHTML = `
-    <h3 class="print-only">${record.infinitive} — Conjugations</h3>
+    <h3 class="print-only">${record.infinitive}${record.meaning ? ` (${record.meaning})` : ""} — Conjugations</h3>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
@@ -711,6 +725,7 @@ function pickDrillQuestion() {
     return {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
       infinitive: verb.infinitive,
+      meaning: verb.meaning,
       tenseKey,
       answer: cell.value,
       alt: null,
@@ -723,6 +738,7 @@ function pickDrillQuestion() {
   return {
     pronounLabel: pronoun.label,
     infinitive: verb.infinitive,
+    meaning: verb.meaning,
     tenseKey,
     answer: cell.value,
     alt,
@@ -735,7 +751,7 @@ function nextDrillQuestion() {
   const card = document.getElementById("drill-card");
   card.innerHTML = `
     <div class="drill-focus">
-      <div class="drill-focus__prompt">${q.pronounLabel} <strong>${q.infinitive}</strong></div>
+      <div class="drill-focus__prompt">${q.pronounLabel} <strong>${q.infinitive}</strong>${q.meaning ? ` <span class="drill-focus__meaning">(${q.meaning})</span>` : ""}</div>
       <div class="drill-focus__tense">${tenseLabelHtml(q.tenseKey)}</div>
       <input type="text" class="drill-focus__input" id="drill-input" autocomplete="off" spellcheck="false">
       <button class="btn drill-focus__check" id="drill-check">Check Answer <span aria-hidden="true">→</span></button>
@@ -806,7 +822,8 @@ function renderTestSetup() {
   setup.innerHTML = `
     <p style="color:var(--color-text-muted);">
       The test picks one verb from this week and one from past weeks (or two current verbs if there aren't any
-      past ones yet) and gives you 7 minutes to fill in every form.
+      past ones yet), asks for each verb's meaning, then tests one random tense (plus commands, always) across
+      both verbs — 7 minutes to fill it all in.
     </p>
     <button class="btn btn-primary" id="start-test">Start test</button>
   `;
@@ -820,9 +837,14 @@ function startTest(currentPool, pastPool) {
     do { verbB = pastPool[Math.floor(Math.random() * pastPool.length)]; } while (verbB.id === verbA.id);
   }
 
+  // One random real tense is tested (all persons); mandato is always
+  // included on top of that, for both verbs.
+  const tenseKey = Conjugator.TENSES[Math.floor(Math.random() * Conjugator.TENSES.length)].key;
+
   testState = {
     verbs: [verbA, verbB],
     forms: [getVerbForms(verbA), getVerbForms(verbB)],
+    tenseKey,
     secondsLeft: TEST_DURATION_SECONDS,
     graded: false,
   };
@@ -849,7 +871,7 @@ function startTest(currentPool, pastPool) {
 }
 
 function buildTestGridHtml(state) {
-  const rows = [...Conjugator.TENSES.map((t) => t.key), "mandato"].map((tenseKey) => {
+  const rows = [state.tenseKey, "mandato"].map((tenseKey) => {
     const isMandato = tenseKey === "mandato";
     const slots = isMandato ? MANDATO_SLOTS : Conjugator.PERSONS;
     const labels = isMandato ? MANDATO_SLOTS.map((s) => Conjugator.IMPERATIVE_LABELS[s]) : ["yo", "tú", "él", "nos.", "ellos"];
@@ -867,8 +889,16 @@ function buildTestGridHtml(state) {
     return `<tr><td class="tense-label">${tenseLabelHtml(tenseKey)}</td>${verbCells}</tr>`;
   }).join("");
 
+  const meaningFields = [0, 1].map((vi) => `
+    <div class="field" style="margin:0; flex:1; min-width:180px;">
+      <label>${state.verbs[vi].infinitive} — meaning</label>
+      <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
+    </div>
+  `).join("");
+
   return `
     <div class="test-timer" id="test-timer">07:00</div>
+    <div class="row" style="margin-bottom: var(--space-4);">${meaningFields}</div>
     <div class="table-scroll">
       <table class="test-grid">
         <thead>
@@ -915,6 +945,18 @@ function gradeTest() {
 
   document.querySelectorAll('#test-runner input[data-verb]').forEach((input) => {
     const vi = Number(input.dataset.verb);
+
+    if (input.dataset.field === "meaning") {
+      const expected = testState.verbs[vi].meaning;
+      if (!expected) return; // nothing to grade if this verb has no meaning on file
+      const ok = isAnswerCorrect(input.value, expected, null);
+      input.classList.add(ok ? "correct" : "incorrect");
+      input.disabled = true;
+      if (ok) correct++; else missedVerbIndices.add(vi);
+      total++;
+      return;
+    }
+
     const tenseKey = input.dataset.tense;
     const slot = input.dataset.slot;
     const cellSource = tenseKey === "mandato" ? testState.forms[vi].imperative[slot] : testState.forms[vi].forms[tenseKey][slot];
@@ -930,10 +972,10 @@ function gradeTest() {
   const summary = document.getElementById("test-summary");
   const pct = ((correct / total) * 100).toFixed(1);
 
-  if (missedTenseKeys.size === 0) {
+  if (correct === total) {
     summary.innerHTML = `Result: ${correct} / ${total} (${pct}%) — perfect! 🎉`;
     celebrate();
-  } else {
+  } else if (missedTenseKeys.size > 0) {
     const reviewVerbs = testState.verbs.filter((_, i) => missedVerbIndices.has(i));
     const reviewTenses = Array.from(missedTenseKeys);
     summary.innerHTML = `
@@ -946,5 +988,8 @@ function gradeTest() {
       document.getElementById("practice-section").scrollIntoView({ behavior: "smooth", block: "start" });
       startPracticeDrill(reviewVerbs, reviewTenses);
     };
+  } else {
+    // Only the meaning fields were missed — nothing conjugation-related to send to practice.
+    summary.innerHTML = `Result: ${correct} / ${total} (${pct}%)`;
   }
 }

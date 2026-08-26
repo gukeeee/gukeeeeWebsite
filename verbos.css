@@ -110,6 +110,7 @@
     flex-wrap: wrap;
 }
 .admin-verb-row .infinitive { font-weight: 700; min-width: 90px; }
+.admin-verb-row .meaning { color: var(--color-text-muted); font-size: 0.85rem; flex: 1; }
 
 .admin-conjugation-table { max-height: 360px; }
 .admin-conjugation-table td { padding: 5px; }
@@ -223,6 +224,7 @@
     box-shadow: var(--shadow-md);
 }
 .drill-focus__prompt strong { font-family: var(--font-display); font-weight: 700; }
+.drill-focus__meaning { font-size: 0.85em; color: #6b6a76; font-weight: 400; }
 .drill-focus__tense {
     color: rgba(255, 255, 255, 0.92);
     font-size: 1.05rem;
