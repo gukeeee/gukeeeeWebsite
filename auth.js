@@ -79,19 +79,19 @@ const Auth = (function () {
     overlay.className = "modal-overlay";
     overlay.innerHTML = `
       <div class="modal">
-        <h2>Iniciar sesión</h2>
+        <h2>Sign in</h2>
         <div class="field">
-          <label for="auth-username">Usuario</label>
+          <label for="auth-username">Username</label>
           <input type="text" id="auth-username" class="input" autocomplete="username">
         </div>
         <div class="field">
-          <label for="auth-password">Contraseña</label>
+          <label for="auth-password">Password</label>
           <input type="password" id="auth-password" class="input" autocomplete="current-password">
         </div>
-        <p id="auth-error" style="display:none;color:var(--color-danger);font-size:0.82rem;margin:-8px 0 12px;">Usuario o contraseña incorrectos</p>
+        <p id="auth-error" style="display:none;color:var(--color-danger);font-size:0.82rem;margin:-8px 0 12px;">Incorrect username or password</p>
         <div class="row between">
-          <button type="button" class="btn btn-ghost" id="auth-cancel">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="auth-submit">Ingresar</button>
+          <button type="button" class="btn btn-ghost" id="auth-cancel">Cancel</button>
+          <button type="button" class="btn btn-primary" id="auth-submit">Sign in</button>
         </div>
       </div>
     `;

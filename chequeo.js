@@ -35,9 +35,9 @@ function showLoginMessage() {
     loginMessage.className = 'empty-state';
     loginMessage.style.marginTop = 'var(--space-4)';
     loginMessage.innerHTML = `
-        <h3 style="color: var(--color-accent); margin-bottom: 12px;">Inicie sesión para acceder al chequeo de verbos</h3>
-        <p style="margin-bottom: 16px;">Para ver y completar el chequeo de verbos, debe iniciar sesión con su cuenta.</p>
-        <button id="login-prompt-btn" class="btn btn-primary">Iniciar sesión</button>
+        <h3 style="color: var(--color-accent); margin-bottom: 12px;">Sign in to access the verb check</h3>
+        <p style="margin-bottom: 16px;">Sign in with your account to view and complete the verb check.</p>
+        <button id="login-prompt-btn" class="btn btn-primary">Sign in</button>
     `;
     container.appendChild(loginMessage);
     document.getElementById('login-prompt-btn').addEventListener('click', () => Auth.openLoginModal());
@@ -91,7 +91,7 @@ async function fetchQuestions(className) {
         document.getElementById('result').innerHTML = '';
     } catch (error) {
         console.error("Error fetching questions:", error);
-        document.getElementById('quiz-form').innerHTML = '<p>Error cargando preguntas. Por favor intente de nuevo.</p>';
+        document.getElementById('quiz-form').innerHTML = '<p>Error loading questions. Please try again.</p>';
     }
 }
 
@@ -131,16 +131,16 @@ function checkAnswers(questions) {
             const userAnswer = inputField?.value.trim().toLowerCase();
             const possibleAnswers = correctAnswer.toLowerCase().split(' / ');
             if (!userAnswer) {
-                feedbackHtml += `<span style="color: var(--color-warning); font-weight: bold;">Sin respuesta, </span>`;
+                feedbackHtml += `<span style="color: var(--color-warning); font-weight: bold;">No answer, </span>`;
                 inputField.classList.add('empty');
             } else if (possibleAnswers.includes(userAnswer)) {
-                feedbackHtml += `<span style="color: var(--color-success); font-weight: bold;">Correcto, </span>`;
+                feedbackHtml += `<span style="color: var(--color-success); font-weight: bold;">Correct, </span>`;
                 inputField.classList.remove('empty');
                 inputField.classList.add('is-correct');
                 inputField.classList.remove('is-incorrect');
                 score++;
             } else {
-                feedbackHtml += `<span style="color: var(--color-danger); font-weight: bold;">Incorrecto, </span>`;
+                feedbackHtml += `<span style="color: var(--color-danger); font-weight: bold;">Incorrect, </span>`;
                 inputField.classList.remove('empty');
                 inputField.classList.remove('is-correct');
                 inputField.classList.add('is-incorrect');
@@ -149,7 +149,7 @@ function checkAnswers(questions) {
         });
         feedbackElement.innerHTML = feedbackHtml.slice(0, -9) + '</span>';
     });
-    document.getElementById('result').innerHTML = `<p><strong>Tu nota:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
+    document.getElementById('result').innerHTML = `<p><strong>Your score:</strong> ${score} / ${total} (${(score / total * 100).toFixed(2)}%)</p>`;
 }
 
 // Clear answers

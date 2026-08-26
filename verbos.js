@@ -3,6 +3,11 @@
    Ties together auth.js (admin gate), verbStore.js (gist-backed data) and
    conjugator.js (form generation) into: admin CRUD, a lookup table, a
    Conjuguemos-style practice drill, and a timed 2-verb test simulation.
+
+   UI text is in English (this is instructional chrome); anything that IS
+   the Spanish practice content — pronouns (yo, tú, él...), the mandato
+   pronoun targets (Tú, Ud., Nosotros), and of course the conjugated verb
+   forms themselves — stays in Spanish, since that's what's being tested.
    ========================================================================== */
 
 let verbs = [];
@@ -24,7 +29,7 @@ const PRONOUNS = [
 const QUESTION_POOL = [...Conjugator.TENSES.map((t) => t.key), "mandato"];
 
 function tenseLabel(key) {
-  if (key === "mandato") return "Mandato";
+  if (key === "mandato") return "Command";
   const t = Conjugator.TENSES.find((x) => x.key === key);
   return t ? t.label : key;
 }
@@ -56,7 +61,7 @@ function getVerbForms(record) {
       ? { value: overrides[key], irregular: true }
       : base.imperative[slot];
   });
-  return { forms, imperative, imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt, infinitive: record.infinitive, meaning: record.meaning };
+  return { forms, imperative, imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt, infinitive: record.infinitive };
 }
 
 function isAnswerCorrect(userValue, correct, alt) {
@@ -65,6 +70,43 @@ function isAnswerCorrect(userValue, correct, alt) {
   if (u === normalize(correct)) return true;
   if (alt && u === normalize(alt)) return true;
   return false;
+}
+
+/* ---------------------------------- sound effects ---------------------------------- */
+/* Short synthesized tones via Web Audio — no audio files to host. */
+
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function beep(freq, duration, delay = 0, type = "sine", volume = 0.18) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = volume;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const startTime = ctx.currentTime + delay;
+    osc.start(startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    osc.stop(startTime + duration + 0.02);
+  } catch (err) {
+    // Audio can fail to init in some contexts (autoplay policy, etc.) — silent no-op.
+  }
+}
+
+function playFeedbackSound(correct) {
+  if (correct) {
+    beep(660, 0.12, 0);
+    beep(880, 0.16, 0.09);
+  } else {
+    beep(200, 0.28, 0, "sawtooth", 0.12);
+  }
 }
 
 /* ---------------------------------- boot ---------------------------------- */
@@ -85,6 +127,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function refreshVerbs({ forceRefresh = false } = {}) {
   verbs = await VerbStore.getVerbs({ forceRefresh });
+  applyVerbs(verbs);
+}
+
+// Used right after a save/delete/toggle: the mutation functions already
+// return the up-to-date list, so render with that directly instead of
+// re-fetching the public raw URL, which can briefly lag behind a commit
+// that was just made (CDN caching) and would otherwise look like the
+// change "didn't happen".
+function applyVerbs(newVerbs) {
+  verbs = newVerbs;
   if (userIsAdmin) renderAdminSection();
   renderLookup();
   renderPracticeSetup();
@@ -100,11 +152,11 @@ function renderAdminSection() {
   if (!VerbStore.isConfigured()) {
     el.innerHTML = `
       <details open>
-        <summary>⚙️ Panel de administrador</summary>
+        <summary>⚙️ Admin panel</summary>
         <p style="color:var(--color-text-muted);">
-          Todavía no configuraste el Gist de verbos. Crea un Gist con un archivo <code>verbs.json</code>
-          conteniendo <code>{"verbs": []}</code>, y pon su ID y su URL "Raw" en <code>GIST_ID</code> /
-          <code>RAW_URL</code> dentro de <code>verbStore.js</code>.
+          The verbs Gist isn't configured yet. Create a Gist with a file containing <code>{"verbs": []}</code>,
+          then put its ID and its "Raw" URL into <code>GIST_ID</code> / <code>RAW_URL</code> in
+          <code>verbStore.js</code>.
         </p>
       </details>
     `;
@@ -117,50 +169,46 @@ function renderAdminSection() {
 
   el.innerHTML = `
     <details>
-      <summary>⚙️ Panel de administrador</summary>
+      <summary>⚙️ Admin panel</summary>
       <div class="stack" style="margin-top: var(--space-3);">
         <div class="card" style="background:var(--color-surface-alt); border:none;">
-          <strong>Token de GitHub (solo para ti)</strong>
+          <strong>GitHub token (yours only)</strong>
           <p style="color:var(--color-text-muted); font-size:0.82rem; margin:6px 0 10px;">
-            Se usa solo en tu navegador para guardar cambios en el Gist. Generá uno en
-            github.com/settings/tokens con permiso <code>gist</code> únicamente.
+            Used only in your browser to save changes to the Gist. Generate one at
+            github.com/settings/tokens with the <code>gist</code> scope only.
           </p>
           <div class="row">
             <input type="password" id="admin-token-input" class="input" style="max-width:320px;"
-              placeholder="${hasToken ? "Token ya configurado — pegar uno nuevo para reemplazarlo" : "ghp_..."}">
-            <button class="btn btn-secondary btn-sm" id="admin-token-save">Guardar token</button>
+              placeholder="${hasToken ? "Token already set — paste a new one to replace it" : "ghp_..."}">
+            <button class="btn btn-secondary btn-sm" id="admin-token-save">Save token</button>
           </div>
         </div>
 
         <div class="card" id="admin-add-card" style="border:none; background:var(--color-surface-alt);">
-          <strong id="admin-add-title">Agregar verbo</strong>
+          <strong id="admin-add-title">Add verb</strong>
           <div class="row" style="margin:10px 0;">
-            <div class="field" style="margin:0;">
-              <label>Infinitivo</label>
+            <div class="field" style="margin:0; flex:1;">
+              <label>Infinitive</label>
               <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:160px;">
             </div>
-            <div class="field" style="margin:0; flex:1;">
-              <label>Significado</label>
-              <input type="text" id="admin-meaning" class="input" placeholder="to speak">
-            </div>
-            <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generar conjugación</button>
+            <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generate conjugation</button>
           </div>
           <div id="admin-override-wrap"></div>
           <div class="row" id="admin-save-row" style="display:none; margin-top:var(--space-3);">
-            <button class="btn btn-primary" id="admin-save-verb">Guardar verbo</button>
-            <button class="btn btn-ghost" id="admin-cancel-edit">Cancelar</button>
+            <button class="btn btn-primary" id="admin-save-verb">Save verb</button>
+            <button class="btn btn-ghost" id="admin-cancel-edit">Cancel</button>
           </div>
         </div>
 
         <div>
           <div class="row between">
-            <strong>Verbos actuales (${current.length})</strong>
+            <strong>Current verbs (${current.length})</strong>
             <button class="btn btn-secondary btn-sm" id="admin-archive-btn" ${current.length ? "" : "disabled"}>
-              Archivar semana actual → pasada
+              Archive current week → past
             </button>
           </div>
           <div id="admin-current-list">${renderAdminVerbList(current)}</div>
-          <strong style="display:block; margin-top:var(--space-4);">Verbos de semanas pasadas (${past.length})</strong>
+          <strong style="display:block; margin-top:var(--space-4);">Past-week verbs (${past.length})</strong>
           <div id="admin-past-list">${renderAdminVerbList(past)}</div>
         </div>
       </div>
@@ -169,7 +217,7 @@ function renderAdminSection() {
 
   el.querySelector("#admin-token-save").addEventListener("click", () => {
     const val = el.querySelector("#admin-token-input").value;
-    if (val.trim()) { VerbStore.setToken(val); alert("Token guardado en este navegador."); renderAdminSection(); }
+    if (val.trim()) { VerbStore.setToken(val); alert("Token saved in this browser."); renderAdminSection(); }
   });
 
   el.querySelector("#admin-generate").addEventListener("click", () => generateAdminPreview());
@@ -182,18 +230,17 @@ function renderAdminSection() {
 }
 
 function renderAdminVerbList(list) {
-  if (!list.length) return `<p class="empty-state" style="padding:var(--space-3);">Ningún verbo todavía.</p>`;
+  if (!list.length) return `<p class="empty-state" style="padding:var(--space-3);">No verbs yet.</p>`;
   return list.map((v) => `
     <div class="admin-verb-row">
       <span class="infinitive">${v.infinitive}</span>
-      <span class="meaning">${v.meaning || ""}</span>
-      <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Actual" : "Pasado"}</span>
+      <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
       <div class="row" style="gap:6px;">
         <button class="btn btn-sm btn-secondary admin-toggle-current-btn" data-id="${v.id}" data-next="${!v.isCurrent}">
-          ${v.isCurrent ? "Marcar pasado" : "Marcar actual"}
+          ${v.isCurrent ? "Mark past" : "Mark current"}
         </button>
-        <button class="btn btn-sm btn-secondary admin-edit-btn" data-id="${v.id}">Editar</button>
-        <button class="btn btn-sm btn-danger admin-delete-btn" data-id="${v.id}">Eliminar</button>
+        <button class="btn btn-sm btn-secondary admin-edit-btn" data-id="${v.id}">Edit</button>
+        <button class="btn btn-sm btn-danger admin-delete-btn" data-id="${v.id}">Delete</button>
       </div>
     </div>
   `).join("");
@@ -201,58 +248,59 @@ function renderAdminVerbList(list) {
 
 function generateAdminPreview(existingRecord) {
   const infinitiveInput = document.getElementById("admin-infinitive");
-  const meaningInput = document.getElementById("admin-meaning");
   const infinitive = (existingRecord ? existingRecord.infinitive : infinitiveInput.value).trim().toLowerCase();
 
-  if (!/^[a-záéíóúñ]+(ar|er|ir)$/.test(infinitive)) {
-    alert("Escribe un infinitivo válido terminado en -ar, -er o -ir.");
+  if (!/^[a-záéíóúñ]*(ar|er|ir)$/.test(infinitive)) {
+    alert("Enter a valid infinitive ending in -ar, -er, or -ir.");
     return;
   }
   infinitiveInput.value = infinitive;
-  if (existingRecord) meaningInput.value = existingRecord.meaning || "";
 
   let conjugated;
   try {
     conjugated = Conjugator.conjugate(infinitive);
   } catch (err) {
-    alert("No se pudo conjugar ese verbo: " + err.message);
+    alert("Couldn't conjugate that verb: " + err.message);
     return;
   }
 
   const overrides = existingRecord ? existingRecord.overrides || {} : {};
   const wrap = document.getElementById("admin-override-wrap");
 
-  const rows = Conjugator.TENSES.map((t) => {
-    const cells = Conjugator.PERSONS.map((p) => {
-      const key = `${t.key}.${p}`;
-      const val = overrides[key] !== undefined ? overrides[key] : conjugated.forms[t.key][p].value;
-      return `
-        <div class="field">
-          <label>${t.label} · ${p}</label>
-          <input class="input" data-key="${key}" data-generated="${conjugated.forms[t.key][p].value}" value="${val}">
-        </div>
-      `;
-    }).join("");
-    return cells;
-  }).join("");
+  function cellInput(key, generatedValue) {
+    const val = overrides[key] !== undefined ? overrides[key] : generatedValue;
+    return `<input class="admin-table-input" data-key="${key}" data-generated="${generatedValue}" value="${val}">`;
+  }
 
-  const mandatoCells = MANDATO_SLOTS.map((slot) => {
-    const key = `imperative.${slot}`;
-    const val = overrides[key] !== undefined ? overrides[key] : conjugated.imperative[slot].value;
-    return `
-      <div class="field">
-        <label>Mandato · ${Conjugator.IMPERATIVE_LABELS[slot]}</label>
-        <input class="input" data-key="${key}" data-generated="${conjugated.imperative[slot].value}" value="${val}">
-      </div>
-    `;
-  }).join("");
+  const rows = Conjugator.TENSES.map((t) => `
+    <tr>
+      <td>${t.label}</td>
+      ${Conjugator.PERSONS.map((p) => `<td>${cellInput(`${t.key}.${p}`, conjugated.forms[t.key][p].value)}</td>`).join("")}
+    </tr>
+  `).join("");
+
+  const mandatoCells = MANDATO_SLOTS.map((slot) =>
+    `<td>${cellInput(`imperative.${slot}`, conjugated.imperative[slot].value)}</td>`
+  ).join("");
 
   wrap.innerHTML = `
     <p style="font-size:0.8rem; color:var(--color-text-muted); margin:10px 0 4px;">
-      Revisa las formas generadas. Corrige lo que haga falta — un campo cambiado queda marcado en rojo y se
-      guarda como una forma irregular editada a mano.
+      Review the generated table below. Fix anything that's wrong — a changed cell is marked red and is saved as
+      a hand-edited irregular form.
     </p>
-    <div class="admin-override-grid">${rows}${mandatoCells}</div>
+    <div class="table-scroll">
+      <table class="data-table admin-conjugation-table">
+        <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <h4 style="margin: var(--space-3) 0 var(--space-2);">Commands</h4>
+    <div class="table-scroll">
+      <table class="data-table admin-conjugation-table">
+        <thead><tr><th>Tú (affirmative)</th><th>Tú (negative)</th><th>Ud.</th><th>Nosotros</th></tr></thead>
+        <tbody><tr>${mandatoCells}</tr></tbody>
+      </table>
+    </div>
   `;
 
   wrap.querySelectorAll("input[data-key]").forEach((input) => {
@@ -263,7 +311,7 @@ function generateAdminPreview(existingRecord) {
   });
 
   document.getElementById("admin-save-row").style.display = "flex";
-  document.getElementById("admin-add-title").textContent = existingRecord ? `Editando "${infinitive}"` : "Agregar verbo";
+  document.getElementById("admin-add-title").textContent = existingRecord ? `Editing "${infinitive}"` : "Add verb";
 
   document.getElementById("admin-save-verb").onclick = () => saveVerbFromForm(existingRecord);
   document.getElementById("admin-cancel-edit").onclick = resetAdminForm;
@@ -271,15 +319,13 @@ function generateAdminPreview(existingRecord) {
 
 function resetAdminForm() {
   document.getElementById("admin-infinitive").value = "";
-  document.getElementById("admin-meaning").value = "";
   document.getElementById("admin-override-wrap").innerHTML = "";
   document.getElementById("admin-save-row").style.display = "none";
-  document.getElementById("admin-add-title").textContent = "Agregar verbo";
+  document.getElementById("admin-add-title").textContent = "Add verb";
 }
 
 async function saveVerbFromForm(existingRecord) {
   const infinitive = document.getElementById("admin-infinitive").value.trim().toLowerCase();
-  const meaning = document.getElementById("admin-meaning").value.trim();
   const overrides = {};
   document.querySelectorAll("#admin-override-wrap input[data-key]").forEach((input) => {
     if (input.value !== input.dataset.generated) overrides[input.dataset.key] = input.value;
@@ -288,15 +334,14 @@ async function saveVerbFromForm(existingRecord) {
   const record = {
     id: existingRecord ? existingRecord.id : undefined,
     infinitive,
-    meaning,
     isCurrent: existingRecord ? existingRecord.isCurrent : true,
     overrides,
   };
 
   try {
-    await VerbStore.saveVerb(record, Date.now());
+    const updated = await VerbStore.saveVerb(record, Date.now());
     resetAdminForm();
-    await refreshVerbs({ forceRefresh: true });
+    applyVerbs(updated);
   } catch (err) {
     alert(err.message);
   }
@@ -312,10 +357,10 @@ function editVerb(id) {
 async function deleteVerbConfirm(id) {
   const record = verbs.find((v) => v.id === id);
   if (!record) return;
-  if (!confirm(`¿Eliminar "${record.infinitive}"? Esta acción no se puede deshacer.`)) return;
+  if (!confirm(`Delete "${record.infinitive}"? This can't be undone.`)) return;
   try {
-    await VerbStore.deleteVerb(id);
-    await refreshVerbs({ forceRefresh: true });
+    const updated = await VerbStore.deleteVerb(id);
+    applyVerbs(updated);
   } catch (err) {
     alert(err.message);
   }
@@ -323,18 +368,18 @@ async function deleteVerbConfirm(id) {
 
 async function toggleCurrent(id, next) {
   try {
-    await VerbStore.setCurrent(id, next);
-    await refreshVerbs({ forceRefresh: true });
+    const updated = await VerbStore.setCurrent(id, next);
+    applyVerbs(updated);
   } catch (err) {
     alert(err.message);
   }
 }
 
 async function archiveWeek() {
-  if (!confirm("Esto marca todos los verbos actuales como \"pasados\". ¿Continuar?")) return;
+  if (!confirm('This marks every current verb as "past". Continue?')) return;
   try {
-    await VerbStore.archiveCurrentToPast();
-    await refreshVerbs({ forceRefresh: true });
+    const updated = await VerbStore.archiveCurrentToPast();
+    applyVerbs(updated);
   } catch (err) {
     alert(err.message);
   }
@@ -345,12 +390,12 @@ async function archiveWeek() {
 function renderLookup() {
   const select = document.getElementById("lookup-select");
   if (!verbs.length) {
-    select.innerHTML = `<option value="">No hay verbos todavía</option>`;
-    document.getElementById("lookup-table-wrap").innerHTML = `<div class="empty-state">Todavía no hay verbos agregados.</div>`;
+    select.innerHTML = `<option value="">No verbs yet</option>`;
+    document.getElementById("lookup-table-wrap").innerHTML = `<div class="empty-state">No verbs added yet.</div>`;
     return;
   }
   const sorted = [...verbs].sort((a, b) => a.infinitive.localeCompare(b.infinitive));
-  select.innerHTML = sorted.map((v) => `<option value="${v.id}">${v.infinitive}${v.meaning ? " — " + v.meaning : ""}</option>`).join("");
+  select.innerHTML = sorted.map((v) => `<option value="${v.id}">${v.infinitive}</option>`).join("");
   select.onchange = () => renderLookupTable(verbs.find((v) => v.id === select.value));
   renderLookupTable(sorted[0]);
 }
@@ -378,14 +423,14 @@ function renderLookupTable(record) {
   wrap.innerHTML = `
     <div class="table-scroll">
       <table class="data-table">
-        <thead><tr><th>Tiempo</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
+        <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <h4 style="margin-top: var(--space-4);">Mandatos</h4>
+    <h4 style="margin-top: var(--space-4);">Commands</h4>
     <div class="table-scroll">
       <table class="data-table">
-        <thead><tr><th>Tú (afirmativo)</th><th>Tú (negativo)</th><th>Ud.</th><th>Nosotros</th></tr></thead>
+        <thead><tr><th>Tú (affirmative)</th><th>Tú (negative)</th><th>Ud.</th><th>Nosotros</th></tr></thead>
         <tbody><tr>${mandatoCells}</tr></tbody>
       </table>
     </div>
@@ -398,28 +443,29 @@ function renderPracticeSetup() {
   const setup = document.getElementById("practice-setup");
   document.getElementById("practice-drill").style.display = "none";
   setup.style.display = "block";
+  stopDrillTimer();
 
   if (!verbs.length) {
-    setup.innerHTML = `<div class="empty-state">Todavía no hay verbos para practicar.</div>`;
+    setup.innerHTML = `<div class="empty-state">No verbs to practice yet.</div>`;
     return;
   }
 
   setup.innerHTML = `
     <div class="row" style="margin-bottom: var(--space-2);">
-      <button class="btn btn-sm btn-secondary" id="pick-current">Esta semana</button>
-      <button class="btn btn-sm btn-secondary" id="pick-past">Semanas pasadas</button>
-      <button class="btn btn-sm btn-secondary" id="pick-all">Ambas</button>
-      <button class="btn btn-sm btn-ghost" id="pick-none">Ninguno</button>
+      <button class="btn btn-sm btn-secondary" id="pick-current">This week</button>
+      <button class="btn btn-sm btn-secondary" id="pick-past">Past weeks</button>
+      <button class="btn btn-sm btn-secondary" id="pick-all">Both</button>
+      <button class="btn btn-sm btn-ghost" id="pick-none">None</button>
     </div>
     <div class="verb-picker" id="practice-verb-picker">
       ${verbs.map((v) => `
         <label class="verb-chip">
           <input type="checkbox" value="${v.id}" checked>
-          ${v.infinitive} ${v.isCurrent ? "" : "<span style=\"color:var(--color-text-faint);\">(pasado)</span>"}
+          ${v.infinitive} ${v.isCurrent ? "" : "<span style=\"color:var(--color-text-faint);\">(past)</span>"}
         </label>
       `).join("")}
     </div>
-    <button class="btn btn-primary" id="start-practice">Empezar práctica</button>
+    <button class="btn btn-primary" id="start-practice">Start practice</button>
   `;
 
   const checkboxes = () => Array.from(setup.querySelectorAll('input[type="checkbox"]'));
@@ -435,24 +481,66 @@ function renderPracticeSetup() {
   setup.querySelector("#start-practice").onclick = () => {
     const selectedIds = checkboxes().filter((cb) => cb.checked).map((cb) => cb.value);
     const selected = verbs.filter((v) => selectedIds.includes(v.id));
-    if (!selected.length) { alert("Selecciona al menos un verbo."); return; }
+    if (!selected.length) { alert("Select at least one verb."); return; }
     startPracticeDrill(selected);
   };
 }
 
 let drillState = null;
 
+function stopDrillTimer() {
+  if (drillState && drillState.timerHandle) clearInterval(drillState.timerHandle);
+}
+
 function startPracticeDrill(selectedVerbs) {
   document.getElementById("practice-setup").style.display = "none";
   const drill = document.getElementById("practice-drill");
   drill.style.display = "block";
-  drillState = { verbs: selectedVerbs, correct: 0, total: 0 };
+  drillState = { verbs: selectedVerbs, correct: 0, total: 0, streak: 0, startTime: Date.now(), timerHandle: null };
+
   drill.innerHTML = `
-    <button class="btn btn-ghost btn-sm" id="drill-back">← Cambiar selección</button>
-    <div id="drill-card"></div>
+    <button class="btn btn-ghost btn-sm drill-back-btn" id="drill-back">← Change selection</button>
+    <div class="drill-layout">
+      <aside class="drill-sidebar">
+        <div class="drill-stat">
+          <span class="drill-stat__icon" aria-hidden="true">⏱️</span>
+          <span class="drill-stat__value" id="drill-timer">00:00</span>
+        </div>
+        <div class="drill-stat">
+          <span class="drill-stat__label">Streak</span>
+          <span class="drill-stat__value" id="drill-streak">0</span>
+        </div>
+        <div class="drill-stat">
+          <span class="drill-stat__label">Accuracy</span>
+          <span class="drill-stat__value" id="drill-accuracy">—</span>
+        </div>
+        <div class="drill-progress"><div class="drill-progress__bar" id="drill-progress-bar" style="width:0%"></div></div>
+        <div class="drill-stat__label" style="text-align:center;">Score: <strong id="drill-score-text">0 / 0</strong></div>
+      </aside>
+      <div class="drill-main" id="drill-card"></div>
+    </div>
   `;
-  drill.querySelector("#drill-back").onclick = renderPracticeSetup;
+  drill.querySelector("#drill-back").onclick = () => { stopDrillTimer(); renderPracticeSetup(); };
+
+  drillState.timerHandle = setInterval(updateDrillTimer, 1000);
   nextDrillQuestion();
+}
+
+function updateDrillTimer() {
+  const el = document.getElementById("drill-timer");
+  if (!el || !drillState) return;
+  const elapsed = Math.floor((Date.now() - drillState.startTime) / 1000);
+  const m = Math.floor(elapsed / 60).toString().padStart(2, "0");
+  const s = (elapsed % 60).toString().padStart(2, "0");
+  el.textContent = `${m}:${s}`;
+}
+
+function updateDrillStats() {
+  document.getElementById("drill-streak").textContent = drillState.streak;
+  const acc = drillState.total ? Math.round((drillState.correct / drillState.total) * 100) : 0;
+  document.getElementById("drill-accuracy").textContent = drillState.total ? `${acc}%` : "—";
+  document.getElementById("drill-progress-bar").style.width = `${acc}%`;
+  document.getElementById("drill-score-text").textContent = `${drillState.correct} / ${drillState.total}`;
 }
 
 function pickDrillQuestion() {
@@ -464,8 +552,9 @@ function pickDrillQuestion() {
     const slot = MANDATO_SLOTS[Math.floor(Math.random() * MANDATO_SLOTS.length)];
     const cell = data.imperative[slot];
     return {
-      prompt: `${verb.infinitive}${verb.meaning ? " (" + verb.meaning + ")" : ""}`,
-      meta: `Mandato — ${Conjugator.IMPERATIVE_LABELS[slot]}`,
+      pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
+      infinitive: verb.infinitive,
+      tenseName: "Command",
       answer: cell.value,
       alt: null,
     };
@@ -475,8 +564,9 @@ function pickDrillQuestion() {
   const cell = data.forms[tenseKey][pronoun.bucket];
   const alt = tenseKey === "imperfectoSubjuntivo" ? data.imperfectoSubjuntivoAlt[pronoun.bucket] : null;
   return {
-    prompt: `${verb.infinitive}${verb.meaning ? " (" + verb.meaning + ")" : ""}`,
-    meta: `${pronoun.label} — ${tenseLabel(tenseKey)}`,
+    pronounLabel: pronoun.label,
+    infinitive: verb.infinitive,
+    tenseName: tenseLabel(tenseKey),
     answer: cell.value,
     alt,
   };
@@ -487,16 +577,12 @@ function nextDrillQuestion() {
   drillState.current = q;
   const card = document.getElementById("drill-card");
   card.innerHTML = `
-    <div class="drill-card">
-      <div class="drill-card__prompt">${q.prompt}</div>
-      <div class="drill-card__meta">${q.meta}</div>
-      <input type="text" class="input" id="drill-input" autocomplete="off">
-      <div class="row" style="justify-content:center; margin-top: var(--space-3);">
-        <button class="btn btn-primary btn-sm" id="drill-check">Comprobar</button>
-        <button class="btn btn-secondary btn-sm" id="drill-next" disabled>Siguiente</button>
-      </div>
+    <div class="drill-focus">
+      <div class="drill-focus__prompt">${q.pronounLabel} <strong>${q.infinitive}</strong></div>
+      <div class="drill-focus__tense">${q.tenseName}</div>
+      <input type="text" class="drill-focus__input" id="drill-input" autocomplete="off" spellcheck="false">
+      <button class="btn drill-focus__check" id="drill-check">Check Answer <span aria-hidden="true">→</span></button>
       <div class="drill-feedback" id="drill-feedback"></div>
-      <div class="drill-score">Puntaje: ${drillState.correct} / ${drillState.total}</div>
     </div>
   `;
   const input = card.querySelector("#drill-input");
@@ -504,25 +590,38 @@ function nextDrillQuestion() {
   const check = () => checkDrillAnswer();
   card.querySelector("#drill-check").onclick = check;
   input.addEventListener("keyup", (e) => { if (e.key === "Enter") check(); });
-  card.querySelector("#drill-next").onclick = nextDrillQuestion;
 }
 
 function checkDrillAnswer() {
   const input = document.getElementById("drill-input");
+  if (input.disabled) return;
   const feedback = document.getElementById("drill-feedback");
   const q = drillState.current;
   const ok = isAnswerCorrect(input.value, q.answer, q.alt);
 
   drillState.total++;
-  if (ok) drillState.correct++;
+  if (ok) { drillState.correct++; drillState.streak++; } else { drillState.streak = 0; }
 
   input.classList.add(ok ? "is-correct" : "is-incorrect");
   input.disabled = true;
-  feedback.className = "drill-feedback " + (ok ? "correct" : "incorrect");
-  feedback.textContent = ok ? "¡Correcto!" : `Incorrecto — respuesta: ${q.answer}`;
   document.getElementById("drill-check").disabled = true;
-  document.getElementById("drill-next").disabled = false;
-  document.querySelector(".drill-score").textContent = `Puntaje: ${drillState.correct} / ${drillState.total}`;
+
+  feedback.className = "drill-feedback " + (ok ? "correct" : "incorrect");
+  feedback.textContent = ok ? "Correct!" : `Incorrect — answer: ${q.answer}`;
+
+  playFeedbackSound(ok);
+  updateDrillStats();
+
+  if (ok) {
+    setTimeout(nextDrillQuestion, 650);
+  } else {
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-secondary btn-sm";
+    nextBtn.style.marginTop = "10px";
+    nextBtn.textContent = "Next →";
+    nextBtn.onclick = nextDrillQuestion;
+    document.getElementById("drill-card").querySelector(".drill-focus").appendChild(nextBtn);
+  }
 }
 
 /* ---------------------------------- test simulation ---------------------------------- */
@@ -535,21 +634,22 @@ function renderTestSetup() {
   const setup = document.getElementById("test-setup");
   document.getElementById("test-runner").style.display = "none";
   setup.style.display = "block";
+  if (testTimerHandle) clearInterval(testTimerHandle);
 
   const current = verbs.filter((v) => v.isCurrent);
   const past = verbs.filter((v) => !v.isCurrent);
 
   if (!current.length) {
-    setup.innerHTML = `<div class="empty-state">Necesitas al menos un verbo marcado como "actual" para generar el examen.</div>`;
+    setup.innerHTML = `<div class="empty-state">You need at least one verb marked "current" to generate a test.</div>`;
     return;
   }
 
   setup.innerHTML = `
     <p style="color:var(--color-text-muted);">
-      El examen elige un verbo de esta semana y uno de semanas pasadas (o dos actuales si aún no hay pasados) y
-      te da 7 minutos para completar todas las formas.
+      The test picks one verb from this week and one from past weeks (or two current verbs if there aren't any
+      past ones yet) and gives you 7 minutes to fill in every form.
     </p>
-    <button class="btn btn-primary" id="start-test">Empezar examen</button>
+    <button class="btn btn-primary" id="start-test">Start test</button>
   `;
   setup.querySelector("#start-test").onclick = () => startTest(current, past.length ? past : current);
 }
@@ -603,14 +703,14 @@ function buildTestGridHtml(state) {
     <div class="table-scroll">
       <table class="test-grid">
         <thead>
-          <tr><th></th><th>${state.verbs[0].infinitive}${state.verbs[0].meaning ? " (" + state.verbs[0].meaning + ")" : ""}</th><th>${state.verbs[1].infinitive}${state.verbs[1].meaning ? " (" + state.verbs[1].meaning + ")" : ""}</th></tr>
+          <tr><th></th><th>${state.verbs[0].infinitive}</th><th>${state.verbs[1].infinitive}</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
     <div class="row" style="justify-content:center; margin-top: var(--space-4);">
-      <button class="btn btn-primary" id="test-submit">Enviar</button>
-      <button class="btn btn-ghost" id="test-restart">Nuevo examen</button>
+      <button class="btn btn-primary" id="test-submit">Submit</button>
+      <button class="btn btn-ghost" id="test-restart">New test</button>
     </div>
     <div class="test-summary" id="test-summary"></div>
   `;
@@ -655,5 +755,5 @@ function gradeTest() {
   });
 
   document.getElementById("test-submit").disabled = true;
-  document.getElementById("test-summary").textContent = `Resultado: ${correct} / ${total} (${((correct / total) * 100).toFixed(1)}%)`;
+  document.getElementById("test-summary").textContent = `Result: ${correct} / ${total} (${((correct / total) * 100).toFixed(1)}%)`;
 }

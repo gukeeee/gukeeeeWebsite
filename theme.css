@@ -1,41 +1,55 @@
 /* ==========================================================================
    gukeeee — shared design system
-   Used by every page. Section pages set data-theme on <body> to pick an
-   accent color while sharing the same tokens, type scale and components.
+   Dark base + a single accent color per page (violet/blue/green/teal),
+   used by every page. Component classes (.btn, .card, .input, etc.) live
+   here; page-specific CSS files only add layout that's unique to that page.
    ========================================================================== */
 
+/* Fonts are loaded via a <link> tag in each page's <head> (faster than an
+   @import here, which would need theme.css itself to load first). */
+
 :root {
-  --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --color-bg: #f4f5fb;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f0f1f9;
-  --color-border: #e3e5f2;
-  --color-text: #171825;
-  --color-text-muted: #666a80;
-  --color-text-faint: #9498ab;
+  --bg-void: #0a0a0c;
+  --bg-base: #17161b;
+  --bg-surface: #201f26;
+  --bg-surface-2: #2b2a32;
+  --line: #383741;
+  --line-soft: #2a2930;
 
-  --color-primary: #7c3aed;
-  --color-primary-dark: #5b21b6;
-  --color-primary-light: #efe4ff;
+  --color-text: #f0f0f3;
+  --color-text-muted: #9c9ba6;
+  --color-text-faint: #6c6b76;
+
+  --color-primary: #a56bff;
+  --color-primary-dark: #8b46f5;
+  --color-primary-light: rgba(165, 107, 255, 0.16);
 
   --color-accent: var(--color-primary);
   --color-accent-dark: var(--color-primary-dark);
   --color-accent-light: var(--color-primary-light);
 
-  --color-success: #17a673;
-  --color-success-dark: #0f7d57;
-  --color-danger: #e0405a;
-  --color-danger-dark: #b62f43;
-  --color-warning: #e0a02c;
+  --color-success: #3ddc84;
+  --color-success-dark: #22b869;
+  --color-danger: #ff5a6a;
+  --color-danger-dark: #e8394b;
+  --color-warning: #ffb84a;
 
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --color-bg: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-surface-alt: var(--bg-surface-2);
+  --color-border: var(--line);
 
-  --shadow-sm: 0 2px 8px rgba(23, 24, 37, 0.06);
-  --shadow-md: 0 8px 24px rgba(23, 24, 37, 0.10);
-  --shadow-lg: 0 16px 40px rgba(23, 24, 37, 0.16);
+  --radius-sm: 7px;
+  --radius-md: 11px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -48,57 +62,56 @@
   --header-height: 64px;
 }
 
-/* Per-page themes, applied via <body data-theme="...">. Each page keeps a
-   visibly colored background (not just a differently-colored link) so the
-   site still reads as distinct, colorful sections the way it always has. */
-body[data-theme="home"] {
-  --color-bg: #efe4ff;
-}
+/* Per-page accent, applied via <body data-theme="...">. Dark base stays
+   constant; the accent is what gives each page its own identity. */
 body[data-theme="chequeo"] {
-  --color-accent: #2f80ed;
-  --color-accent-dark: #1c5fc0;
-  --color-accent-light: #e8f1fd;
-  --color-bg: #e3edfd;
+  --color-accent: #4a8cff;
+  --color-accent-dark: #2f6fe0;
+  --color-accent-light: rgba(74, 140, 255, 0.16);
 }
 body[data-theme="sports"] {
-  --color-accent: #16a35a;
-  --color-accent-dark: #0d7d44;
-  --color-accent-light: #e6f7ee;
-  --color-bg: #e1f5e9;
+  --color-accent: #34d17a;
+  --color-accent-dark: #1fae61;
+  --color-accent-light: rgba(52, 209, 122, 0.16);
 }
 body[data-theme="verbos"] {
-  --color-accent: #0f9aa8;
-  --color-accent-dark: #0b7580;
-  --color-accent-light: #e3f6f8;
-  --color-bg: #e0f4f6;
+  --color-accent: #2dd4c8;
+  --color-accent-dark: #17b0a5;
+  --color-accent-light: rgba(45, 212, 200, 0.16);
 }
 
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-}
+html { color-scheme: dark; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  background: var(--bg-base);
+  background-image:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 100%, var(--bg-surface) 0%, var(--bg-void) 70%);
+  background-attachment: fixed;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-weight: 700;
   margin: 0 0 var(--space-3);
   line-height: 1.2;
 }
 
-p { line-height: 1.55; }
+p { line-height: 1.6; color: var(--color-text); }
 
-a { color: var(--color-accent); }
+a { color: inherit; text-decoration: none; }
+
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
 /* ---------------------------------- Header ---------------------------------- */
 
@@ -108,9 +121,9 @@ a { color: var(--color-accent); }
   z-index: 200;
   width: 100%;
   height: var(--header-height);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(10, 10, 12, 0.85);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--line-soft);
 }
 
 .site-header__inner {
@@ -128,13 +141,14 @@ a { color: var(--color-accent); }
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  text-decoration: none;
-  color: var(--color-text);
   font-weight: 700;
+  font-family: var(--font-display);
   font-size: 1.05rem;
   flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
-.site-header__logo img { height: 32px; display: block; }
+.site-header__logo img { height: 30px; display: block; border-radius: 6px; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.site-header__logo:hover img { transform: rotate(-8deg) scale(1.08); }
 
 .site-nav {
   display: flex;
@@ -149,28 +163,25 @@ a { color: var(--color-accent); }
   padding: 8px 14px;
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
-  text-decoration: none;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   transition: background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
-.site-nav__link:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.site-nav__link:hover { background: var(--bg-surface-2); color: var(--color-text); }
 .site-nav__link.is-active { color: var(--color-accent); background: var(--color-accent-light); }
 
 .site-nav__user {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--color-text-muted);
   margin-right: var(--space-1);
   white-space: nowrap;
 }
 
-.site-header__menu-toggle {
-  display: none;
-}
+.site-header__menu-toggle { display: none; }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .site-header__inner { padding: 0 var(--space-3); }
   .site-nav { display: none; }
   .site-nav.is-open {
@@ -179,31 +190,32 @@ a { color: var(--color-accent); }
     top: var(--header-height);
     left: 0;
     right: 0;
-    background: var(--color-surface);
+    background: var(--bg-surface);
     flex-direction: column;
     align-items: stretch;
     padding: var(--space-3);
     box-shadow: var(--shadow-md);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--line-soft);
   }
   .site-nav.is-open .site-nav__link { text-align: center; }
   .site-header__menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: none;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    background: var(--color-surface-alt);
-    cursor: pointer;
-    font-size: 1.1rem;
+    background: var(--bg-surface);
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
   }
 }
 
 /* ---------------------------------- Layout ---------------------------------- */
 
 .page {
+  position: relative;
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-6) var(--space-5) var(--space-7);
@@ -212,26 +224,27 @@ a { color: var(--color-accent); }
 .page--narrow { max-width: 860px; }
 
 .card {
-  background: var(--color-surface);
+  background: var(--bg-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: var(--space-5);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--line-soft);
 }
 
 .section-title {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
 .eyebrow {
+  font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--color-accent);
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
   margin-bottom: var(--space-2);
 }
 
@@ -244,38 +257,46 @@ a { color: var(--color-accent); }
   gap: var(--space-2);
   padding: 10px 18px;
   border-radius: var(--radius-sm);
-  border: none;
+  border: 1px solid transparent;
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.88rem;
+  font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.btn:active { transform: translateY(0); }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-.btn-primary { background: var(--color-accent); color: #fff; }
-.btn-primary:hover { background: var(--color-accent-dark); }
+.btn-primary {
+  background: var(--color-accent);
+  color: #0a0a0c;
+  border-color: var(--color-accent);
+  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
 
-.btn-secondary { background: var(--color-surface-alt); color: var(--color-text); }
-.btn-secondary:hover { background: var(--color-border); }
+.btn-secondary {
+  background: var(--bg-surface-2);
+  color: var(--color-text);
+  border-color: var(--line);
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--color-text-faint); }
 
-.btn-danger { background: var(--color-danger); color: #fff; }
-.btn-danger:hover { background: var(--color-danger-dark); }
+.btn-danger { background: var(--color-danger); color: #1a0a0c; border-color: var(--color-danger); }
+.btn-danger:hover:not(:disabled) { filter: brightness(1.1); }
 
-.btn-ghost { background: transparent; color: var(--color-text-muted); }
-.btn-ghost:hover { background: var(--color-surface-alt); }
+.btn-ghost { background: transparent; color: var(--color-text-muted); border-color: var(--line); }
+.btn-ghost:hover:not(:disabled) { color: var(--color-text); border-color: var(--color-text-faint); }
 
-.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-sm { padding: 7px 13px; font-size: 0.78rem; }
 
 /* ---------------------------------- Forms ---------------------------------- */
 
 .field { margin-bottom: var(--space-4); text-align: left; }
 .field label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-muted);
   margin-bottom: var(--space-1);
@@ -285,19 +306,20 @@ a { color: var(--color-accent); }
   width: 100%;
   padding: 9px 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--line);
   font-family: var(--font-sans);
   font-size: 0.9rem;
-  background: var(--color-surface);
+  background: var(--bg-surface-2);
   color: var(--color-text);
 }
+.input::placeholder { color: var(--color-text-faint); }
 .input:focus, select.input:focus, textarea.input:focus {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px var(--color-accent-light);
 }
-.input.is-correct { border-color: var(--color-success); background: #f1fbf7; }
-.input.is-incorrect { border-color: var(--color-danger); background: #fdf1f3; }
+.input.is-correct { border-color: var(--color-success); background: color-mix(in srgb, var(--color-success) 14%, var(--bg-surface-2)); }
+.input.is-incorrect { border-color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 14%, var(--bg-surface-2)); }
 
 /* ---------------------------------- Badges ---------------------------------- */
 
@@ -306,20 +328,21 @@ a { color: var(--color-accent); }
   align-items: center;
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  border: 1px solid var(--line);
 }
-.badge-accent { background: var(--color-accent-light); color: var(--color-accent-dark); }
-.badge-muted { background: var(--color-surface-alt); color: var(--color-text-muted); }
-.badge-success { background: #e6f7ef; color: var(--color-success-dark); }
+.badge-accent { background: var(--color-accent-light); color: var(--color-accent); border-color: transparent; }
+.badge-muted { background: var(--bg-surface-2); color: var(--color-text-muted); }
+.badge-success { background: color-mix(in srgb, var(--color-success) 16%, transparent); color: var(--color-success); border-color: transparent; }
 
 /* ---------------------------------- Modal ---------------------------------- */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(23, 24, 37, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,7 +355,8 @@ a { color: var(--color-accent); }
 .modal-overlay.closing { opacity: 0; }
 
 .modal {
-  background: var(--color-surface);
+  background: var(--bg-surface);
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-5);
@@ -345,44 +369,45 @@ a { color: var(--color-accent); }
 .modal-overlay.visible .modal { transform: scale(1) translateY(0); opacity: 1; }
 .modal-overlay.closing .modal { transform: scale(0.92) translateY(-8px); opacity: 0; }
 .modal--wide { max-width: 640px; }
-.modal h2 { text-align: center; font-size: 1.15rem; }
+.modal h2 { text-align: center; font-size: 1.1rem; }
 
 /* ---------------------------------- Tables ---------------------------------- */
 
-.table-scroll { width: 100%; overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--color-border); }
+.table-scroll { width: 100%; overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--line-soft); }
 table.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 table.data-table th, table.data-table td {
   padding: 8px 10px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--line-soft);
   text-align: center;
   white-space: nowrap;
 }
 table.data-table thead th {
-  background: var(--color-surface-alt);
+  background: var(--bg-surface-2);
   font-weight: 700;
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
 }
 table.data-table td:first-child, table.data-table th:first-child {
   text-align: left;
   position: sticky;
   left: 0;
-  background: var(--color-surface);
+  background: var(--bg-surface);
   font-weight: 600;
 }
 table.data-table .is-irregular { color: var(--color-danger); font-weight: 700; }
 
 /* ---------------------------------- Footer / misc ---------------------------------- */
 
-.footer-note { text-align: center; color: var(--color-text-faint); font-size: 0.78rem; padding: var(--space-5) 0; }
+.footer-note { text-align: center; color: var(--color-text-faint); font-size: 0.75rem; padding: var(--space-5) 0; }
 
 .empty-state {
   text-align: center;
   color: var(--color-text-muted);
   padding: var(--space-6) var(--space-4);
-  border: 1px dashed var(--color-border);
+  border: 1px dashed var(--line);
   border-radius: var(--radius-md);
 }
 

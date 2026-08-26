@@ -13,10 +13,10 @@
   }
   window.navigateTo = navigateTo;
 
+  // Chequeo and Sports stay live at their URLs and are still linked from the
+  // homepage — just not in the global nav, to keep it focused.
   const NAV_LINKS = [
     { key: "home", label: "Home", path: "/" },
-    { key: "chequeo", label: "Chequeo", path: "/chequeo.html" },
-    { key: "sports", label: "Sports", path: "/sports.html" },
     { key: "verbos", label: "Prueba de Verbos", path: "/verbos.html" },
   ];
 
@@ -38,7 +38,7 @@
               (link) => `<a class="site-nav__link${link.key === active ? " is-active" : ""}" data-path="${link.path}">${link.label}</a>`
             ).join("")}
             <span class="site-nav__user" id="nav-user" style="display:none;"></span>
-            <button type="button" class="btn btn-sm btn-secondary" id="nav-auth-btn">Iniciar sesión</button>
+            <button type="button" class="btn btn-sm btn-secondary" id="nav-auth-btn">Sign in</button>
           </nav>
         </div>
       </header>
@@ -67,10 +67,10 @@
       if (user) {
         userEl.style.display = "inline";
         userEl.textContent = user.displayName;
-        authBtn.textContent = "Cerrar sesión";
+        authBtn.textContent = "Sign out";
       } else {
         userEl.style.display = "none";
-        authBtn.textContent = "Iniciar sesión";
+        authBtn.textContent = "Sign in";
       }
     });
   }

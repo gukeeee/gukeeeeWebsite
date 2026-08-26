@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prueba de Verbos</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="verbos.css">
 </head>
@@ -14,15 +14,15 @@
 
     <main class="page">
         <div id="config-warning" class="empty-state" style="display:none; margin-bottom: var(--space-5);">
-            La lista de verbos todavía no está configurada. El administrador debe crear el Gist de verbos y completar
-            <code>GIST_ID</code> / <code>RAW_URL</code> en <code>verbStore.js</code>.
+            The verb list isn't configured yet. The admin needs to create the verbs Gist and fill in
+            <code>GIST_ID</code> / <code>RAW_URL</code> in <code>verbStore.js</code>.
         </div>
 
         <section id="admin-section" class="card" style="display:none; margin-bottom: var(--space-5);"></section>
 
         <section id="lookup-section" class="card" style="margin-bottom: var(--space-5);">
             <div class="eyebrow">Lookup</div>
-            <h2 class="section-title">🔍 Buscar un verbo</h2>
+            <h2 class="section-title">🔍 Look up a verb</h2>
             <div class="row" style="margin: var(--space-3) 0 var(--space-4);">
                 <select id="lookup-select" class="input" style="max-width:280px;"></select>
             </div>
@@ -31,14 +31,14 @@
 
         <section id="practice-section" class="card" style="margin-bottom: var(--space-5);">
             <div class="eyebrow">Conjuguemos</div>
-            <h2 class="section-title">✏️ Práctica</h2>
+            <h2 class="section-title">✏️ Practice</h2>
             <div id="practice-setup"></div>
             <div id="practice-drill" style="display:none;"></div>
         </section>
 
         <section id="test-section" class="card">
-            <div class="eyebrow">Simulación</div>
-            <h2 class="section-title">⏱️ Examen de práctica (7 minutos)</h2>
+            <div class="eyebrow">Simulation</div>
+            <h2 class="section-title">⏱️ Practice test (7 minutes)</h2>
             <div id="test-setup"></div>
             <div id="test-runner" style="display:none;"></div>
         </section>

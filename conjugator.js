@@ -14,23 +14,23 @@ const Conjugator = (function () {
   const PERSONS = ["yo", "tu", "el", "nosotros", "ellos"];
 
   const TENSES = [
-    { key: "presente", label: "Presente" },
-    { key: "presenteProgresivo", label: "Presente Progresivo" },
-    { key: "preterito", label: "Pretérito" },
-    { key: "imperfecto", label: "Imperfecto" },
-    { key: "futuro", label: "Futuro" },
-    { key: "condicional", label: "Condicional" },
-    { key: "presenteSubjuntivo", label: "Presente de Subjuntivo" },
-    { key: "imperfectoSubjuntivo", label: "Imperfecto de Subjuntivo" },
-    { key: "preteritoPerfecto", label: "Pretérito Perfecto" },
-    { key: "pluscuamperfecto", label: "Pluscuamperfecto" },
-    { key: "futuroPerfecto", label: "Futuro Perfecto" },
-    { key: "condicionalPerfecto", label: "Condicional Perfecto" },
-    { key: "preteritoPerfectoSubjuntivo", label: "Pretérito Perfecto de Subjuntivo" },
-    { key: "pluscuamperfectoSubjuntivo", label: "Pluscuamperfecto de Subjuntivo" },
+    { key: "presente", label: "Present" },
+    { key: "presenteProgresivo", label: "Present Progressive" },
+    { key: "preterito", label: "Preterite" },
+    { key: "imperfecto", label: "Imperfect" },
+    { key: "futuro", label: "Future" },
+    { key: "condicional", label: "Conditional" },
+    { key: "presenteSubjuntivo", label: "Present Subjunctive" },
+    { key: "imperfectoSubjuntivo", label: "Imperfect Subjunctive" },
+    { key: "preteritoPerfecto", label: "Present Perfect" },
+    { key: "pluscuamperfecto", label: "Past Perfect" },
+    { key: "futuroPerfecto", label: "Future Perfect" },
+    { key: "condicionalPerfecto", label: "Conditional Perfect" },
+    { key: "preteritoPerfectoSubjuntivo", label: "Present Perfect Subjunctive" },
+    { key: "pluscuamperfectoSubjuntivo", label: "Past Perfect Subjunctive" },
   ];
 
-  const IMPERATIVE_LABELS = { tuAff: "Tú (afirmativo)", tuNeg: "Tú (negativo)", ud: "Ud.", nosotros: "Nosotros" };
+  const IMPERATIVE_LABELS = { tuAff: "Tú (affirmative)", tuNeg: "Tú (negative)", ud: "Ud.", nosotros: "Nosotros" };
 
   const isVowelChar = (ch) => "aeiou".includes(ch);
   const endsWithDigraphGuQu = (stem) => stem.endsWith("gu") || stem.endsWith("qu");
@@ -267,11 +267,28 @@ const Conjugator = (function () {
     return { presente, preterito, imperfecto, presenteSubjuntivo, gerundio, participio };
   }
 
+  // The literal, no-exceptions baseline used only to decide what counts as
+  // "irregular": plain stem + ending, with none of buildSimpleTenses' spelling
+  // fixes (car/gar/zar, cer/cir, gu/qu, vowel-hiatus y-insertion, accents).
+  // Those fixes are real Spanish spelling rules, but a language class still
+  // treats verbs that trigger them (buscar, conocer, leer...) as irregular —
+  // comparing against this naive form is what makes that show up as red.
+  function buildNaiveBaseline(stem, group) {
+    return {
+      presente: ENDINGS.presente[group].map((e) => stem + e),
+      preterito: ENDINGS.preterito[group].map((e) => stem + e),
+      imperfecto: ENDINGS.imperfecto[group].map((e) => stem + e),
+      presenteSubjuntivo: ENDINGS.presenteSubjuntivo[group].map((e) => stem + e),
+      gerundio: stem + (group === "ar" ? "ando" : "iendo"),
+      participio: stem + (group === "ar" ? "ado" : "ido"),
+    };
+  }
+
   function conjugate(infinitive) {
     const { stem, group, inf } = splitInfinitive(infinitive);
     const irr = IRREGULAR[inf] || {};
 
-    const baseline = buildSimpleTenses(stem, group, null);
+    const baseline = buildNaiveBaseline(stem, group);
     const built = buildSimpleTenses(stem, group, irr.pattern || null);
 
     let forms = {

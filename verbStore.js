@@ -20,6 +20,13 @@ const VerbStore = (function () {
   const TOKEN_KEY = "githubGistToken";
   const CACHE_TTL_MS = 5 * 60 * 1000;
 
+  // In-memory snapshot for this tab. Once loaded, admin writes build on top
+  // of this instead of re-fetching the public raw URL — that CDN can lag a
+  // few seconds behind a commit that was just made, so re-fetching right
+  // after (or right before, for a second quick edit) a save can silently
+  // read stale data and make a change look like it "didn't happen".
+  let memoryVerbs = null;
+
   function isConfigured() {
     return !!(GIST_ID && RAW_URL);
   }
@@ -34,13 +41,14 @@ const VerbStore = (function () {
   }
 
   function writeCache(verbs) {
+    memoryVerbs = verbs;
     localStorage.setItem(CACHE_KEY, JSON.stringify(verbs));
     localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
   }
 
   async function fetchFromGist() {
     const res = await fetch(`${RAW_URL}?_=${Date.now()}`, { cache: "no-store" });
-    if (!res.ok) throw new Error("No se pudo cargar la lista de verbos");
+    if (!res.ok) throw new Error("Couldn't load the verb list");
     const data = await res.json();
     return Array.isArray(data.verbs) ? data.verbs : [];
   }
@@ -52,15 +60,27 @@ const VerbStore = (function () {
     if (!isConfigured()) return [];
     const cached = readCache();
     const cacheAge = Date.now() - Number(localStorage.getItem(CACHE_TIME_KEY) || 0);
-    if (cached && !forceRefresh && cacheAge < CACHE_TTL_MS) return cached;
+    if (cached && !forceRefresh && cacheAge < CACHE_TTL_MS) {
+      memoryVerbs = cached;
+      return cached;
+    }
     try {
       const fresh = await fetchFromGist();
       writeCache(fresh);
       return fresh;
     } catch (err) {
       console.error("VerbStore: fetch failed, falling back to cache", err);
-      return cached || [];
+      memoryVerbs = cached || [];
+      return memoryVerbs;
     }
+  }
+
+  // Base for a mutation: the in-memory snapshot from this tab if we have
+  // one, otherwise whatever's cached, otherwise an empty list. Never hits
+  // the network — see the comment on memoryVerbs above.
+  function currentSnapshot() {
+    if (memoryVerbs) return memoryVerbs;
+    return readCache() || [];
   }
 
   function getToken() {
@@ -77,7 +97,7 @@ const VerbStore = (function () {
 
   async function persist(verbs) {
     const token = getToken();
-    if (!token) throw new Error("Falta el token de administrador. Configúralo primero.");
+    if (!token) throw new Error("Missing admin token. Set it first.");
     const res = await fetch(API_URL, {
       method: "PATCH",
       headers: {
@@ -88,7 +108,7 @@ const VerbStore = (function () {
     });
     if (!res.ok) {
       const body = await res.text();
-      throw new Error(`Error al guardar (${res.status}): ${body.slice(0, 200)}`);
+      throw new Error(`Save failed (${res.status}): ${body.slice(0, 200)}`);
     }
     writeCache(verbs);
     return verbs;
@@ -99,7 +119,7 @@ const VerbStore = (function () {
   }
 
   async function saveVerb(verb, timestamp) {
-    const verbs = await getVerbs({ forceRefresh: true });
+    const verbs = currentSnapshot().slice();
     const idx = verbs.findIndex((v) => v.id === verb.id);
     if (idx >= 0) {
       verbs[idx] = verb;
@@ -112,20 +132,16 @@ const VerbStore = (function () {
   }
 
   async function deleteVerb(id) {
-    const verbs = await getVerbs({ forceRefresh: true });
-    return persist(verbs.filter((v) => v.id !== id));
+    return persist(currentSnapshot().filter((v) => v.id !== id));
   }
 
   async function setCurrent(id, isCurrent) {
-    const verbs = await getVerbs({ forceRefresh: true });
-    const verb = verbs.find((v) => v.id === id);
-    if (verb) verb.isCurrent = isCurrent;
+    const verbs = currentSnapshot().map((v) => (v.id === id ? { ...v, isCurrent } : v));
     return persist(verbs);
   }
 
   async function archiveCurrentToPast() {
-    const verbs = await getVerbs({ forceRefresh: true });
-    verbs.forEach((v) => { v.isCurrent = false; });
+    const verbs = currentSnapshot().map((v) => ({ ...v, isCurrent: false }));
     return persist(verbs);
   }
 
