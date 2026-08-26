@@ -287,37 +287,6 @@
 }
 .test-timer.is-low { color: var(--color-danger); }
 
-/* Worksheet-style header: Nombre/Fecha, then Verbo/Significado/Forma per
-   verb column — modeled directly on the paper test sheet. */
-.test-header-table {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr 1.3fr;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin-bottom: var(--space-4);
-}
-.test-header-cell {
-    padding: var(--space-4);
-    border-right: 1px solid var(--color-border);
-    font-size: 0.85rem;
-}
-.test-header-cell:last-child { border-right: none; }
-.test-header-verb {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    margin-bottom: var(--space-2);
-}
-.test-header-forma {
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    background: var(--color-accent-light);
-    display: inline-block;
-    font-size: 0.85rem;
-}
-
 table.test-grid { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
 table.test-grid td {
     border: 1px solid var(--color-border);
@@ -333,6 +302,37 @@ table.test-grid td.tense-label {
     max-width: 170px;
     position: sticky;
     left: 0;
+}
+
+/* Worksheet-style header row: Nombre/Fecha, then Verbo/Significado/Forma per
+   verb column — the first row of the same table, modeled directly on the
+   paper test sheet, rather than a separate element above it. */
+.test-header-row .test-header-cell {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--space-4);
+    background: var(--color-surface-alt);
+    font-size: 0.85rem;
+}
+/* Sticks to the left on horizontal scroll, same as the tense-label column
+   below it, so the two line up while scrolling. */
+.test-header-row .test-header-cell:first-child {
+    position: sticky;
+    left: 0;
+}
+.test-header-verb {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+}
+.test-header-forma {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent-light);
+    display: inline-block;
+    font-size: 0.85rem;
 }
 
 /* Each row only asks for one subject now, so its single box gets to be much
@@ -352,9 +352,3 @@ table.test-grid td.tense-label {
 .test-single-input.incorrect { background: color-mix(in srgb, var(--color-danger) 20%, var(--bg-void)); border-color: var(--color-danger); }
 
 .test-summary { text-align: center; margin-top: var(--space-4); font-weight: 700; font-family: var(--font-display); font-size: 1.1rem; }
-
-@media (max-width: 640px) {
-    .test-header-table { grid-template-columns: 1fr; }
-    .test-header-cell { border-right: none; border-bottom: 1px solid var(--color-border); }
-    .test-header-cell:last-child { border-bottom: none; }
-}

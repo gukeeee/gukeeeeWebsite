@@ -932,32 +932,35 @@ function buildTestGridHtml(state) {
   }).join("");
 
   const headerCell = (vi) => `
-    <div class="test-header-cell">
+    <td class="test-header-cell">
       <div class="test-header-verb">${state.verbs[vi].infinitive}</div>
       <div class="field" style="margin:0 0 8px;">
         <label>Significado</label>
         <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
       </div>
       <div class="test-header-forma"><strong>Forma:</strong> ${state.subjects[vi].label}</div>
-    </div>
+    </td>
   `;
 
   const student = Auth.getCurrentUser();
   const dateStr = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
-  return `
-    <div class="test-timer" id="test-timer">07:00</div>
-    <div class="test-header-table">
-      <div class="test-header-cell">
+  const headerRow = `
+    <tr class="test-header-row">
+      <td class="test-header-cell">
         <div><strong>Nombre:</strong> ${student ? student.displayName : ""}</div>
         <div style="margin-top:6px;"><strong>Fecha:</strong> ${dateStr}</div>
-      </div>
+      </td>
       ${headerCell(0)}
       ${headerCell(1)}
-    </div>
+    </tr>
+  `;
+
+  return `
+    <div class="test-timer" id="test-timer">07:00</div>
     <div class="table-scroll">
       <table class="test-grid">
-        <tbody>${tenseRows}${mandatoRows}</tbody>
+        <tbody>${headerRow}${tenseRows}${mandatoRows}</tbody>
       </table>
     </div>
     <div class="row" style="justify-content:center; margin-top: var(--space-4);">
