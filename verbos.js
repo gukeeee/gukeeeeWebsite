@@ -28,10 +28,18 @@ const PRONOUNS = [
 ];
 const QUESTION_POOL = [...Conjugator.TENSES.map((t) => t.key), "mandato"];
 
-function tenseLabel(key) {
-  if (key === "mandato") return "Command (Mandato)";
+function tenseLabelParts(key) {
+  if (key === "mandato") return { en: "Command", es: "Mandato" };
   const t = Conjugator.TENSES.find((x) => x.key === key);
-  return t ? t.label : key;
+  return t ? { en: t.label, es: t.labelEs } : { en: key, es: "" };
+}
+
+// English on its own line, Spanish below it in a distinct style — used
+// anywhere a tense name is rendered as HTML (table headers/cells, the
+// drill's tense line).
+function tenseLabelHtml(key) {
+  const { en, es } = tenseLabelParts(key);
+  return `<span class="tense-en">${en}</span>${es ? `<span class="tense-es">${es}</span>` : ""}`;
 }
 
 function normalize(str) {
@@ -297,7 +305,7 @@ function generateAdminPreview(existingRecord) {
 
   const rows = Conjugator.TENSES.map((t) => `
     <tr>
-      <td>${t.label}</td>
+      <td>${tenseLabelHtml(t.key)}</td>
       ${Conjugator.PERSONS.map((p) => `<td>${cellInput(`${t.key}.${p}`, conjugated.forms[t.key][p].value)}</td>`).join("")}
     </tr>
   `).join("");
@@ -430,7 +438,7 @@ function renderLookupTable(record) {
 
   const rows = Conjugator.TENSES.map((t) => `
     <tr>
-      <td>${t.label}</td>
+      <td>${tenseLabelHtml(t.key)}</td>
       ${Conjugator.PERSONS.map((p) => {
         const cell = data.forms[t.key][p];
         return `<td class="${cell.irregular ? "is-irregular" : ""}">${cell.value}</td>`;
@@ -577,7 +585,7 @@ function pickDrillQuestion() {
     return {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
       infinitive: verb.infinitive,
-      tenseName: "Command (Mandato)",
+      tenseKey,
       answer: cell.value,
       alt: null,
     };
@@ -589,7 +597,7 @@ function pickDrillQuestion() {
   return {
     pronounLabel: pronoun.label,
     infinitive: verb.infinitive,
-    tenseName: tenseLabel(tenseKey),
+    tenseKey,
     answer: cell.value,
     alt,
   };
@@ -602,7 +610,7 @@ function nextDrillQuestion() {
   card.innerHTML = `
     <div class="drill-focus">
       <div class="drill-focus__prompt">${q.pronounLabel} <strong>${q.infinitive}</strong></div>
-      <div class="drill-focus__tense">${q.tenseName}</div>
+      <div class="drill-focus__tense">${tenseLabelHtml(q.tenseKey)}</div>
       <input type="text" class="drill-focus__input" id="drill-input" autocomplete="off" spellcheck="false">
       <button class="btn drill-focus__check" id="drill-check">Check Answer <span aria-hidden="true">→</span></button>
       <div class="drill-feedback" id="drill-feedback"></div>
@@ -718,7 +726,7 @@ function buildTestGridHtml(state) {
       return `<td><div class="test-cell-group">${inputs}</div></td>`;
     }).join("");
 
-    return `<tr><td class="tense-label">${tenseLabel(tenseKey)}</td>${verbCells}</tr>`;
+    return `<tr><td class="tense-label">${tenseLabelHtml(tenseKey)}</td>${verbCells}</tr>`;
   }).join("");
 
   return `

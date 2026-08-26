@@ -13,21 +13,24 @@
 const Conjugator = (function () {
   const PERSONS = ["yo", "tu", "el", "nosotros", "ellos"];
 
+  // label = English name (instructional chrome), labelEs = Spanish name
+  // (the actual grammar term) — kept separate so callers can render them on
+  // their own line/style instead of one flat "English (Spanish)" string.
   const TENSES = [
-    { key: "presente", label: "Present (Presente)" },
-    { key: "presenteProgresivo", label: "Present Progressive (Presente Progresivo)" },
-    { key: "preterito", label: "Preterite (Pretérito)" },
-    { key: "imperfecto", label: "Imperfect (Imperfecto)" },
-    { key: "futuro", label: "Future (Futuro)" },
-    { key: "condicional", label: "Conditional (Condicional)" },
-    { key: "presenteSubjuntivo", label: "Present Subjunctive (Presente de Subjuntivo)" },
-    { key: "imperfectoSubjuntivo", label: "Imperfect Subjunctive (Imperfecto de Subjuntivo)" },
-    { key: "preteritoPerfecto", label: "Present Perfect (Pretérito Perfecto)" },
-    { key: "pluscuamperfecto", label: "Past Perfect (Pluscuamperfecto)" },
-    { key: "futuroPerfecto", label: "Future Perfect (Futuro Perfecto)" },
-    { key: "condicionalPerfecto", label: "Conditional Perfect (Condicional Perfecto)" },
-    { key: "preteritoPerfectoSubjuntivo", label: "Present Perfect Subjunctive (Pretérito Perfecto de Subjuntivo)" },
-    { key: "pluscuamperfectoSubjuntivo", label: "Past Perfect Subjunctive (Pluscuamperfecto de Subjuntivo)" },
+    { key: "presente", label: "Present", labelEs: "Presente" },
+    { key: "presenteProgresivo", label: "Present Progressive", labelEs: "Presente Progresivo" },
+    { key: "preterito", label: "Preterite", labelEs: "Pretérito" },
+    { key: "imperfecto", label: "Imperfect", labelEs: "Imperfecto" },
+    { key: "futuro", label: "Future", labelEs: "Futuro" },
+    { key: "condicional", label: "Conditional", labelEs: "Condicional" },
+    { key: "presenteSubjuntivo", label: "Present Subjunctive", labelEs: "Presente de Subjuntivo" },
+    { key: "imperfectoSubjuntivo", label: "Imperfect Subjunctive", labelEs: "Imperfecto de Subjuntivo" },
+    { key: "preteritoPerfecto", label: "Present Perfect", labelEs: "Pretérito Perfecto" },
+    { key: "pluscuamperfecto", label: "Past Perfect", labelEs: "Pluscuamperfecto" },
+    { key: "futuroPerfecto", label: "Future Perfect", labelEs: "Futuro Perfecto" },
+    { key: "condicionalPerfecto", label: "Conditional Perfect", labelEs: "Condicional Perfecto" },
+    { key: "preteritoPerfectoSubjuntivo", label: "Present Perfect Subjunctive", labelEs: "Pretérito Perfecto de Subjuntivo" },
+    { key: "pluscuamperfectoSubjuntivo", label: "Past Perfect Subjunctive", labelEs: "Pluscuamperfecto de Subjuntivo" },
   ];
 
   const IMPERATIVE_LABELS = { tuAff: "Tú (affirmative)", tuNeg: "Tú (negative)", ud: "Ud.", nosotros: "Nosotros" };

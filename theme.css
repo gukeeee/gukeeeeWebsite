@@ -402,6 +402,18 @@ table.data-table td:first-child, table.data-table th:first-child {
 }
 table.data-table .is-irregular { color: var(--color-danger); font-weight: 700; }
 
+/* Bilingual tense name: English on its own line, Spanish below it in a
+   distinct (italic, muted-accent) style so the two are never confused. */
+.tense-en { display: block; }
+.tense-es {
+  display: block;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-accent);
+  font-size: 0.85em;
+  margin-top: 2px;
+}
+
 /* ---------------------------------- Footer / misc ---------------------------------- */
 
 .footer-note { text-align: center; color: var(--color-text-faint); font-size: 0.75rem; padding: var(--space-5) 0; }

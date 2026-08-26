@@ -164,6 +164,9 @@
     font-family: var(--font-display);
     margin-bottom: var(--space-5);
 }
+/* The shared .tense-es color (page accent) can clash against this card's
+   own gradient — use a soft white instead, still distinguished by italics. */
+.drill-focus .tense-es { color: rgba(255, 255, 255, 0.65); }
 .drill-focus__input {
     display: block;
     width: 260px;
