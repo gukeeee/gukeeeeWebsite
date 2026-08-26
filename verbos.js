@@ -751,6 +751,16 @@ function startTest(currentPool, pastPool) {
   runner.querySelector("#test-submit").onclick = () => gradeTest();
   runner.querySelector("#test-restart").onclick = renderTestSetup;
 
+  const testInputs = Array.from(runner.querySelectorAll("input[data-verb]"));
+  testInputs.forEach((input, i) => {
+    input.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const next = testInputs[i + 1];
+      if (next) next.focus();
+    });
+  });
+
   testTimerHandle = setInterval(tickTestTimer, 1000);
   updateTimerDisplay();
 }
