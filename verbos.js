@@ -367,25 +367,47 @@ function degerund(word) {
   return GERUND_IE_EXCEPTIONS[stem] || word;
 }
 
-// Auto-fetched (MyMemory's free translation API) instead of typed in by
-// hand — the admin can still edit the field afterward if the translation
-// is off, but this is now the primary path. MyMemory returns a ranked list
-// of translation-memory matches rather than a clean dictionary gloss, so
-// this picks the first one that actually reads like a short "to X" phrase
-// instead of a sentence fragment or gerund clause.
-async function fetchMeaning(query) {
+function cleanCandidate(t) {
+  return t && t.split(/\s+/).length <= 5 && !/["“”.!?;]/.test(t) ? t : null;
+}
+
+// Lingva (a privacy front-end for Google Translate) gives noticeably better
+// glosses than a translation-memory API — real machine translation instead
+// of a fuzzy match against a phrase corpus — so it's tried first.
+async function fetchFromLingva(query) {
+  try {
+    const res = await fetch(`https://lingva.lunar.icu/api/v1/es/en/${encodeURIComponent(query)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return cleanCandidate((data.translation || "").trim());
+  } catch (err) {
+    return null;
+  }
+}
+
+// Fallback if Lingva's instance is ever unreachable. MyMemory returns a
+// ranked list of translation-memory matches rather than a single gloss, so
+// this picks the first one that reads like a short phrase, not a fragment.
+async function fetchFromMyMemory(query) {
   try {
     const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=es|en`);
     const data = await res.json();
     const candidates = [data.responseData, ...(data.matches || [])]
-      .map((m) => (m && (m.translatedText || m.translation) || "").trim())
-      .filter((t) => t && t.split(/\s+/).length <= 5 && !/["“”.!?;]/.test(t));
-    if (!candidates.length) return null;
-    let text = degerund(candidates[0].toLowerCase().replace(/[.!?]+$/, ""));
-    return text.startsWith("to ") ? text : `to ${text}`;
+      .map((m) => cleanCandidate((m && (m.translatedText || m.translation) || "").trim()))
+      .filter(Boolean);
+    return candidates[0] || null;
   } catch (err) {
     return null;
   }
+}
+
+// Auto-fetched instead of typed in by hand — the admin can still edit the
+// field afterward if the translation is off, but this is now the primary path.
+async function fetchMeaning(query) {
+  const raw = (await fetchFromLingva(query)) || (await fetchFromMyMemory(query));
+  if (!raw) return null;
+  const text = degerund(raw.toLowerCase().replace(/[.!?]+$/, ""));
+  return text.startsWith("to ") ? text : `to ${text}`;
 }
 
 function generateAdminPreview(existingRecord) {
