@@ -278,10 +278,10 @@ function renderAdminSection() {
   el.innerHTML = adminCollapseHtml(`
       <div class="stack" style="margin-top: var(--space-3);">
         <div class="card" style="background:var(--color-surface-alt); border:none;">
-          <strong>GitHub token (yours only)</strong>
+          <strong>GitHub token</strong>
           <div class="row" style="margin-top:8px;">
             <input type="password" id="admin-token-input" class="input" style="max-width:320px;"
-              placeholder="${hasToken ? "Token already set — paste a new one to replace it" : "ghp_..."}">
+              placeholder="${hasToken ? "•••••••••••" : "ghp_..."}">
             <button class="btn btn-secondary btn-sm" id="admin-token-save">Save token</button>
           </div>
         </div>
@@ -290,11 +290,11 @@ function renderAdminSection() {
           <strong id="admin-add-title">Add verb</strong>
           <div class="row" style="margin:10px 0;">
             <div class="field" style="margin:0;">
-              <label>Infinitive (+ preposition, e.g. "parecerse a")</label>
-              <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:220px;">
+              <label>Infinitive</label>
+              <input type="text" id="admin-infinitive" class="input" placeholder="parecerse a" style="width:220px;">
             </div>
             <div class="field" style="margin:0; flex:1;">
-              <label>Meaning (auto — edit if wrong)</label>
+              <label>Meaning</label>
               <input type="text" id="admin-meaning" class="input" placeholder="to speak">
             </div>
             <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generate conjugation</button>
@@ -383,7 +383,7 @@ function generateAdminPreview(existingRecord) {
     : parseInfinitiveInput(infinitiveInput.value);
 
   if (!/^[a-záéíóúñ]*(ar|er|ir)(se)?$/.test(infinitive)) {
-    alert("Enter a valid infinitive ending in -ar, -er, or -ir (reflexive -se is fine).");
+    alert("Enter a valid infinitive ending in -ar, -er, or -ir.");
     return;
   }
   infinitiveInput.value = preposition ? `${infinitive} ${preposition}` : infinitive;
@@ -960,7 +960,7 @@ function buildTestGridHtml(state) {
       <div class="test-header-verb">${verbDisplayName(state.verbs[vi])}</div>
       <div class="field" style="margin:0 0 8px;">
         <label>Significado</label>
-        <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
+        <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="to speak">
       </div>
       <div class="test-header-forma"><strong>Forma:</strong> ${state.subjects[vi].label}</div>
     </td>
