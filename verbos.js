@@ -354,6 +354,19 @@ function renderAdminVerbList(list) {
   `).join("");
 }
 
+// English's only monosyllabic -ie verbs (lie, die, tie, vie) swap "ie" for
+// "y" before adding "-ing" — lie->lying, die->dying — so stripping "ing"
+// alone leaves "ly"/"dy"/"ty"/"vy" rather than a real word. Every other
+// English verb keeps its own ending intact under "-ing" (dream->dreaming,
+// run->running), so this exception list is complete, not a heuristic.
+const GERUND_IE_EXCEPTIONS = { ly: "lie", dy: "die", ty: "tie", vy: "vie" };
+
+function degerund(word) {
+  if (!word.endsWith("ing")) return word;
+  const stem = word.slice(0, -3);
+  return GERUND_IE_EXCEPTIONS[stem] || word;
+}
+
 // Auto-fetched (MyMemory's free translation API) instead of typed in by
 // hand — the admin can still edit the field afterward if the translation
 // is off, but this is now the primary path. MyMemory returns a ranked list
@@ -368,7 +381,7 @@ async function fetchMeaning(query) {
       .map((m) => (m && (m.translatedText || m.translation) || "").trim())
       .filter((t) => t && t.split(/\s+/).length <= 5 && !/["“”.!?;]/.test(t));
     if (!candidates.length) return null;
-    let text = candidates[0].toLowerCase().replace(/[.!?]+$/, "");
+    let text = degerund(candidates[0].toLowerCase().replace(/[.!?]+$/, ""));
     return text.startsWith("to ") ? text : `to ${text}`;
   } catch (err) {
     return null;
