@@ -34,6 +34,7 @@ const Conjugator = (function () {
   ];
 
   const IMPERATIVE_LABELS = { tuAff: "Tú (affirmative)", tuNeg: "Tú (negative)", ud: "Ud.", nosotros: "Nosotros" };
+  const REFLEXIVE_PRONOUNS = { yo: "me", tu: "te", el: "se", nosotros: "nos", ellos: "se" };
 
   const isVowelChar = (ch) => "aeiou".includes(ch);
   const endsWithDigraphGuQu = (stem) => stem.endsWith("gu") || stem.endsWith("qu");
@@ -53,6 +54,22 @@ const Conjugator = (function () {
       if ("aeiou".includes(str[i])) return str.slice(0, i) + accentVowel(str[i]) + str.slice(i + 1);
     }
     return str;
+  }
+
+  // Attaching a reflexive pronoun as a suffix (levanta+te, hablando+se,
+  // levantemos->levantémonos) always pushes the word's existing stress two
+  // syllables further from the end, which written Spanish must then mark
+  // with an accent. That stressed vowel is always the second-to-last vowel
+  // character in the word as written today — true whether it's a plain
+  // vowel (levanta -> levánta+te) or the strong vowel of a diphthong
+  // (cuenta -> cuénta+te, yendo -> yéndo+se) — so one rule covers every
+  // "attach a pronoun to this form" case in the imperative and progressive.
+  function accentSecondToLastVowel(str) {
+    const positions = [];
+    for (let i = 0; i < str.length; i++) if ("aeiou".includes(str[i])) positions.push(i);
+    if (positions.length < 2) return str;
+    const idx = positions[positions.length - 2];
+    return str.slice(0, idx) + accentVowel(str[idx]) + str.slice(idx + 1);
   }
 
   // Fix the stem/ending boundary for predictable consonant spelling changes.
@@ -158,6 +175,11 @@ const Conjugator = (function () {
     sentir: { pattern: "ie" },
     mentir: { pattern: "ie" },
     preferir: { pattern: "ie" },
+    sentar: { pattern: "ie" },
+    despertar: { pattern: "ie" },
+    acostar: { pattern: "ue" },
+    acordar: { pattern: "ue" },
+    despedir: { pattern: "i" },
     divertir: { pattern: "ie" },
     volver: { pattern: "ue" },
     mover: { pattern: "ue" },
@@ -288,7 +310,11 @@ const Conjugator = (function () {
   }
 
   function conjugate(infinitive) {
-    const { stem, group, inf } = splitInfinitive(infinitive);
+    const rawInf = infinitive.trim().toLowerCase();
+    const isReflexive = /^[a-záéíóúñ]*(ar|er|ir)se$/.test(rawInf);
+    const baseInfinitive = isReflexive ? rawInf.slice(0, -2) : rawInf;
+
+    const { stem, group, inf } = splitInfinitive(baseInfinitive);
     const irr = IRREGULAR[inf] || {};
 
     const baseline = buildNaiveBaseline(stem, group);
@@ -395,6 +421,44 @@ const Conjugator = (function () {
     };
 
     result.imperfectoSubjuntivoAlt = toObj(imperfectoSubjuntivoAlt);
+    result.infinitive = rawInf;
+    result.isReflexive = isReflexive;
+
+    // Reflexive: prepend the pronoun everywhere except the progressive and
+    // the imperative, where Spanish allows two word orders and both count —
+    // "se está X-ando" / "está X-ándose" for the progressive, and for the
+    // imperative the pronoun attaches to the end (with the accent that
+    // requires) rather than ever standing in front of an affirmative command.
+    if (isReflexive) {
+      const simpleAndCompoundTenses = [
+        "presente", "preterito", "imperfecto", "futuro", "condicional", "presenteSubjuntivo",
+        "preteritoPerfecto", "pluscuamperfecto", "futuroPerfecto", "condicionalPerfecto",
+        "preteritoPerfectoSubjuntivo", "pluscuamperfectoSubjuntivo",
+      ];
+      simpleAndCompoundTenses.forEach((tenseKey) => {
+        PERSONS.forEach((p) => {
+          const cell = result.forms[tenseKey][p];
+          cell.value = `${REFLEXIVE_PRONOUNS[p]} ${cell.value}`;
+        });
+      });
+
+      const progresivoAlt = {};
+      PERSONS.forEach((p, i) => {
+        progresivoAlt[p] = `${estarPresente[i]} ${accentSecondToLastVowel(gerundio)}${REFLEXIVE_PRONOUNS[p]}`;
+        const cell = result.forms.presenteProgresivo[p];
+        cell.value = `${REFLEXIVE_PRONOUNS[p]} ${cell.value}`;
+      });
+      result.presenteProgresivoAlt = progresivoAlt;
+
+      PERSONS.forEach((p) => {
+        result.imperfectoSubjuntivoAlt[p] = `${REFLEXIVE_PRONOUNS[p]} ${result.imperfectoSubjuntivoAlt[p]}`;
+      });
+
+      result.imperative.tuAff.value = accentSecondToLastVowel(result.imperative.tuAff.value) + "te";
+      result.imperative.tuNeg.value = result.imperative.tuNeg.value.replace(/^no /, "no te ");
+      result.imperative.ud.value = accentSecondToLastVowel(result.imperative.ud.value) + "se";
+      result.imperative.nosotros.value = accentSecondToLastVowel(result.imperative.nosotros.value).slice(0, -1) + "nos";
+    }
 
     return result;
   }

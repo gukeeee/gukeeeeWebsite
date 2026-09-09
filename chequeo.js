@@ -35,8 +35,7 @@ function showLoginMessage() {
     loginMessage.className = 'empty-state';
     loginMessage.style.marginTop = 'var(--space-4)';
     loginMessage.innerHTML = `
-        <h3 style="color: var(--color-accent); margin-bottom: 12px;">Sign in to access the verb check</h3>
-        <p style="margin-bottom: 16px;">Sign in with your account to view and complete the verb check.</p>
+        <h3 style="color: var(--color-accent); margin-bottom: 16px;">Sign in to access the verb check</h3>
         <button id="login-prompt-btn" class="btn btn-primary">Sign in</button>
     `;
     container.appendChild(loginMessage);

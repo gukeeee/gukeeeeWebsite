@@ -54,6 +54,21 @@ function normalize(str) {
   return (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
+// Admin types the infinitive and, optionally, a trailing preposition in the
+// same box (e.g. "parecerse a", "soñar con") — the preposition is cosmetic:
+// it's part of the verb's name/meaning everywhere it's displayed, but never
+// touches the conjugation itself.
+function parseInfinitiveInput(raw) {
+  const trimmed = raw.trim().toLowerCase();
+  const spaceIdx = trimmed.indexOf(" ");
+  if (spaceIdx === -1) return { infinitive: trimmed, preposition: "" };
+  return { infinitive: trimmed.slice(0, spaceIdx), preposition: trimmed.slice(spaceIdx + 1).trim() };
+}
+
+function verbDisplayName(record) {
+  return record.preposition ? `${record.infinitive} ${record.preposition}` : record.infinitive;
+}
+
 // Merge a verb record's admin overrides on top of the rule-generated forms.
 // Overridden slots are always flagged irregular, since the admin chose to
 // correct them by hand.
@@ -77,7 +92,22 @@ function getVerbForms(record) {
       ? { value: overrides[key], irregular: true }
       : base.imperative[slot];
   });
-  return { forms, imperative, imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt, infinitive: record.infinitive, meaning: record.meaning };
+  return {
+    forms,
+    imperative,
+    imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt,
+    presenteProgresivoAlt: base.presenteProgresivoAlt,
+    infinitive: record.infinitive,
+    meaning: record.meaning,
+  };
+}
+
+// Some tenses accept two forms: imperfect subjunctive's -ra/-se, and (for
+// reflexive verbs only) the progressive's "se está X-ando" / "está X-ándose".
+function altForCell(data, tenseKey, bucket) {
+  if (tenseKey === "imperfectoSubjuntivo") return data.imperfectoSubjuntivoAlt[bucket];
+  if (tenseKey === "presenteProgresivo" && data.presenteProgresivoAlt) return data.presenteProgresivoAlt[bucket];
+  return null;
 }
 
 function isAnswerCorrect(userValue, correct, alt) {
@@ -235,11 +265,7 @@ function renderAdminSection() {
 
   if (!VerbStore.isConfigured()) {
     el.innerHTML = adminCollapseHtml(`
-      <p style="color:var(--color-text-muted);">
-        The verbs Gist isn't configured yet. Create a Gist with a file containing <code>{"verbs": []}</code>,
-        then put its ID and its "Raw" URL into <code>GIST_ID</code> / <code>RAW_URL</code> in
-        <code>verbStore.js</code>.
-      </p>
+      <p style="color:var(--color-text-muted);">Set <code>GIST_ID</code> / <code>RAW_URL</code> in <code>verbStore.js</code>.</p>
     `);
     bindAdminToggle(el);
     return;
@@ -253,11 +279,7 @@ function renderAdminSection() {
       <div class="stack" style="margin-top: var(--space-3);">
         <div class="card" style="background:var(--color-surface-alt); border:none;">
           <strong>GitHub token (yours only)</strong>
-          <p style="color:var(--color-text-muted); font-size:0.82rem; margin:6px 0 10px;">
-            Used only in your browser to save changes to the Gist. Generate one at
-            github.com/settings/tokens with the <code>gist</code> scope only.
-          </p>
-          <div class="row">
+          <div class="row" style="margin-top:8px;">
             <input type="password" id="admin-token-input" class="input" style="max-width:320px;"
               placeholder="${hasToken ? "Token already set — paste a new one to replace it" : "ghp_..."}">
             <button class="btn btn-secondary btn-sm" id="admin-token-save">Save token</button>
@@ -268,8 +290,8 @@ function renderAdminSection() {
           <strong id="admin-add-title">Add verb</strong>
           <div class="row" style="margin:10px 0;">
             <div class="field" style="margin:0;">
-              <label>Infinitive</label>
-              <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:160px;">
+              <label>Infinitive (+ preposition, e.g. "parecerse a")</label>
+              <input type="text" id="admin-infinitive" class="input" placeholder="hablar" style="width:220px;">
             </div>
             <div class="field" style="margin:0; flex:1;">
               <label>Meaning (auto — edit if wrong)</label>
@@ -318,7 +340,7 @@ function renderAdminVerbList(list) {
   if (!list.length) return `<p class="empty-state" style="padding:var(--space-3);">No verbs yet.</p>`;
   return list.map((v) => `
     <div class="admin-verb-row">
-      <span class="infinitive">${v.infinitive}</span>
+      <span class="infinitive">${verbDisplayName(v)}</span>
       <span class="meaning">${v.meaning || ""}</span>
       <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
       <div class="row" style="gap:6px;">
@@ -334,14 +356,19 @@ function renderAdminVerbList(list) {
 
 // Auto-fetched (MyMemory's free translation API) instead of typed in by
 // hand — the admin can still edit the field afterward if the translation
-// is off, but this is now the primary path.
-async function fetchMeaning(infinitive) {
+// is off, but this is now the primary path. MyMemory returns a ranked list
+// of translation-memory matches rather than a clean dictionary gloss, so
+// this picks the first one that actually reads like a short "to X" phrase
+// instead of a sentence fragment or gerund clause.
+async function fetchMeaning(query) {
   try {
-    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(infinitive)}&langpair=es|en`);
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=es|en`);
     const data = await res.json();
-    let text = (data.responseData && data.responseData.translatedText || "").trim().toLowerCase();
-    if (!text) return null;
-    text = text.replace(/[.!?]+$/, "");
+    const candidates = [data.responseData, ...(data.matches || [])]
+      .map((m) => (m && (m.translatedText || m.translation) || "").trim())
+      .filter((t) => t && t.split(/\s+/).length <= 5 && !/["“”.!?;]/.test(t));
+    if (!candidates.length) return null;
+    let text = candidates[0].toLowerCase().replace(/[.!?]+$/, "");
     return text.startsWith("to ") ? text : `to ${text}`;
   } catch (err) {
     return null;
@@ -351,20 +378,22 @@ async function fetchMeaning(infinitive) {
 function generateAdminPreview(existingRecord) {
   const infinitiveInput = document.getElementById("admin-infinitive");
   const meaningInput = document.getElementById("admin-meaning");
-  const infinitive = (existingRecord ? existingRecord.infinitive : infinitiveInput.value).trim().toLowerCase();
+  const { infinitive, preposition } = existingRecord
+    ? { infinitive: existingRecord.infinitive, preposition: existingRecord.preposition || "" }
+    : parseInfinitiveInput(infinitiveInput.value);
 
-  if (!/^[a-záéíóúñ]*(ar|er|ir)$/.test(infinitive)) {
-    alert("Enter a valid infinitive ending in -ar, -er, or -ir.");
+  if (!/^[a-záéíóúñ]*(ar|er|ir)(se)?$/.test(infinitive)) {
+    alert("Enter a valid infinitive ending in -ar, -er, or -ir (reflexive -se is fine).");
     return;
   }
-  infinitiveInput.value = infinitive;
+  infinitiveInput.value = preposition ? `${infinitive} ${preposition}` : infinitive;
 
   if (existingRecord) {
     meaningInput.value = existingRecord.meaning || "";
   } else {
     meaningInput.value = "";
     meaningInput.placeholder = "Looking up...";
-    fetchMeaning(infinitive).then((meaning) => {
+    fetchMeaning(preposition ? `${infinitive} ${preposition}` : infinitive).then((meaning) => {
       meaningInput.placeholder = "to speak";
       if (meaning && !meaningInput.value) meaningInput.value = meaning;
     });
@@ -398,10 +427,6 @@ function generateAdminPreview(existingRecord) {
   ).join("");
 
   wrap.innerHTML = `
-    <p style="font-size:0.8rem; color:var(--color-text-muted); margin:10px 0 4px;">
-      Review the generated table below. Fix anything that's wrong — a changed cell is marked red and is saved as
-      a hand-edited irregular form.
-    </p>
     <div class="table-scroll">
       <table class="data-table admin-conjugation-table">
         <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
@@ -425,7 +450,9 @@ function generateAdminPreview(existingRecord) {
   });
 
   document.getElementById("admin-save-row").style.display = "flex";
-  document.getElementById("admin-add-title").textContent = existingRecord ? `Editing "${infinitive}"` : "Add verb";
+  document.getElementById("admin-add-title").textContent = existingRecord
+    ? `Editing "${verbDisplayName(existingRecord)}"`
+    : "Add verb";
 
   document.getElementById("admin-save-verb").onclick = () => saveVerbFromForm(existingRecord);
   document.getElementById("admin-cancel-edit").onclick = resetAdminForm;
@@ -440,7 +467,7 @@ function resetAdminForm() {
 }
 
 async function saveVerbFromForm(existingRecord) {
-  const infinitive = document.getElementById("admin-infinitive").value.trim().toLowerCase();
+  const { infinitive, preposition } = parseInfinitiveInput(document.getElementById("admin-infinitive").value);
   const meaning = document.getElementById("admin-meaning").value.trim();
 
   const isDuplicate = verbs.some((v) => v.infinitive === infinitive && v.id !== (existingRecord && existingRecord.id));
@@ -454,6 +481,7 @@ async function saveVerbFromForm(existingRecord) {
   const record = {
     id: existingRecord ? existingRecord.id : undefined,
     infinitive,
+    preposition,
     meaning,
     isCurrent: existingRecord ? existingRecord.isCurrent : true,
     overrides,
@@ -478,7 +506,7 @@ function editVerb(id) {
 async function deleteVerbConfirm(id) {
   const record = verbs.find((v) => v.id === id);
   if (!record) return;
-  if (!confirm(`Delete "${record.infinitive}"? This can't be undone.`)) return;
+  if (!confirm(`Delete "${verbDisplayName(record)}"? This can't be undone.`)) return;
   try {
     const updated = await VerbStore.deleteVerb(id);
     applyVerbs(updated);
@@ -514,7 +542,7 @@ function selectLookupVerb(record) {
   if (!record) return;
   currentLookupId = record.id;
   const searchInput = document.getElementById("lookup-search");
-  if (searchInput) searchInput.value = record.infinitive;
+  if (searchInput) searchInput.value = verbDisplayName(record);
   renderLookupTable(record);
 }
 
@@ -536,13 +564,13 @@ function renderLookup() {
   function showResults(query) {
     const q = query.trim().toLowerCase();
     const matches = (q
-      ? sorted.filter((v) => v.infinitive.includes(q) || (v.meaning || "").toLowerCase().includes(q))
+      ? sorted.filter((v) => verbDisplayName(v).includes(q) || (v.meaning || "").toLowerCase().includes(q))
       : sorted
     ).slice(0, 8);
     resultsEl.innerHTML = matches.length
       ? matches.map((v) => `
           <div class="lookup-result-item" data-id="${v.id}">
-            ${v.infinitive}${v.meaning ? ` <span style="color:var(--color-text-faint);">— ${v.meaning}</span>` : ""}
+            ${verbDisplayName(v)}${v.meaning ? ` <span style="color:var(--color-text-faint);">— ${v.meaning}</span>` : ""}
             ${v.isCurrent ? "" : ' <span style="color:var(--color-text-faint);">(past)</span>'}
           </div>
         `).join("")
@@ -597,7 +625,7 @@ function renderLookupTable(record) {
   }).join("");
 
   wrap.innerHTML = `
-    <h3 class="print-only">${record.infinitive}${record.meaning ? ` (${record.meaning})` : ""} — Conjugations</h3>
+    <h3 class="print-only">${verbDisplayName(record)}${record.meaning ? ` (${record.meaning})` : ""} — Conjugations</h3>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Tense</th><th>Yo</th><th>Tú</th><th>Él/Ella/Ud.</th><th>Nosotros</th><th>Ellos/Ellas/Uds.</th></tr></thead>
@@ -638,7 +666,7 @@ function renderPracticeSetup() {
       ${verbs.map((v) => `
         <label class="verb-chip">
           <input type="checkbox" value="${v.id}" checked>
-          ${v.infinitive} ${v.isCurrent ? "" : "<span style=\"color:var(--color-text-faint);\">(past)</span>"}
+          ${verbDisplayName(v)} ${v.isCurrent ? "" : "<span style=\"color:var(--color-text-faint);\">(past)</span>"}
         </label>
       `).join("")}
     </div>
@@ -758,7 +786,7 @@ function pickDrillQuestion() {
     const cell = data.imperative[slot];
     return {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
-      infinitive: verb.infinitive,
+      infinitive: verbDisplayName(verb),
       meaning: verb.meaning,
       tenseKey,
       answer: cell.value,
@@ -768,10 +796,10 @@ function pickDrillQuestion() {
 
   const pronoun = PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)];
   const cell = data.forms[tenseKey][pronoun.bucket];
-  const alt = tenseKey === "imperfectoSubjuntivo" ? data.imperfectoSubjuntivoAlt[pronoun.bucket] : null;
+  const alt = altForCell(data, tenseKey, pronoun.bucket);
   return {
     pronounLabel: pronoun.label,
-    infinitive: verb.infinitive,
+    infinitive: verbDisplayName(verb),
     meaning: verb.meaning,
     tenseKey,
     answer: cell.value,
@@ -853,14 +881,7 @@ function renderTestSetup() {
     return;
   }
 
-  setup.innerHTML = `
-    <p style="color:var(--color-text-muted);">
-      The test picks one verb from this week and one from past weeks (or two current verbs if there aren't any
-      past ones yet), asks for each verb's meaning, then covers all 14 tenses — each verb gets one randomly
-      picked subject, used across every tense — plus every command form. 7 minutes to fill it all in.
-    </p>
-    <button class="btn btn-primary" id="start-test">Start test</button>
-  `;
+  setup.innerHTML = `<button class="btn btn-primary" id="start-test">Start test</button>`;
   setup.querySelector("#start-test").onclick = () => startTest(current, past.length ? past : current);
 }
 
@@ -894,7 +915,10 @@ function startTest(currentPool, pastPool) {
   runner.querySelector("#test-submit").onclick = () => gradeTest();
   runner.querySelector("#test-restart").onclick = renderTestSetup;
 
-  const testInputs = Array.from(runner.querySelectorAll("input[data-verb]"));
+  // Fill order matches how you'd fill in the paper sheet: all the way down
+  // verb A's column first, then down verb B's — not left-to-right per row.
+  const allInputs = Array.from(runner.querySelectorAll("input[data-verb]"));
+  const testInputs = [0, 1].flatMap((vi) => allInputs.filter((input) => Number(input.dataset.verb) === vi));
   testInputs.forEach((input, i) => {
     input.addEventListener("keydown", (e) => {
       if (e.key !== "Enter") return;
@@ -933,7 +957,7 @@ function buildTestGridHtml(state) {
 
   const headerCell = (vi) => `
     <td class="test-header-cell">
-      <div class="test-header-verb">${state.verbs[vi].infinitive}</div>
+      <div class="test-header-verb">${verbDisplayName(state.verbs[vi])}</div>
       <div class="field" style="margin:0 0 8px;">
         <label>Significado</label>
         <input type="text" class="input" autocomplete="off" data-verb="${vi}" data-field="meaning" placeholder="e.g. to speak">
@@ -1016,7 +1040,7 @@ function gradeTest() {
     const tenseKey = input.dataset.tense;
     const slot = input.dataset.slot;
     const cellSource = tenseKey === "mandato" ? testState.forms[vi].imperative[slot] : testState.forms[vi].forms[tenseKey][slot];
-    const alt = tenseKey === "imperfectoSubjuntivo" ? testState.forms[vi].imperfectoSubjuntivoAlt[slot] : null;
+    const alt = altForCell(testState.forms[vi], tenseKey, slot);
     const ok = isAnswerCorrect(input.value, cellSource.value, alt);
     input.classList.add(ok ? "correct" : "incorrect");
     input.disabled = true;
