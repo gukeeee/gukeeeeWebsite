@@ -210,9 +210,9 @@ input, select, textarea { font-family: inherit; }
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  width: 140px;
+  width: 220px;
 }
 .settings-popover.is-open { display: grid; }
 
@@ -226,9 +226,7 @@ input, select, textarea { font-family: inherit; }
 }
 .settings-swatch:hover { transform: scale(1.1); }
 .settings-swatch.is-selected { border-color: var(--color-text); }
-.settings-swatch--default {
-  background: linear-gradient(135deg, #a56bff 0 50%, #34d17a 50% 100%);
-}
+.settings-swatch--default { background: var(--bg-void); border-color: var(--line); }
 
 @media (max-width: 640px) {
   .site-header__inner { padding: 0 var(--space-3); }

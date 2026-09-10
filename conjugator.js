@@ -431,7 +431,7 @@ const Conjugator = (function () {
     // requires) rather than ever standing in front of an affirmative command.
     if (isReflexive) {
       const simpleAndCompoundTenses = [
-        "presente", "preterito", "imperfecto", "futuro", "condicional", "presenteSubjuntivo",
+        "presente", "preterito", "imperfecto", "futuro", "condicional", "presenteSubjuntivo", "imperfectoSubjuntivo",
         "preteritoPerfecto", "pluscuamperfecto", "futuroPerfecto", "condicionalPerfecto",
         "preteritoPerfectoSubjuntivo", "pluscuamperfectoSubjuntivo",
       ];
