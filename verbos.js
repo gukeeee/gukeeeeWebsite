@@ -182,6 +182,10 @@ function celebrate(pieceCount = 40) {
 /* ---------------------------------- boot ---------------------------------- */
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Fired off immediately so it's loading in the background while the rest
+  // of boot runs; awaited just before the first conjugate() call happens.
+  const datasetPromise = Conjugator.loadDataset();
+
   if (!VerbStore.isConfigured()) {
     document.getElementById("config-warning").style.display = "block";
   }
@@ -198,6 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (userIsAdmin) renderAdminSection();
   });
 
+  await datasetPromise;
   await refreshVerbs();
 });
 

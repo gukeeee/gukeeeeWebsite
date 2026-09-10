@@ -1,10 +1,13 @@
 /* ==========================================================================
    gukeeee — Spanish conjugation engine
-   Rule-based conjugator for regular verbs + a curated irregular/stem-changing
-   dictionary layered on top. Best-effort: covers the high-frequency verbs a
-   Spanish class actually uses. Anything it gets wrong for a rarer verb can be
-   corrected by hand in the admin "add verb" screen — every generated form is
-   editable there, and admin-edited forms are always flagged irregular (red).
+   Verified data first: verbDataset.json (~630 verbs, pre-processed from the
+   Jehle Spanish Verb Database, bundled locally — no 15MB live fetch, no
+   third-party dependency at runtime) is checked before anything else. Verbs
+   outside that set fall back to a rule-based conjugator with a curated
+   irregular/stem-changing dictionary layered on top. Best-effort either way:
+   anything wrong for a rare verb can be corrected by hand in the admin "add
+   verb" screen — every generated form is editable there, and admin-edited
+   forms are always flagged irregular (red).
 
    Persons (vosotros excluded, per spec): yo, tu, el (él/ella/Ud.),
    nosotros (nosotros/nosotras), ellos (ellos/ellas/Uds.)
@@ -12,6 +15,22 @@
 
 const Conjugator = (function () {
   const PERSONS = ["yo", "tu", "el", "nosotros", "ellos"];
+
+  let DATASET = null;
+  let datasetLoadPromise = null;
+
+  // Call once (verbos.js does this at boot) and await it before the first
+  // conjugate() call. If it hasn't resolved yet or fails, conjugate() just
+  // falls back to the rule-based engine for everything — never throws.
+  function loadDataset() {
+    if (!datasetLoadPromise) {
+      datasetLoadPromise = fetch("/verbDataset.json")
+        .then((res) => (res.ok ? res.json() : {}))
+        .then((data) => { DATASET = data; })
+        .catch(() => { DATASET = {}; });
+    }
+    return datasetLoadPromise;
+  }
 
   // label = English name (instructional chrome), labelEs = Spanish name
   // (the actual grammar term) — kept separate so callers can render them on
@@ -177,6 +196,21 @@ const Conjugator = (function () {
     preferir: { pattern: "ie" },
     sentar: { pattern: "ie" },
     despertar: { pattern: "ie" },
+    negar: { pattern: "ie" },
+    regar: { pattern: "ie" },
+    recomendar: { pattern: "ie" },
+    encender: { pattern: "ie" },
+    defender: { pattern: "ie" },
+    atender: { pattern: "ie" },
+    convertir: { pattern: "ie" },
+    herir: { pattern: "ie" },
+    referir: { pattern: "ie" },
+    sugerir: { pattern: "ie" },
+    advertir: { pattern: "ie" },
+    hervir: { pattern: "ie" },
+    calentar: { pattern: "ie" },
+    gobernar: { pattern: "ie" },
+    nevar: { pattern: "ie" },
     acostar: { pattern: "ue" },
     acordar: { pattern: "ue" },
     despedir: { pattern: "i" },
@@ -189,12 +223,36 @@ const Conjugator = (function () {
     recordar: { pattern: "ue" },
     dormir: { pattern: "ue" },
     morir: { pattern: "ue" },
+    soñar: { pattern: "ue" },
+    probar: { pattern: "ue" },
+    costar: { pattern: "ue" },
+    doler: { pattern: "ue" },
+    volar: { pattern: "ue" },
+    colgar: { pattern: "ue" },
+    sonar: { pattern: "ue" },
+    soltar: { pattern: "ue" },
+    resolver: { pattern: "ue" },
+    envolver: { pattern: "ue" },
+    devolver: { pattern: "ue" },
+    aprobar: { pattern: "ue" },
+    demostrar: { pattern: "ue" },
+    renovar: { pattern: "ue" },
+    rogar: { pattern: "ue" },
+    tronar: { pattern: "ue" },
+    llover: { pattern: "ue" },
     pedir: { pattern: "i" },
     servir: { pattern: "i" },
     seguir: { pattern: "i" },
     repetir: { pattern: "i" },
     vestir: { pattern: "i" },
     conseguir: { pattern: "i" },
+    elegir: { pattern: "i" },
+    corregir: { pattern: "i" },
+    medir: { pattern: "i" },
+    competir: { pattern: "i" },
+    impedir: { pattern: "i" },
+    rendir: { pattern: "i" },
+    freir: { pattern: "i" },
     jugar: {
       presenteOverride: { yo: "juego", tu: "juegas", el: "juega", nosotros: "jugamos", ellos: "juegan" },
       subjOverrideAll: ["juegue", "juegues", "juegue", "juguemos", "jueguen"],
@@ -315,7 +373,30 @@ const Conjugator = (function () {
     const baseInfinitive = isReflexive ? rawInf.slice(0, -2) : rawInf;
 
     const { stem, group, inf } = splitInfinitive(baseInfinitive);
-    const irr = IRREGULAR[inf] || {};
+
+    // The dataset's own reflexive entry (if any) already has the pronoun
+    // baked in — use it as-is and skip the reflexive post-processing below.
+    // Otherwise fall back to the base verb's dataset entry (if any) and let
+    // the usual reflexive wrapping apply on top of it, same as the
+    // rule-engine path.
+    const datasetEntry = DATASET && (DATASET[rawInf] || (isReflexive ? DATASET[baseInfinitive] : null));
+    const datasetHasReflexiveForm = !!(DATASET && DATASET[rawInf]);
+
+    const irr = datasetEntry
+      ? {
+          fullOverride: {
+            presente: PERSONS.map((p) => datasetEntry.forms.presente[p]),
+            preterito: PERSONS.map((p) => datasetEntry.forms.preterito[p]),
+            imperfecto: PERSONS.map((p) => datasetEntry.forms.imperfecto[p]),
+            futuro: PERSONS.map((p) => datasetEntry.forms.futuro[p]),
+            condicional: PERSONS.map((p) => datasetEntry.forms.condicional[p]),
+            presenteSubjuntivo: PERSONS.map((p) => datasetEntry.forms.presenteSubjuntivo[p]),
+          },
+          gerund: datasetEntry.gerundio,
+          imperativeTuAff: datasetEntry.imperativo.tuAff,
+          nosotrosMandato: datasetEntry.imperativo.nosotros,
+        }
+      : IRREGULAR[inf] || {};
 
     const baseline = buildNaiveBaseline(stem, group);
     const built = buildSimpleTenses(stem, group, irr.pattern || null);
@@ -327,7 +408,7 @@ const Conjugator = (function () {
       presenteSubjuntivo: built.presenteSubjuntivo.slice(),
     };
     let gerundio = built.gerundio;
-    let participio = IRREGULAR_PARTICIPLES[inf] || built.participio;
+    let participio = (datasetEntry && datasetEntry.participio) || IRREGULAR_PARTICIPLES[inf] || built.participio;
 
     let futBase = irr.futureStem || stem + group;
     forms.futuro = ENDINGS.futuro.map((e) => futBase + e);
@@ -429,7 +510,9 @@ const Conjugator = (function () {
     // "se está X-ando" / "está X-ándose" for the progressive, and for the
     // imperative the pronoun attaches to the end (with the accent that
     // requires) rather than ever standing in front of an affirmative command.
-    if (isReflexive) {
+    // Skipped when the dataset's own reflexive entry was used directly —
+    // its forms already have the pronoun baked in.
+    if (isReflexive && !datasetHasReflexiveForm) {
       const simpleAndCompoundTenses = [
         "presente", "preterito", "imperfecto", "futuro", "condicional", "presenteSubjuntivo", "imperfectoSubjuntivo",
         "preteritoPerfecto", "pluscuamperfecto", "futuroPerfecto", "condicionalPerfecto",
@@ -463,5 +546,5 @@ const Conjugator = (function () {
     return result;
   }
 
-  return { conjugate, TENSES, PERSONS, IMPERATIVE_LABELS };
+  return { conjugate, loadDataset, TENSES, PERSONS, IMPERATIVE_LABELS };
 })();
