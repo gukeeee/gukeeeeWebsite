@@ -110,12 +110,14 @@ function altForCell(data, tenseKey, bucket) {
   return null;
 }
 
-function isAnswerCorrect(userValue, correct, alt) {
+// The verb's own trailing preposition ("parecerse a") is never required on
+// a conjugated answer, but tacking it on ("se parece a") is accepted too.
+function isAnswerCorrect(userValue, correct, alt, preposition) {
   const u = normalize(userValue);
   if (!u) return false;
-  if (u === normalize(correct)) return true;
-  if (alt && u === normalize(alt)) return true;
-  return false;
+  const candidates = [correct, alt].filter(Boolean);
+  if (preposition) candidates.push(...candidates.map((c) => `${c} ${preposition}`));
+  return candidates.some((c) => u === normalize(c));
 }
 
 /* ---------------------------------- sound effects ---------------------------------- */
@@ -823,6 +825,7 @@ function pickDrillQuestion() {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
       infinitive: verbDisplayName(verb),
       meaning: verb.meaning,
+      preposition: verb.preposition,
       tenseKey,
       answer: cell.value,
       alt: null,
@@ -836,6 +839,7 @@ function pickDrillQuestion() {
     pronounLabel: pronoun.label,
     infinitive: verbDisplayName(verb),
     meaning: verb.meaning,
+    preposition: verb.preposition,
     tenseKey,
     answer: cell.value,
     alt,
@@ -867,7 +871,7 @@ function checkDrillAnswer() {
   if (input.disabled) return;
   const feedback = document.getElementById("drill-feedback");
   const q = drillState.current;
-  const ok = isAnswerCorrect(input.value, q.answer, q.alt);
+  const ok = isAnswerCorrect(input.value, q.answer, q.alt, q.preposition);
 
   drillState.total++;
   if (ok) {
@@ -1076,7 +1080,7 @@ function gradeTest() {
     const slot = input.dataset.slot;
     const cellSource = tenseKey === "mandato" ? testState.forms[vi].imperative[slot] : testState.forms[vi].forms[tenseKey][slot];
     const alt = altForCell(testState.forms[vi], tenseKey, slot);
-    const ok = isAnswerCorrect(input.value, cellSource.value, alt);
+    const ok = isAnswerCorrect(input.value, cellSource.value, alt, testState.verbs[vi].preposition);
     input.classList.add(ok ? "correct" : "incorrect");
     input.disabled = true;
     if (ok) { correct++; } else { missedTenseKeys.add(tenseKey); missedVerbIndices.add(vi); }
