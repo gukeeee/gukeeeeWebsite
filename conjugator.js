@@ -157,7 +157,20 @@ const Conjugator = (function () {
   const IRREGULAR_PARTICIPLES = {
     decir: "dicho", hacer: "hecho", ver: "visto", poner: "puesto", volver: "vuelto",
     escribir: "escrito", romper: "roto", morir: "muerto", abrir: "abierto",
-    cubrir: "cubierto", resolver: "resuelto", freir: "frito",
+    cubrir: "cubierto", resolver: "resuelto",
+  };
+
+  // Verbs with two valid past participles: a "primary" one shown by default
+  // (and used to build the compound tenses) and an alternate that's also
+  // accepted as correct — grading checks both, same as -ra/-se or the
+  // reflexive progressive's two word orders.
+  const DUAL_PARTICIPLES = {
+    elegir: { primary: "electo", alt: "elegido" },
+    imprimir: { primary: "impreso", alt: "imprimido" },
+    freir: { primary: "frito", alt: "freído" },
+    proveer: { primary: "provisto", alt: "proveído" },
+    bendecir: { primary: "bendito", alt: "bendecido" },
+    maldecir: { primary: "maldito", alt: "maldecido" },
   };
 
   // Curated irregular / stem-changing dictionary. Anything not listed here is
@@ -408,7 +421,12 @@ const Conjugator = (function () {
       presenteSubjuntivo: built.presenteSubjuntivo.slice(),
     };
     let gerundio = built.gerundio;
-    let participio = (datasetEntry && datasetEntry.participio) || IRREGULAR_PARTICIPLES[inf] || built.participio;
+    const dualParticiple = DUAL_PARTICIPLES[inf];
+    let participio = (dualParticiple && dualParticiple.primary)
+      || (datasetEntry && datasetEntry.participio)
+      || IRREGULAR_PARTICIPLES[inf]
+      || built.participio;
+    const participioAlt = dualParticiple ? dualParticiple.alt : null;
 
     let futBase = irr.futureStem || stem + group;
     forms.futuro = ENDINGS.futuro.map((e) => futBase + e);
@@ -448,6 +466,16 @@ const Conjugator = (function () {
     Object.keys(AUX_HABER).forEach((tenseKey) => {
       compound[tenseKey] = AUX_HABER[tenseKey].map((aux) => `${aux} ${participio}`);
     });
+
+    // If this verb has two valid participles, every compound tense accepts
+    // the alternate one too (same haber conjugation, other participle).
+    let compoundAlt = null;
+    if (participioAlt) {
+      compoundAlt = {};
+      Object.keys(AUX_HABER).forEach((tenseKey) => {
+        compoundAlt[tenseKey] = toObj(AUX_HABER[tenseKey].map((aux) => `${aux} ${participioAlt}`));
+      });
+    }
 
     // Presente progresivo = estar (present) + gerundio.
     const estarPresente = inf === "estar" ? forms.presente : ["estoy", "estás", "está", "estamos", "están"];
@@ -502,6 +530,7 @@ const Conjugator = (function () {
     };
 
     result.imperfectoSubjuntivoAlt = toObj(imperfectoSubjuntivoAlt);
+    result.compoundAlt = compoundAlt;
     result.infinitive = rawInf;
     result.isReflexive = isReflexive;
 

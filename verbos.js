@@ -97,16 +97,20 @@ function getVerbForms(record) {
     imperative,
     imperfectoSubjuntivoAlt: base.imperfectoSubjuntivoAlt,
     presenteProgresivoAlt: base.presenteProgresivoAlt,
+    compoundAlt: base.compoundAlt,
     infinitive: record.infinitive,
     meaning: record.meaning,
   };
 }
 
-// Some tenses accept two forms: imperfect subjunctive's -ra/-se, and (for
-// reflexive verbs only) the progressive's "se está X-ando" / "está X-ándose".
+// Some tenses accept two forms: imperfect subjunctive's -ra/-se, (for
+// reflexive verbs only) the progressive's "se está X-ando" / "está X-ándose",
+// and any compound tense for a verb with two valid participles (elegir's
+// electo/elegido, imprimir's impreso/imprimido, etc).
 function altForCell(data, tenseKey, bucket) {
   if (tenseKey === "imperfectoSubjuntivo") return data.imperfectoSubjuntivoAlt[bucket];
   if (tenseKey === "presenteProgresivo" && data.presenteProgresivoAlt) return data.presenteProgresivoAlt[bucket];
+  if (data.compoundAlt && data.compoundAlt[tenseKey]) return data.compoundAlt[tenseKey][bucket];
   return null;
 }
 
@@ -279,8 +283,9 @@ function renderAdminSection() {
   }
 
   const hasToken = VerbStore.hasToken();
-  const current = verbs.filter((v) => v.isCurrent);
-  const past = verbs.filter((v) => !v.isCurrent);
+  const byNewest = (a, b) => (b.addedAt || 0) - (a.addedAt || 0);
+  const current = verbs.filter((v) => v.isCurrent).sort(byNewest);
+  const past = verbs.filter((v) => !v.isCurrent).sort(byNewest);
 
   el.innerHTML = adminCollapseHtml(`
       <div class="stack" style="margin-top: var(--space-3);">
@@ -600,7 +605,7 @@ function renderLookup() {
     return;
   }
 
-  const sorted = [...verbs].sort((a, b) => a.infinitive.localeCompare(b.infinitive));
+  const sorted = [...verbs].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
   selectLookupVerb(verbs.find((v) => v.id === currentLookupId) || sorted[0]);
 
   function showResults(query) {
