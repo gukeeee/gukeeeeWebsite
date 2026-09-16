@@ -229,6 +229,22 @@ function applyVerbs(newVerbs) {
   renderTestSetup();
 }
 
+// Calendar-week boundary (Sunday, midnight) for a timestamp — used to group
+// the lookup dropdown by the actual week each verb was added, not just a
+// current/past split.
+function weekStart(timestamp) {
+  const d = new Date(timestamp);
+  const sunday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
+  sunday.setHours(0, 0, 0, 0);
+  return sunday.getTime();
+}
+
+function weekLabel(weekStartMs) {
+  if (weekStartMs === weekStart(Date.now())) return "This week";
+  const d = new Date(weekStartMs);
+  return `Week of ${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+}
+
 // "Week of ..." is derived from the earliest addedAt among verbs currently
 // marked current — i.e. whenever this batch was first added — rather than
 // needing the admin to separately track/set a date.
@@ -610,18 +626,35 @@ function renderLookup() {
 
   function showResults(query) {
     const q = query.trim().toLowerCase();
-    const matches = (q
+    const matches = q
       ? sorted.filter((v) => verbDisplayName(v).includes(q) || (v.meaning || "").toLowerCase().includes(q))
-      : sorted
-    ).slice(0, 8);
-    resultsEl.innerHTML = matches.length
-      ? matches.map((v) => `
-          <div class="lookup-result-item" data-id="${v.id}">
-            ${verbDisplayName(v)}${v.meaning ? ` <span style="color:var(--color-text-faint);">— ${v.meaning}</span>` : ""}
-            ${v.isCurrent ? "" : ' <span style="color:var(--color-text-faint);">(past)</span>'}
-          </div>
-        `).join("")
-      : `<div class="lookup-result-empty">No matches</div>`;
+      : sorted;
+
+    if (!matches.length) {
+      resultsEl.innerHTML = `<div class="lookup-result-empty">No matches</div>`;
+      resultsEl.style.display = "block";
+      return;
+    }
+
+    // Nested by the calendar week each verb was added, newest week first —
+    // not just current/past, but every distinct week that has verbs in it.
+    const groups = new Map();
+    matches.forEach((v) => {
+      const key = weekStart(v.addedAt || 0);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(v);
+    });
+    const weekKeys = [...groups.keys()].sort((a, b) => b - a);
+
+    resultsEl.innerHTML = weekKeys.map((key) => `
+      <div class="lookup-result-group-label">${weekLabel(key)}</div>
+      ${groups.get(key).map((v) => `
+        <div class="lookup-result-item" data-id="${v.id}">
+          ${verbDisplayName(v)}${v.meaning ? ` <span style="color:var(--color-text-faint);">— ${v.meaning}</span>` : ""}
+        </div>
+      `).join("")}
+    `).join("");
+
     resultsEl.querySelectorAll(".lookup-result-item").forEach((el) => {
       // mousedown (not click) so this fires before the input's blur hides the dropdown first.
       el.addEventListener("mousedown", (e) => {
