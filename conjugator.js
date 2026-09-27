@@ -84,10 +84,14 @@ const Conjugator = (function () {
   // (cuenta -> cuénta+te, yendo -> yéndo+se) — so one rule covers every
   // "attach a pronoun to this form" case in the imperative and progressive.
   function accentSecondToLastVowel(str) {
+    const ACCENTED = "áéíóú";
     const positions = [];
-    for (let i = 0; i < str.length; i++) if ("aeiou".includes(str[i])) positions.push(i);
+    for (let i = 0; i < str.length; i++) if ("aeiou".includes(str[i]) || ACCENTED.includes(str[i])) positions.push(i);
     if (positions.length < 2) return str;
     const idx = positions[positions.length - 2];
+    // Already accented (e.g. "gradúa" -> "gradúate"): that vowel is already
+    // marked as the stressed one, nothing to add.
+    if (ACCENTED.includes(str[idx])) return str;
     return str.slice(0, idx) + accentVowel(str[idx]) + str.slice(idx + 1);
   }
 
@@ -165,12 +169,12 @@ const Conjugator = (function () {
   // accepted as correct — grading checks both, same as -ra/-se or the
   // reflexive progressive's two word orders.
   const DUAL_PARTICIPLES = {
-    elegir: { primary: "electo", alt: "elegido" },
-    imprimir: { primary: "impreso", alt: "imprimido" },
-    freir: { primary: "frito", alt: "freído" },
-    proveer: { primary: "provisto", alt: "proveído" },
-    bendecir: { primary: "bendito", alt: "bendecido" },
-    maldecir: { primary: "maldito", alt: "maldecido" },
+    elegir: { primary: "elegido", alt: "electo" },
+    imprimir: { primary: "imprimido", alt: "impreso" },
+    freir: { primary: "freído", alt: "frito" },
+    proveer: { primary: "proveído", alt: "provisto" },
+    bendecir: { primary: "bendecido", alt: "bendito" },
+    maldecir: { primary: "maldecido", alt: "maldito" },
   };
 
   // Curated irregular / stem-changing dictionary. Anything not listed here is
@@ -387,13 +391,32 @@ const Conjugator = (function () {
 
     const { stem, group, inf } = splitInfinitive(baseInfinitive);
 
-    // The dataset's own reflexive entry (if any) already has the pronoun
-    // baked in — use it as-is and skip the reflexive post-processing below.
-    // Otherwise fall back to the base verb's dataset entry (if any) and let
-    // the usual reflexive wrapping apply on top of it, same as the
-    // rule-engine path.
-    const datasetEntry = DATASET && (DATASET[rawInf] || (isReflexive ? DATASET[baseInfinitive] : null));
+    // The dataset's own reflexive entry (if any) stores forms with the
+    // pronoun already attached — prefix on indicative/subjunctive ("me
+    // gradúo"), suffix+accent on the imperative ("gradúate"), and baked into
+    // the gerund ("graduándose"). Every other part of this function (the
+    // naive baseline used for irregular-flagging, the dual-word-order
+    // progressive, the mandato accent logic) assumes a BARE non-reflexive
+    // verb and re-attaches the pronoun itself in the wrapping block below —
+    // so strip it back off here and let a native-reflexive dataset entry
+    // flow through the exact same bare-verb pipeline as every other
+    // reflexive verb, instead of special-casing (and subtly breaking) it.
     const datasetHasReflexiveForm = !!(DATASET && DATASET[rawInf]);
+    function stripPronounPrefix(str, person) {
+      const p = REFLEXIVE_PRONOUNS[person] + " ";
+      return str.startsWith(p) ? str.slice(p.length) : str;
+    }
+    const rawDatasetEntry = DATASET && (DATASET[rawInf] || (isReflexive ? DATASET[baseInfinitive] : null));
+    const datasetEntry = datasetHasReflexiveForm && rawDatasetEntry
+      ? {
+          forms: Object.keys(rawDatasetEntry.forms).reduce((acc, tenseKey) => {
+            acc[tenseKey] = {};
+            PERSONS.forEach((p) => { acc[tenseKey][p] = stripPronounPrefix(rawDatasetEntry.forms[tenseKey][p], p); });
+            return acc;
+          }, {}),
+          participio: rawDatasetEntry.participio,
+        }
+      : rawDatasetEntry;
 
     const irr = datasetEntry
       ? {
@@ -405,9 +428,17 @@ const Conjugator = (function () {
             condicional: PERSONS.map((p) => datasetEntry.forms.condicional[p]),
             presenteSubjuntivo: PERSONS.map((p) => datasetEntry.forms.presenteSubjuntivo[p]),
           },
-          gerund: datasetEntry.gerundio,
-          imperativeTuAff: datasetEntry.imperativo.tuAff,
-          nosotrosMandato: datasetEntry.imperativo.nosotros,
+          // A native-reflexive entry's gerund is fixed to the "-se" suffix
+          // ("graduándose"), not usable as the bare per-person gerund the
+          // progressive needs — leave that to the rule engine below. Its
+          // imperativo strings, though, are already complete and correct
+          // (including the irregular commands like "ponte"/"detente"/"vete"
+          // that the presente-derived fallback below can't reproduce), so
+          // use those verbatim rather than re-deriving.
+          gerund: datasetHasReflexiveForm ? null : datasetEntry.gerundio,
+          imperativeTuAff: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.tuAff : datasetEntry.imperativo.tuAff,
+          imperativeUd: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.ud : null,
+          nosotrosMandato: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.nosotros : datasetEntry.imperativo.nosotros,
         }
       : IRREGULAR[inf] || {};
 
@@ -485,7 +516,7 @@ const Conjugator = (function () {
     const imperative = {
       tuAff: irr.imperativeTuAff || forms.presente[2],
       tuNeg: "no " + forms.presenteSubjuntivo[1],
-      ud: forms.presenteSubjuntivo[2],
+      ud: irr.imperativeUd || forms.presenteSubjuntivo[2],
       nosotros: irr.nosotrosMandato || forms.presenteSubjuntivo[3],
     };
 
@@ -539,9 +570,7 @@ const Conjugator = (function () {
     // "se está X-ando" / "está X-ándose" for the progressive, and for the
     // imperative the pronoun attaches to the end (with the accent that
     // requires) rather than ever standing in front of an affirmative command.
-    // Skipped when the dataset's own reflexive entry was used directly —
-    // its forms already have the pronoun baked in.
-    if (isReflexive && !datasetHasReflexiveForm) {
+    if (isReflexive) {
       const simpleAndCompoundTenses = [
         "presente", "preterito", "imperfecto", "futuro", "condicional", "presenteSubjuntivo", "imperfectoSubjuntivo",
         "preteritoPerfecto", "pluscuamperfecto", "futuroPerfecto", "condicionalPerfecto",
@@ -566,10 +595,17 @@ const Conjugator = (function () {
         result.imperfectoSubjuntivoAlt[p] = `${REFLEXIVE_PRONOUNS[p]} ${result.imperfectoSubjuntivoAlt[p]}`;
       });
 
-      result.imperative.tuAff.value = accentSecondToLastVowel(result.imperative.tuAff.value) + "te";
+      // A native-reflexive dataset entry's tuAff/ud/nosotros are already
+      // complete, correct strings straight from the dataset (irr.imperativeTuAff
+      // etc above) — including irregular commands the accent heuristic below
+      // can't derive (ponte, detente, vete). Only re-derive/suffix them when
+      // they came from the bare-verb fallback instead.
+      if (!datasetHasReflexiveForm) {
+        result.imperative.tuAff.value = accentSecondToLastVowel(result.imperative.tuAff.value) + "te";
+        result.imperative.ud.value = accentSecondToLastVowel(result.imperative.ud.value) + "se";
+        result.imperative.nosotros.value = accentSecondToLastVowel(result.imperative.nosotros.value).slice(0, -1) + "nos";
+      }
       result.imperative.tuNeg.value = result.imperative.tuNeg.value.replace(/^no /, "no te ");
-      result.imperative.ud.value = accentSecondToLastVowel(result.imperative.ud.value) + "se";
-      result.imperative.nosotros.value = accentSecondToLastVowel(result.imperative.nosotros.value).slice(0, -1) + "nos";
     }
 
     return result;

@@ -245,16 +245,34 @@ function weekLabel(weekStartMs) {
   return `Week of ${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-// "Week of ..." is derived from the earliest addedAt among verbs currently
-// marked current — i.e. whenever this batch was first added — rather than
-// needing the admin to separately track/set a date.
+// A verb's week is admin-controlled (v.weekStart, set via the date picker in
+// the add/edit form) when present, falling back to the week it was added on
+// for older verbs saved before that control existed.
+function verbWeekStart(v) {
+  return v.weekStart != null ? v.weekStart : weekStart(v.addedAt || 0);
+}
+
+function dateInputToWeekStart(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return weekStart(new Date(y, m - 1, d).getTime());
+}
+
+function weekStartToDateInput(ms) {
+  const d = new Date(ms);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// "Week of ..." reflects whatever week the current-marked verbs are
+// admin-assigned to (falling back to when they were added, for verbs saved
+// before the week control existed).
 function renderWeekBanner() {
   const banner = document.getElementById("week-banner");
-  const current = verbs.filter((v) => v.isCurrent && v.addedAt);
+  const current = verbs.filter((v) => v.isCurrent);
   if (!current.length) { banner.style.display = "none"; return; }
-  const earliest = Math.min(...current.map((v) => v.addedAt));
-  const dateStr = new Date(earliest).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-  banner.textContent = `📅 Week of ${dateStr}`;
+  const latest = Math.max(...current.map(verbWeekStart));
+  banner.textContent = `📅 ${weekLabel(latest)}`;
   banner.style.display = "block";
 }
 
@@ -325,6 +343,10 @@ function renderAdminSection() {
               <label>Meaning</label>
               <input type="text" id="admin-meaning" class="input" placeholder="to speak">
             </div>
+            <div class="field" style="margin:0;">
+              <label>Week</label>
+              <input type="date" id="admin-week" class="input" style="width:160px;">
+            </div>
             <button class="btn btn-primary btn-sm" id="admin-generate" style="align-self:flex-end;">Generate conjugation</button>
           </div>
           <div id="admin-override-wrap"></div>
@@ -392,7 +414,16 @@ const GERUND_IE_EXCEPTIONS = { ly: "lie", dy: "die", ty: "tie", vy: "vie" };
 function degerund(word) {
   if (!word.endsWith("ing")) return word;
   const stem = word.slice(0, -3);
-  return GERUND_IE_EXCEPTIONS[stem] || word;
+  if (GERUND_IE_EXCEPTIONS[stem]) return GERUND_IE_EXCEPTIONS[stem];
+  // Most English gerunds are just base+"ing" with nothing else changed
+  // (try->trying, dream->dreaming, ask->asking), so the stripped stem is
+  // usually already the right infinitive — this was previously only tried
+  // for the 4 -ie verbs above and left everything else as "trying" itself,
+  // producing nonsense like "to trying". Doubled-consonant (run->running)
+  // and dropped-silent-e (make->making) verbs aren't reversible without a
+  // real dictionary, so those can still come out short ("runn", "mak") —
+  // still an improvement over leaving "-ing" attached, and still editable.
+  return stem;
 }
 
 function cleanCandidate(t) {
@@ -438,9 +469,14 @@ async function fetchMeaning(query) {
   return text.startsWith("to ") ? text : `to ${text}`;
 }
 
+// Tracked so saveVerbFromForm can await it — otherwise clicking "Save verb"
+// before the lookup resolves saved the meaning field empty.
+let pendingMeaningFetch = null;
+
 function generateAdminPreview(existingRecord) {
   const infinitiveInput = document.getElementById("admin-infinitive");
   const meaningInput = document.getElementById("admin-meaning");
+  const weekInput = document.getElementById("admin-week");
   const { infinitive, preposition } = existingRecord
     ? { infinitive: existingRecord.infinitive, preposition: existingRecord.preposition || "" }
     : parseInfinitiveInput(infinitiveInput.value);
@@ -450,13 +486,16 @@ function generateAdminPreview(existingRecord) {
     return;
   }
   infinitiveInput.value = preposition ? `${infinitive} ${preposition}` : infinitive;
+  weekInput.value = weekStartToDateInput(existingRecord ? verbWeekStart(existingRecord) : weekStart(Date.now()));
 
+  pendingMeaningFetch = null;
   if (existingRecord) {
     meaningInput.value = existingRecord.meaning || "";
   } else {
     meaningInput.value = "";
     meaningInput.placeholder = "Looking up...";
-    fetchMeaning(preposition ? `${infinitive} ${preposition}` : infinitive).then((meaning) => {
+    pendingMeaningFetch = fetchMeaning(preposition ? `${infinitive} ${preposition}` : infinitive);
+    pendingMeaningFetch.then((meaning) => {
       meaningInput.placeholder = "to speak";
       if (meaning && !meaningInput.value) meaningInput.value = meaning;
     });
@@ -524,14 +563,27 @@ function generateAdminPreview(existingRecord) {
 function resetAdminForm() {
   document.getElementById("admin-infinitive").value = "";
   document.getElementById("admin-meaning").value = "";
+  document.getElementById("admin-week").value = "";
   document.getElementById("admin-override-wrap").innerHTML = "";
   document.getElementById("admin-save-row").style.display = "none";
   document.getElementById("admin-add-title").textContent = "Add verb";
+  pendingMeaningFetch = null;
 }
 
 async function saveVerbFromForm(existingRecord) {
+  const saveBtn = document.getElementById("admin-save-verb");
+  if (pendingMeaningFetch) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Waiting for definition...";
+    await pendingMeaningFetch;
+    pendingMeaningFetch = null;
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save verb";
+  }
+
   const { infinitive, preposition } = parseInfinitiveInput(document.getElementById("admin-infinitive").value);
   const meaning = document.getElementById("admin-meaning").value.trim();
+  const weekStartMs = dateInputToWeekStart(document.getElementById("admin-week").value);
 
   const isDuplicate = verbs.some((v) => v.infinitive === infinitive && v.id !== (existingRecord && existingRecord.id));
   if (isDuplicate && !confirm(`"${infinitive}" is already in the list. Add it again anyway?`)) return;
@@ -548,6 +600,8 @@ async function saveVerbFromForm(existingRecord) {
     meaning,
     isCurrent: existingRecord ? existingRecord.isCurrent : true,
     overrides,
+    addedAt: existingRecord ? existingRecord.addedAt : undefined,
+    weekStart: weekStartMs,
   };
 
   try {
@@ -640,7 +694,7 @@ function renderLookup() {
     // not just current/past, but every distinct week that has verbs in it.
     const groups = new Map();
     matches.forEach((v) => {
-      const key = weekStart(v.addedAt || 0);
+      const key = verbWeekStart(v);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(v);
     });
