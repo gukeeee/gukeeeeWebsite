@@ -110,4 +110,11 @@
   }
 
   document.addEventListener("DOMContentLoaded", renderHeader);
+
+  // Registered here (loaded on every page) instead of per-page, so the
+  // offline cache and install eligibility aren't limited to whichever page
+  // happens to register it.
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 })();

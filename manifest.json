@@ -3,9 +3,9 @@
   "short_name": "gukeeee",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1a85e5",
-  "description": "",
+  "background_color": "#0a0a0c",
+  "theme_color": "#a56bff",
+  "description": "Spanish verb practice, checks, and sports streams.",
   "icons": [
     {
       "src": "logo-192.png",
