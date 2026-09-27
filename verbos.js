@@ -231,7 +231,25 @@ const WeakSpots = (function () {
       .slice(0, limit);
   }
 
-  return { record, weight, worst };
+  // Lifetime correct/total across every combo — feeds the "N correct
+  // answers" achievements without a separate running counter.
+  function totals() {
+    return Object.values(load()).reduce(
+      (acc, e) => ({ correct: acc.correct + e.correct, total: acc.total + e.correct + e.wrong }),
+      { correct: 0, total: 0 }
+    );
+  }
+
+  // A combo counts as "mastered" once it's been seen enough times to trust
+  // the accuracy (5+) and is answered right at least 90% of the time.
+  function masteredCount() {
+    return Object.values(load()).filter((e) => {
+      const total = e.correct + e.wrong;
+      return total >= 5 && e.correct / total >= 0.9;
+    }).length;
+  }
+
+  return { record, weight, worst, totals, masteredCount };
 })();
 
 // A daily practice streak — any completed practice/test answer counts as
@@ -272,6 +290,83 @@ const Streak = (function () {
   return { recordToday, current };
 })();
 
+// Once unlocked, a badge stays unlocked forever — even if the streak that
+// earned it later breaks — so unlocks persist as a set of ids rather than
+// being recomputed live from current stats every time.
+const Achievements = (function () {
+  const KEY = "verbAchievements";
+  const DEFS = [
+    { id: "first-steps", icon: "🌱", label: "First Steps", desc: "Answer your first question", check: (s) => s.totalAnswered >= 1 },
+    { id: "century", icon: "💯", label: "Century", desc: "100 correct answers", check: (s) => s.totalCorrect >= 100 },
+    { id: "perfect-test", icon: "🏆", label: "Perfect Test", desc: "Score 100% on a timed test", check: (s) => s.perfectTest },
+    { id: "streak-3", icon: "🔥", label: "3-Day Streak", desc: "Practice 3 days in a row", check: (s) => s.streak >= 3 },
+    { id: "streak-7", icon: "🔥", label: "Week Streak", desc: "Practice 7 days in a row", check: (s) => s.streak >= 7 },
+    { id: "streak-30", icon: "🔥", label: "Month Streak", desc: "Practice 30 days in a row", check: (s) => s.streak >= 30 },
+    { id: "verb-master", icon: "🎯", label: "Verb Master", desc: "Master a verb/tense (90%+ over 5+ tries)", check: (s) => s.masteredCombos >= 1 },
+  ];
+
+  function load() {
+    try { return new Set(JSON.parse(localStorage.getItem(KEY)) || []); } catch (err) { return new Set(); }
+  }
+
+  function save(set) {
+    try { localStorage.setItem(KEY, JSON.stringify([...set])); } catch (err) { /* skip silently */ }
+  }
+
+  // Checks every not-yet-unlocked badge against the given stats snapshot;
+  // persists and returns any that newly cleared their bar.
+  function checkNewly(stats) {
+    const unlocked = load();
+    const newlyUnlocked = [];
+    DEFS.forEach((def) => {
+      if (!unlocked.has(def.id) && def.check(stats)) {
+        unlocked.add(def.id);
+        newlyUnlocked.push(def);
+      }
+    });
+    if (newlyUnlocked.length) save(unlocked);
+    return newlyUnlocked;
+  }
+
+  function allWithStatus() {
+    const unlocked = load();
+    return DEFS.map((def) => ({ ...def, unlocked: unlocked.has(def.id) }));
+  }
+
+  return { checkNewly, allWithStatus };
+})();
+
+function currentStatsSnapshot(extra = {}) {
+  const totals = WeakSpots.totals();
+  return {
+    totalAnswered: totals.total,
+    totalCorrect: totals.correct,
+    streak: Streak.current(),
+    masteredCombos: WeakSpots.masteredCount(),
+    perfectTest: false,
+    ...extra,
+  };
+}
+
+function showAchievementToasts(defs) {
+  defs.forEach((def, i) => {
+    setTimeout(() => {
+      const toast = document.createElement("div");
+      toast.className = "achievement-toast";
+      toast.innerHTML = `
+        <span class="achievement-toast__icon">${def.icon}</span>
+        <div>
+          <strong>Achievement unlocked!</strong>
+          <div>${def.label} — ${def.desc}</div>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      celebrate(20);
+      setTimeout(() => toast.remove(), 4200);
+    }, i * 700);
+  });
+}
+
 function renderStreakBanner() {
   const banner = document.getElementById("streak-banner");
   const streak = Streak.current();
@@ -293,6 +388,31 @@ function weightedPick(items, weightFn) {
   return items[items.length - 1];
 }
 
+// A shared accent toolbar for any answer input (practice drill, timed test) —
+// rather than one per input, it acts on whichever such input was last
+// focused, tracked below and updated automatically by input.focus() calls
+// already in the drill/test code.
+const ACCENT_CHARS = ["á", "é", "í", "ó", "ú", "ñ", "ü"];
+
+function accentToolbarHtml() {
+  return `
+    <div class="accent-toolbar">
+      ${ACCENT_CHARS.map((c) => `<button type="button" class="accent-btn" data-char="${c}">${c}</button>`).join("")}
+    </div>
+  `;
+}
+
+let lastFocusedAnswerInput = null;
+
+function insertAtCursor(input, char) {
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? input.value.length;
+  input.value = input.value.slice(0, start) + char + input.value.slice(end);
+  const pos = start + char.length;
+  input.focus();
+  input.setSelectionRange(pos, pos);
+}
+
 /* ---------------------------------- boot ---------------------------------- */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -311,6 +431,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   renderStreakBanner();
+
+  document.addEventListener("focusin", (e) => {
+    if (e.target.matches && e.target.matches(".drill-focus__input, .test-single-input")) {
+      lastFocusedAnswerInput = e.target;
+    }
+  });
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".accent-btn");
+    if (!btn || !lastFocusedAnswerInput || !document.body.contains(lastFocusedAnswerInput)) return;
+    insertAtCursor(lastFocusedAnswerInput, btn.dataset.char);
+  });
 
   Auth.onChange((user) => {
     userIsAdmin = Auth.isAdmin();
@@ -965,8 +1096,23 @@ function renderPracticeSetup() {
     </div>
   ` : "";
 
+  const badges = Achievements.allWithStatus();
+  const achievementsHtml = `
+    <div class="achievements-panel">
+      <strong style="font-size:0.85rem; display:block; margin-bottom:6px;">🏆 Achievements</strong>
+      <div class="achievement-chips">
+        ${badges.map((b) => `
+          <span class="achievement-chip ${b.unlocked ? "is-unlocked" : "is-locked"}" title="${b.label} — ${b.desc}">
+            ${b.unlocked ? b.icon : "🔒"} ${b.label}
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
   setup.innerHTML = `
     ${weakSpotsHtml}
+    ${achievementsHtml}
     <div class="row" style="margin-bottom: var(--space-2);">
       <button class="btn btn-sm btn-secondary" id="pick-current">This week</button>
       <button class="btn btn-sm btn-secondary" id="pick-past">Past weeks</button>
@@ -1143,6 +1289,7 @@ function nextDrillQuestion() {
       <div class="drill-focus__prompt">${q.pronounLabel} <strong>${q.infinitive}</strong>${q.meaning ? ` <span class="drill-focus__meaning">(${q.meaning})</span>` : ""}</div>
       <div class="drill-focus__tense">${tenseLabelHtml(q.tenseKey)}</div>
       <input type="text" class="drill-focus__input" id="drill-input" autocomplete="off" spellcheck="false">
+      ${accentToolbarHtml()}
       <button class="btn drill-focus__check" id="drill-check">Check Answer <span aria-hidden="true">→</span></button>
       <div class="drill-feedback" id="drill-feedback"></div>
     </div>
@@ -1173,6 +1320,8 @@ function checkDrillAnswer() {
   WeakSpots.record(q.rawInfinitive, q.tenseKey, ok);
   Streak.recordToday();
   renderStreakBanner();
+  const newlyUnlocked = Achievements.checkNewly(currentStatsSnapshot());
+  if (newlyUnlocked.length) showAchievementToasts(newlyUnlocked);
 
   input.classList.add(ok ? "is-correct" : "is-incorrect");
   input.disabled = true;
@@ -1187,9 +1336,19 @@ function checkDrillAnswer() {
   const nextBtn = document.createElement("button");
   nextBtn.className = "btn btn-secondary btn-sm";
   nextBtn.style.marginTop = "10px";
-  nextBtn.textContent = "Next →";
-  nextBtn.onclick = nextDrillQuestion;
+  nextBtn.textContent = "Next → (or press any key)";
   document.getElementById("drill-card").querySelector(".drill-focus").appendChild(nextBtn);
+
+  // Any keypress advances too, not just the button click — a keydown
+  // listener (rather than keyup, which triggered this very check via
+  // Enter) so the keypress that triggered the check can't also trigger this.
+  const advance = (e) => {
+    if (e && e.type === "keydown" && ["Shift", "Control", "Alt", "Meta", "CapsLock", "Tab"].includes(e.key)) return;
+    document.removeEventListener("keydown", advance);
+    nextDrillQuestion();
+  };
+  nextBtn.onclick = advance;
+  document.addEventListener("keydown", advance);
 }
 
 /* ---------------------------------- test simulation ---------------------------------- */
@@ -1395,6 +1554,7 @@ function buildTestGridHtml(state) {
 
   return `
     <div class="test-timer" id="test-timer">07:00</div>
+    ${accentToolbarHtml()}
     <div class="table-scroll">
       <table class="test-grid">
         <tbody>${headerRow}${tenseRows}${mandatoRows}</tbody>
@@ -1462,7 +1622,12 @@ function gradeTest() {
     WeakSpots.record(testState.verbs[vi].infinitive, tenseKey, ok);
   });
 
-  if (total > 0) { Streak.recordToday(); renderStreakBanner(); }
+  if (total > 0) {
+    Streak.recordToday();
+    renderStreakBanner();
+    const newlyUnlocked = Achievements.checkNewly(currentStatsSnapshot({ perfectTest: correct === total }));
+    if (newlyUnlocked.length) showAchievementToasts(newlyUnlocked);
+  }
   document.getElementById("test-submit").disabled = true;
   const summary = document.getElementById("test-summary");
   const pct = ((correct / total) * 100).toFixed(1);

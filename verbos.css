@@ -49,6 +49,79 @@
     font-weight: 700;
 }
 
+/* ---- Achievements ---- */
+.achievements-panel {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+.achievement-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.achievement-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    border: 1px solid var(--color-border);
+    font-size: 0.78rem;
+}
+.achievement-chip.is-locked {
+    color: var(--color-text-faint);
+    opacity: 0.6;
+}
+.achievement-chip.is-unlocked {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+}
+
+.achievement-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 3100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--color-accent);
+    box-shadow: var(--shadow-md);
+    max-width: 320px;
+    animation: achievement-toast-in 0.3s ease;
+}
+.achievement-toast__icon { font-size: 1.8rem; }
+@keyframes achievement-toast-in {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* ---- Accent quick-insert toolbar ---- */
+.accent-toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 var(--space-3);
+    flex-wrap: wrap;
+}
+.accent-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--bg-surface);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.accent-btn:hover { background: var(--color-surface-alt); border-color: var(--color-accent); }
+
 /* ---- Celebration ---- */
 .confetti-burst {
     position: fixed;
@@ -322,6 +395,17 @@
 .drill-focus .drill-feedback { color: #fff; font-weight: 700; margin-top: var(--space-3); }
 .drill-focus .drill-feedback.correct { color: #baffd8; }
 .drill-focus .drill-feedback.incorrect { color: #ffd4da; }
+
+/* The shared accent toolbar sits on this card's dark gradient too — same
+   light treatment as the check button instead of the default light-theme
+   surface colors, which would be unreadable here. */
+.drill-focus .accent-toolbar { margin: 0 0 var(--space-4); }
+.drill-focus .accent-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+.drill-focus .accent-btn:hover { background: rgba(255, 255, 255, 0.3); border-color: rgba(255, 255, 255, 0.5); }
 
 @media (max-width: 640px) {
     .drill-layout { flex-direction: column; }
