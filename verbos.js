@@ -495,7 +495,20 @@ function renderAdminSection() {
   el.querySelectorAll(".admin-toggle-current-btn").forEach((b) =>
     b.addEventListener("click", () => toggleCurrent(b.dataset.id, b.dataset.next === "true"))
   );
+  el.querySelectorAll(".admin-week-select").forEach((sel) =>
+    sel.addEventListener("change", () => updateVerbWeek(sel.dataset.id, sel.value, sel))
+  );
   el.querySelector("#admin-archive-btn").addEventListener("click", archiveWeek);
+}
+
+// Every distinct week any verb is assigned to, plus the current calendar
+// week (so it's always pickable even before anything's in it), newest first.
+function weekOptionsHtml(selectedWeek) {
+  const weeks = new Set(verbs.map(verbWeekStart));
+  weeks.add(weekStart(Date.now()));
+  const sorted = [...weeks].sort((a, b) => b - a);
+  const options = sorted.map((wk) => `<option value="${wk}" ${wk === selectedWeek ? "selected" : ""}>${weekLabel(wk)}</option>`).join("");
+  return options + `<option value="__custom__">+ Custom date...</option>`;
 }
 
 function renderAdminVerbList(list) {
@@ -505,6 +518,9 @@ function renderAdminVerbList(list) {
       <span class="infinitive">${verbDisplayName(v)}</span>
       <span class="meaning">${v.meaning || ""}</span>
       <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
+      <select class="input admin-week-select" data-id="${v.id}" style="width:auto; padding:5px 8px; font-size:0.8rem;">
+        ${weekOptionsHtml(verbWeekStart(v))}
+      </select>
       <div class="row" style="gap:6px;">
         <button class="btn btn-sm btn-secondary admin-toggle-current-btn" data-id="${v.id}" data-next="${!v.isCurrent}">
           ${v.isCurrent ? "Mark past" : "Mark current"}
@@ -514,6 +530,27 @@ function renderAdminVerbList(list) {
       </div>
     </div>
   `).join("");
+}
+
+async function updateVerbWeek(id, selectValue, selectEl) {
+  const record = verbs.find((v) => v.id === id);
+  if (!record) return;
+
+  let weekStartMs;
+  if (selectValue === "__custom__") {
+    const input = prompt("Enter a date (YYYY-MM-DD) for this verb's week:");
+    weekStartMs = input ? dateInputToWeekStart(input.trim()) : null;
+    if (!weekStartMs) { selectEl.value = verbWeekStart(record); return; }
+  } else {
+    weekStartMs = Number(selectValue);
+  }
+
+  try {
+    const updated = await VerbStore.saveVerb({ ...record, weekStart: weekStartMs }, Date.now());
+    applyVerbs(updated);
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 // English's only monosyllabic -ie verbs (lie, die, tie, vie) swap "ie" for
