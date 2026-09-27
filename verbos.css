@@ -161,6 +161,15 @@
 .admin-verb-row .infinitive { font-weight: 700; min-width: 90px; }
 .admin-verb-row .meaning { color: var(--color-text-muted); font-size: 0.85rem; flex: 1; }
 
+.admin-week-group-label {
+    padding: 10px 4px 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-faint);
+}
+
 .admin-conjugation-table { max-height: 360px; }
 .admin-conjugation-table td { padding: 5px; }
 .admin-table-input {

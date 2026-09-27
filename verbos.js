@@ -429,9 +429,9 @@ function renderAdminSection() {
   }
 
   const hasToken = VerbStore.hasToken();
-  const byNewest = (a, b) => (b.addedAt || 0) - (a.addedAt || 0);
-  const current = verbs.filter((v) => v.isCurrent).sort(byNewest);
-  const past = verbs.filter((v) => !v.isCurrent).sort(byNewest);
+  const byWeekThenNewest = (a, b) => verbWeekStart(b) - verbWeekStart(a) || (b.addedAt || 0) - (a.addedAt || 0);
+  const current = verbs.filter((v) => v.isCurrent).sort(byWeekThenNewest);
+  const past = verbs.filter((v) => !v.isCurrent).sort(byWeekThenNewest);
 
   el.innerHTML = adminCollapseHtml(`
       <div class="stack" style="margin-top: var(--space-3);">
@@ -511,25 +511,35 @@ function weekOptionsHtml(selectedWeek) {
   return options + `<option value="__custom__">+ Custom date...</option>`;
 }
 
+// Expects list already sorted newest-week-first (byWeekThenNewest above) —
+// inserts a group header each time the week changes, same pattern as the
+// lookup dropdown's week grouping.
 function renderAdminVerbList(list) {
   if (!list.length) return `<p class="empty-state" style="padding:var(--space-3);">No verbs yet.</p>`;
-  return list.map((v) => `
-    <div class="admin-verb-row">
-      <span class="infinitive">${verbDisplayName(v)}</span>
-      <span class="meaning">${v.meaning || ""}</span>
-      <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
-      <select class="input admin-week-select" data-id="${v.id}" style="width:auto; padding:5px 8px; font-size:0.8rem;">
-        ${weekOptionsHtml(verbWeekStart(v))}
-      </select>
-      <div class="row" style="gap:6px;">
-        <button class="btn btn-sm btn-secondary admin-toggle-current-btn" data-id="${v.id}" data-next="${!v.isCurrent}">
-          ${v.isCurrent ? "Mark past" : "Mark current"}
-        </button>
-        <button class="btn btn-sm btn-secondary admin-edit-btn" data-id="${v.id}">Edit</button>
-        <button class="btn btn-sm btn-danger admin-delete-btn" data-id="${v.id}">Delete</button>
+  let lastWeek = null;
+  return list.map((v) => {
+    const wk = verbWeekStart(v);
+    const header = wk !== lastWeek ? `<div class="admin-week-group-label">${weekLabel(wk)}</div>` : "";
+    lastWeek = wk;
+    return `
+      ${header}
+      <div class="admin-verb-row">
+        <span class="infinitive">${verbDisplayName(v)}</span>
+        <span class="meaning">${v.meaning || ""}</span>
+        <span class="badge ${v.isCurrent ? "badge-accent" : "badge-muted"}">${v.isCurrent ? "Current" : "Past"}</span>
+        <select class="input admin-week-select" data-id="${v.id}" style="width:auto; padding:5px 8px; font-size:0.8rem;">
+          ${weekOptionsHtml(wk)}
+        </select>
+        <div class="row" style="gap:6px;">
+          <button class="btn btn-sm btn-secondary admin-toggle-current-btn" data-id="${v.id}" data-next="${!v.isCurrent}">
+            ${v.isCurrent ? "Mark past" : "Mark current"}
+          </button>
+          <button class="btn btn-sm btn-secondary admin-edit-btn" data-id="${v.id}">Edit</button>
+          <button class="btn btn-sm btn-danger admin-delete-btn" data-id="${v.id}">Delete</button>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 async function updateVerbWeek(id, selectValue, selectEl) {
