@@ -10,6 +10,44 @@
     font-size: 0.82rem;
     margin-bottom: var(--space-5);
 }
+#streak-banner {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-warning, #e8c93d) 20%, var(--bg-surface));
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: var(--space-5);
+}
+
+/* ---- Weak spots ---- */
+.weak-spots-panel {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+.weak-spot-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: var(--space-2);
+}
+.weak-spot-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    border: 1px solid var(--color-border);
+    font-size: 0.78rem;
+}
+.weak-spot-chip__pct {
+    color: var(--color-danger);
+    font-weight: 700;
+}
 
 /* ---- Celebration ---- */
 .confetti-burst {

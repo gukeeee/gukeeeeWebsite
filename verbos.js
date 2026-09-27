@@ -183,6 +183,116 @@ function celebrate(pieceCount = 40) {
   setTimeout(() => container.remove(), 3200);
 }
 
+/* All per-viewer engagement data (weak spots, streak) lives in localStorage —
+   it's personal practice history, not shared verb content, so it has no
+   business in the Gist store. */
+
+// Tracks per-(verb, tense) accuracy across every practice/test answer, so
+// practice can be weighted toward what a given student actually struggles
+// with instead of picking uniformly at random.
+const WeakSpots = (function () {
+  const KEY = "verbWeakSpotStats";
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (err) { return {}; }
+  }
+
+  function record(infinitive, tenseKey, correct) {
+    try {
+      const data = load();
+      const key = `${infinitive}|${tenseKey}`;
+      const entry = data[key] || { correct: 0, wrong: 0 };
+      if (correct) entry.correct++; else entry.wrong++;
+      data[key] = entry;
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (err) { /* localStorage unavailable (private mode etc.) — skip silently */ }
+  }
+
+  // Weight = 1 for a combo with no history (fully random until we know
+  // anything), rising the more often it's been missed — capped by attempt
+  // count so one unlucky early miss doesn't dominate forever.
+  function weight(infinitive, tenseKey) {
+    const entry = load()[`${infinitive}|${tenseKey}`];
+    if (!entry) return 1;
+    const total = entry.correct + entry.wrong;
+    const accuracy = entry.correct / total;
+    return 1 + (1 - accuracy) * Math.min(total, 8);
+  }
+
+  function worst(limit = 5) {
+    return Object.entries(load())
+      .map(([key, v]) => {
+        const [infinitive, tenseKey] = key.split("|");
+        const total = v.correct + v.wrong;
+        return { infinitive, tenseKey, total, accuracy: v.correct / total };
+      })
+      .filter((e) => e.total >= 2 && e.accuracy < 1)
+      .sort((a, b) => a.accuracy - b.accuracy)
+      .slice(0, limit);
+  }
+
+  return { record, weight, worst };
+})();
+
+// A daily practice streak — any completed practice/test answer counts as
+// "practiced today." A day already banked before today still counts even if
+// today hasn't been touched yet, so the streak doesn't drop to 0 the moment
+// midnight passes; it only breaks once a full day is skipped.
+const Streak = (function () {
+  const KEY = "verbPracticeDates";
+
+  function dateStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  function load() {
+    try { return new Set(JSON.parse(localStorage.getItem(KEY)) || []); } catch (err) { return new Set(); }
+  }
+
+  function recordToday() {
+    try {
+      const dates = load();
+      dates.add(dateStr(new Date()));
+      localStorage.setItem(KEY, JSON.stringify([...dates]));
+    } catch (err) { /* localStorage unavailable — skip silently */ }
+  }
+
+  function current() {
+    const dates = load();
+    const d = new Date();
+    if (!dates.has(dateStr(d))) d.setDate(d.getDate() - 1);
+    let streak = 0;
+    while (dates.has(dateStr(d))) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  }
+
+  return { recordToday, current };
+})();
+
+function renderStreakBanner() {
+  const banner = document.getElementById("streak-banner");
+  const streak = Streak.current();
+  if (!streak) { banner.style.display = "none"; return; }
+  banner.textContent = `🔥 ${streak}-day streak`;
+  banner.style.display = "inline-block";
+}
+
+// Picks one (verb, tense) pair from the cross product, weighted toward
+// combos a student has been getting wrong more often.
+function weightedPick(items, weightFn) {
+  const weights = items.map(weightFn);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
 /* ---------------------------------- boot ---------------------------------- */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -199,6 +309,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!verbs.length) return;
     selectLookupVerb(verbs[Math.floor(Math.random() * verbs.length)]);
   };
+
+  renderStreakBanner();
 
   Auth.onChange((user) => {
     userIsAdmin = Auth.isAdmin();
@@ -789,7 +901,25 @@ function renderPracticeSetup() {
     return;
   }
 
+  const worstSpots = WeakSpots.worst(5).filter((w) => verbs.some((v) => v.infinitive === w.infinitive));
+  const weakSpotsHtml = worstSpots.length ? `
+    <div class="weak-spots-panel">
+      <div class="row between" style="align-items:center;">
+        <strong style="font-size:0.85rem;">🎯 Your weak spots</strong>
+        <button class="btn btn-sm btn-secondary" id="practice-weak-spots-btn">Practice these</button>
+      </div>
+      <div class="weak-spot-chips">
+        ${worstSpots.map((w) => {
+          const verb = verbs.find((v) => v.infinitive === w.infinitive);
+          const { en } = tenseLabelParts(w.tenseKey);
+          return `<span class="weak-spot-chip">${verbDisplayName(verb)} · ${en} <span class="weak-spot-chip__pct">${Math.round(w.accuracy * 100)}%</span></span>`;
+        }).join("")}
+      </div>
+    </div>
+  ` : "";
+
   setup.innerHTML = `
+    ${weakSpotsHtml}
     <div class="row" style="margin-bottom: var(--space-2);">
       <button class="btn btn-sm btn-secondary" id="pick-current">This week</button>
       <button class="btn btn-sm btn-secondary" id="pick-past">Past weeks</button>
@@ -850,6 +980,15 @@ function renderPracticeSetup() {
     if (!selectedTenses.length) { alert("Select at least one tense."); return; }
     startPracticeDrill(selectedVerbs, selectedTenses);
   };
+
+  const weakSpotsBtn = setup.querySelector("#practice-weak-spots-btn");
+  if (weakSpotsBtn) {
+    weakSpotsBtn.onclick = () => {
+      const weakVerbs = verbs.filter((v) => worstSpots.some((w) => w.infinitive === v.infinitive));
+      const weakTenses = [...new Set(worstSpots.map((w) => w.tenseKey))];
+      startPracticeDrill(weakVerbs, weakTenses);
+    };
+  }
 }
 
 let drillState = null;
@@ -910,10 +1049,13 @@ function updateDrillStats() {
 }
 
 function pickDrillQuestion() {
-  const verb = drillState.verbs[Math.floor(Math.random() * drillState.verbs.length)];
+  // A joint weighted pick over every (verb, tense) combo in the selection —
+  // rather than picking a verb and a tense independently — so combos the
+  // student has been missing show up more often (see WeakSpots.weight).
+  const pairs = [];
+  drillState.verbs.forEach((verb) => drillState.tenses.forEach((tenseKey) => pairs.push({ verb, tenseKey })));
+  const { verb, tenseKey } = weightedPick(pairs, (p) => WeakSpots.weight(p.verb.infinitive, p.tenseKey));
   const data = getVerbForms(verb);
-  const pool = drillState.tenses;
-  const tenseKey = pool[Math.floor(Math.random() * pool.length)];
 
   if (tenseKey === "mandato") {
     const slot = MANDATO_SLOTS[Math.floor(Math.random() * MANDATO_SLOTS.length)];
@@ -921,6 +1063,7 @@ function pickDrillQuestion() {
     return {
       pronounLabel: Conjugator.IMPERATIVE_LABELS[slot],
       infinitive: verbDisplayName(verb),
+      rawInfinitive: verb.infinitive,
       meaning: verb.meaning,
       preposition: verb.preposition,
       tenseKey,
@@ -935,6 +1078,7 @@ function pickDrillQuestion() {
   return {
     pronounLabel: pronoun.label,
     infinitive: verbDisplayName(verb),
+    rawInfinitive: verb.infinitive,
     meaning: verb.meaning,
     preposition: verb.preposition,
     tenseKey,
@@ -979,6 +1123,10 @@ function checkDrillAnswer() {
     drillState.streak = 0;
   }
 
+  WeakSpots.record(q.rawInfinitive, q.tenseKey, ok);
+  Streak.recordToday();
+  renderStreakBanner();
+
   input.classList.add(ok ? "is-correct" : "is-incorrect");
   input.disabled = true;
   document.getElementById("drill-check").disabled = true;
@@ -1017,8 +1165,90 @@ function renderTestSetup() {
     return;
   }
 
-  setup.innerHTML = `<button class="btn btn-primary" id="start-test">Start test</button>`;
+  setup.innerHTML = `
+    <div class="row">
+      <button class="btn btn-primary" id="start-test">Start test</button>
+      <button class="btn btn-secondary" id="print-worksheet-btn">🖨️ Print blank worksheet</button>
+    </div>
+  `;
   setup.querySelector("#start-test").onclick = () => startTest(current, past.length ? past : current);
+  setup.querySelector("#print-worksheet-btn").onclick = () => printBlankWorksheet(current, past.length ? past : current);
+}
+
+// A blank, paper-ready version of the same worksheet the digital test
+// simulates — same layout and random verb/subject picks, but empty cells to
+// fill in by hand instead of live-graded inputs. Opened in its own window so
+// print styling doesn't have to coexist with the interactive page's CSS.
+function buildPrintableWorksheetHtml(verbA, verbB, subjects) {
+  const blankCell = () => `<td><div class="print-blank"></div></td>`;
+  const tenseRows = Conjugator.TENSES.map((t) =>
+    `<tr><td class="tense-label">${t.label}<br><em>${t.labelEs}</em></td>${blankCell()}${blankCell()}</tr>`
+  ).join("");
+  const mandatoRows = MANDATO_ROWS.map(({ label }) =>
+    `<tr><td class="tense-label">${label}</td>${blankCell()}${blankCell()}</tr>`
+  ).join("");
+
+  const headerCell = (vi) => `
+    <td class="test-header-cell">
+      <div class="test-header-verb">${verbDisplayName([verbA, verbB][vi])}</div>
+      <div style="margin:6px 0;"><strong>Significado:</strong> <div class="print-blank print-blank--inline"></div></div>
+      <div class="test-header-forma"><strong>Forma:</strong> ${subjects[vi].label}</div>
+    </td>
+  `;
+
+  const headerRow = `
+    <tr class="test-header-row">
+      <td class="test-header-cell">
+        <div><strong>Nombre:</strong> <div class="print-blank print-blank--inline"></div></div>
+        <div style="margin-top:6px;"><strong>Fecha:</strong> <div class="print-blank print-blank--inline"></div></div>
+      </td>
+      ${headerCell(0)}
+      ${headerCell(1)}
+    </tr>
+  `;
+
+  return `<table class="test-grid"><tbody>${headerRow}${tenseRows}${mandatoRows}</tbody></table>`;
+}
+
+function printBlankWorksheet(currentPool, pastPool) {
+  const verbA = currentPool[Math.floor(Math.random() * currentPool.length)];
+  let verbB = pastPool[Math.floor(Math.random() * pastPool.length)];
+  if (pastPool === currentPool && currentPool.length > 1) {
+    do { verbB = pastPool[Math.floor(Math.random() * pastPool.length)]; } while (verbB.id === verbA.id);
+  }
+  const subjects = [
+    PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)],
+    PRONOUNS[Math.floor(Math.random() * PRONOUNS.length)],
+  ];
+  const tableHtml = buildPrintableWorksheetHtml(verbA, verbB, subjects);
+
+  const win = window.open("", "_blank");
+  if (!win) { alert("Your browser blocked the print window — allow pop-ups for this site and try again."); return; }
+  win.document.write(`
+    <!doctype html>
+    <html><head><title>Prueba de Verbos — Worksheet</title>
+    <style>
+      body { font-family: Georgia, 'Times New Roman', serif; padding: 24px; color: #111; }
+      h1 { font-size: 20px; margin: 0 0 16px; }
+      table.test-grid { border-collapse: collapse; width: 100%; font-size: 13px; }
+      table.test-grid td { border: 1px solid #333; padding: 8px; text-align: center; vertical-align: middle; }
+      td.tense-label { text-align: left; font-weight: 600; max-width: 170px; }
+      td.tense-label em { font-weight: 400; font-size: 0.85em; }
+      .test-header-cell { text-align: left; vertical-align: top; padding: 12px; }
+      .test-header-verb { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+      .test-header-forma { padding: 4px 8px; border: 1px solid #333; display: inline-block; margin-top: 4px; }
+      .print-blank { border-bottom: 1px solid #333; height: 22px; }
+      .print-blank--inline { display: inline-block; width: 160px; height: 16px; vertical-align: middle; margin-left: 6px; }
+      @media print { body { padding: 0; } }
+    </style>
+    </head><body>
+      <h1>Prueba de Verbos</h1>
+      ${tableHtml}
+    </body></html>
+  `);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 300);
 }
 
 function startTest(currentPool, pastPool) {
@@ -1182,8 +1412,10 @@ function gradeTest() {
     input.disabled = true;
     if (ok) { correct++; } else { missedTenseKeys.add(tenseKey); missedVerbIndices.add(vi); }
     total++;
+    WeakSpots.record(testState.verbs[vi].infinitive, tenseKey, ok);
   });
 
+  if (total > 0) { Streak.recordToday(); renderStreakBanner(); }
   document.getElementById("test-submit").disabled = true;
   const summary = document.getElementById("test-summary");
   const pct = ((correct / total) * 100).toFixed(1);
