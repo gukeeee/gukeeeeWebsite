@@ -17,7 +17,7 @@
   // homepage — just not in the global nav, to keep it focused.
   const NAV_LINKS = [
     { key: "home", label: "Home", path: "/" },
-    { key: "verbos", label: "Prueba de Verbos", path: "/verbos.html" },
+    { key: "verbos", label: "Prueba de Verbos", path: "/verbos" },
   ];
 
   function renderSwatches() {

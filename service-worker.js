@@ -5,11 +5,15 @@
    static site, no per-file versioning needed.
    ========================================================================== */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE_NAME = `gukeeee-${VERSION}`;
 
+// Cloudflare Pages redirects "*.html" URLs to their clean equivalent
+// ("/verbos.html" -> "/verbos", a 308) — precache the clean URLs directly,
+// not the ones that redirect (see the fetch handler below for why a
+// redirected response is actively dangerous to precache, not just wasteful).
 const APP_SHELL = [
-  "/", "/index.html", "/verbos.html", "/chequeo.html", "/sports.html", "/404.html",
+  "/", "/verbos", "/chequeo", "/sports",
   "/theme.css", "/verbos.css", "/chequeo.css", "/sports.css",
   "/auth.js", "/header.js", "/settings.js", "/verbStore.js", "/conjugator.js", "/verbos.js", "/chequeo.js",
   "/verbDataset.json",
@@ -18,9 +22,15 @@ const APP_SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
+  // Individual cache.add() calls via allSettled instead of cache.addAll() —
+  // addAll is all-or-nothing, so one unexpectedly missing/redirecting URL
+  // would silently break precaching for every other file (this is exactly
+  // how the site went down: a handful of redirecting .html URLs in the list
+  // made the whole install fail, leaving no service worker in control —
+  // except when an old broken one was already active, see below).
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => Promise.allSettled(APP_SHELL.map((url) => cache.add(url))))
       .then(() => self.skipWaiting())
   );
 });
@@ -32,6 +42,19 @@ self.addEventListener("activate", (event) => {
       .then(() => self.clients.claim())
   );
 });
+
+// Chrome refuses to fulfill a navigation request with a redirected Response
+// via respondWith() (it fails the whole navigation with a network error) —
+// this is what actually took the site down: a request for a URL Cloudflare
+// redirects (like the old "/verbos.html") got its redirected response cached
+// and later replayed for a navigation. Precaching only clean URLs (above)
+// avoids that in practice, but this strips the redirected flag from
+// anything before it's ever handed to respondWith(), so a stray old
+// bookmark or link can't reproduce the same failure.
+function deredirect(response) {
+  if (!response || !response.redirected) return response;
+  return new Response(response.body, response);
+}
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
@@ -47,10 +70,10 @@ self.addEventListener("fetch", (event) => {
         const network = fetch(req)
           .then((res) => {
             if (res.ok) caches.open(CACHE_NAME).then((cache) => cache.put(req, res.clone()));
-            return res;
+            return deredirect(res);
           })
           .catch(() => cached);
-        return cached || network;
+        return cached ? deredirect(cached) : network;
       })
     );
     return;

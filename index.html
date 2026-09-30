@@ -67,7 +67,7 @@
       <button id="install-button" class="btn btn-primary">Install app</button>
 
       <div class="hero__cards">
-        <a class="hero-card card" href="/verbos.html">
+        <a class="hero-card card" href="/verbos">
           <div class="hero-card__icon">🔤</div>
           <div class="hero-card__title">Prueba de Verbos</div>
           <div class="hero-card__desc">Look up conjugations and practice verbs.</div>
@@ -86,7 +86,7 @@
         if (redirectPath) {
           sessionStorage.removeItem('redirectPath');
           if (redirectPath.includes('/sports')) {
-            window.location.href = `/sports.html${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
+            window.location.href = `/sports${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
           } else {
             window.history.replaceState(null, '', redirectPath);
           }
