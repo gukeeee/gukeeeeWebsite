@@ -694,69 +694,196 @@ async function updateVerbWeek(id, selectValue, selectEl) {
   }
 }
 
-// English's only monosyllabic -ie verbs (lie, die, tie, vie) swap "ie" for
-// "y" before adding "-ing" — lie->lying, die->dying — so stripping "ing"
-// alone leaves "ly"/"dy"/"ty"/"vy" rather than a real word. Every other
-// English verb keeps its own ending intact under "-ing" (dream->dreaming,
-// run->running), so this exception list is complete, not a heuristic.
-const GERUND_IE_EXCEPTIONS = { ly: "lie", dy: "die", ty: "tie", vy: "vie" };
+// ---------------------------------------------------------------------------
+// Verb definitions. Order: the bundled dataset's curated gloss (instant, no
+// network) -> Wiktionary (a real dictionary with CORS enabled, so the browser
+// can call it directly; SpanishDict has no public API) -> MyMemory only as a
+// last resort and only if it returns something shaped like "to X". Machine
+// translation of a bare infinitive is what produced junk like "to i running",
+// so an empty field the admin fills in beats a confident wrong answer.
+// ---------------------------------------------------------------------------
 
-function degerund(word) {
-  if (!word.endsWith("ing")) return word;
-  const stem = word.slice(0, -3);
-  if (GERUND_IE_EXCEPTIONS[stem]) return GERUND_IE_EXCEPTIONS[stem];
-  // Most English gerunds are just base+"ing" with nothing else changed
-  // (try->trying, dream->dreaming, ask->asking), so the stripped stem is
-  // usually already the right infinitive — this was previously only tried
-  // for the 4 -ie verbs above and left everything else as "trying" itself,
-  // producing nonsense like "to trying". Doubled-consonant (run->running)
-  // and dropped-silent-e (make->making) verbs aren't reversible without a
-  // real dictionary, so those can still come out short ("runn", "mak") —
-  // still an improvement over leaving "-ing" attached, and still editable.
-  return stem;
+function decodeEntities(str) {
+  return str
+    .replace(/&nbsp;|&#160;/g, " ")
+    .replace(/&quot;|&#34;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
 }
 
-function cleanCandidate(t) {
-  return t && t.split(/\s+/).length <= 5 && !/["“”.!?;]/.test(t) ? t : null;
+// Parsoid puts JSON in attributes (data-mw='{"...>..."}'), so a tag can't be
+// matched with a naive <[^>]+> — quoted attribute values may contain ">".
+const TAG_RE = /<(?:[^>"']|"[^"]*"|'[^']*')*>/g;
+
+function htmlToText(html) {
+  return decodeEntities(
+    html
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<sup[\s\S]*?<\/sup>/gi, "")
+      .replace(TAG_RE, "")
+  ).replace(/\s+/g, " ").trim();
 }
 
-// Lingva (a privacy front-end for Google Translate) gives noticeably better
-// glosses than a translation-memory API — real machine translation instead
-// of a fuzzy match against a phrase corpus — so it's tried first.
-async function fetchFromLingva(query) {
-  try {
-    const res = await fetch(`https://lingva.lunar.icu/api/v1/es/en/${encodeURIComponent(query)}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    return cleanCandidate((data.translation || "").trim());
-  } catch (err) {
-    return null;
+// Pulls the top-level senses out of the Spanish "Verb" section(s) of a
+// Wiktionary page (Parsoid HTML). Nested lists inside a sense — examples,
+// sub-senses, quotations — are cut off so only the gloss line remains.
+// Returns [{ labels: "reflexive, colloquial", text: "to go to bed, ..." }].
+function parseWiktionarySenses(html) {
+  const start = html.indexOf('id="Spanish"');
+  if (start < 0) return [];
+  const end = html.indexOf("<h2", start + 12);
+  const spanish = html.slice(start, end > 0 ? end : undefined);
+
+  const senses = [];
+  const headingRe = /<h[3-5][^>]*?id="(Verb[^"]*)"[^>]*>/g;
+  let h;
+  while ((h = headingRe.exec(spanish))) {
+    const afterHeading = spanish.slice(h.index + h[0].length);
+    const nextHeading = afterHeading.search(/<h[2-5][\s>]/);
+    const block = nextHeading >= 0 ? afterHeading.slice(0, nextHeading) : afterHeading;
+    const olStart = block.search(/<ol[\s>]/);
+    if (olStart < 0) continue;
+
+    const tagRe = /<(\/?)(ol|ul|dl|li)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
+    tagRe.lastIndex = olStart;
+    let depth = 0, liStart = -1, cut = -1, m;
+    while ((m = tagRe.exec(block))) {
+      const closing = m[1] === "/", tag = m[2];
+      if (tag === "li") {
+        if (depth !== 1) continue;
+        if (!closing) { liStart = m.index + m[0].length; cut = -1; }
+        else if (liStart >= 0) {
+          const raw = htmlToText(block.slice(liStart, cut >= 0 ? cut : m.index));
+          const lm = raw.match(/^\(([^)]*)\)\s*/);
+          senses.push({ labels: lm ? lm[1].toLowerCase() : "", text: lm ? raw.slice(lm[0].length) : raw });
+          liStart = -1;
+        }
+      } else if (!closing) {
+        depth++;
+        if (depth === 2 && liStart >= 0 && cut < 0) cut = m.index;
+      } else {
+        depth--;
+        if (depth === 0) break;
+      }
+    }
   }
+  return senses.filter((s) => s.text);
 }
 
-// Fallback if Lingva's instance is ever unreachable. MyMemory returns a
-// ranked list of translation-memory matches rather than a single gloss, so
-// this picks the first one that reads like a short phrase, not a fragment.
+// "infinitive of acostar combined with se", "reflexive of quedar", etc. —
+// a pointer to another page rather than a definition.
+function formOfTarget(text) {
+  const m = text.match(/^(?:\w+ )*?(?:infinitive|form|reflexive|pronominal|alternative (?:form|spelling)) of ([a-záéíóúüñ]+)/i);
+  return m ? m[1].toLowerCase() : null;
+}
+
+// "to notice, to realize, to figure out (something) [with de]; to see" ->
+// "to notice, to realize"
+function tidyGloss(text) {
+  let t = text
+    .replace(/\[[^\]]*\]/g, "")
+    .replace(/\([^)]*\)/g, "")
+    .split(/[;:]/)[0]
+    .replace(/\s+([,.])/g, "$1")
+    .replace(/\s+/g, " ")
+    .replace(/[.\s]+$/, "")
+    .trim()
+    .toLowerCase();
+  if (!t) return null;
+  const parts = t.split(/,\s*/).filter(Boolean).slice(0, 2);
+  t = parts.join(", ");
+  if (!/^to\s/.test(t)) t = `to ${t}`;
+  return t.split(/\s+/).length <= 10 ? t : null;
+}
+
+const SKIP_LABELS = /obsolete|archaic|vulgar|slang|rare|dated|euphemistic|derogatory|offensive/;
+
+// Senses carrying a usage note ("(usually used for negative descriptions)",
+// "[with dative ...]") tend to be the narrow ones; Wiktionary's plain senses
+// are the core meaning — so among otherwise-equal candidates prefer those.
+function firstPreferPlain(list) {
+  return list.find((s) => !/[([]/.test(s.text)) || list[0];
+}
+
+function pickSense(senses, { wantReflexive }) {
+  const real = senses.filter((s) => !formOfTarget(s.text) && !SKIP_LABELS.test(s.labels));
+  if (!real.length) return senses.find((s) => !formOfTarget(s.text)) || null;
+  const isRefl = (s) => /reflexive|pronominal/.test(s.labels);
+  if (wantReflexive) {
+    const refl = real.filter(isRefl);
+    // "to prevent someone from sleeping" is the transitive use that merely
+    // shares a combined "(transitive, reflexive)" label — a sense that takes
+    // an object isn't what the -se form means.
+    const intransitive = refl.filter((s) => !/\b(someone|something)\b/.test(s.text));
+    if (refl.length) return firstPreferPlain(intransitive.length ? intransitive : refl);
+  }
+  // "(transitive, reflexive)" covers both uses, so it still counts for the
+  // bare verb; only reflexive-only senses are skipped here.
+  const nonRefl = real.filter((s) => !isRefl(s) || /\btransitive/.test(s.labels));
+  return firstPreferPlain(nonRefl.length ? nonRefl.slice(0, 3) : real);
+}
+
+const wiktionaryCache = new Map();
+function fetchWiktionarySenses(word) {
+  const title = word.trim().replace(/\s+/g, "_");
+  if (!wiktionaryCache.has(title)) {
+    wiktionaryCache.set(title, (async () => {
+      try {
+        const res = await fetch(`https://en.wiktionary.org/api/rest_v1/page/html/${encodeURIComponent(title)}`);
+        if (!res.ok) return [];
+        return parseWiktionarySenses(await res.text());
+      } catch (err) {
+        return [];
+      }
+    })());
+  }
+  return wiktionaryCache.get(title);
+}
+
+async function fetchFromWiktionary(query) {
+  const phrase = query.trim().toLowerCase();
+  const verb = phrase.split(/\s+/)[0];
+  const isReflexive = /(ar|er|ir)se$/.test(verb);
+
+  // Exact phrase first ("darse cuenta", "acordarse de"), then the bare verb.
+  const attempts = phrase !== verb ? [phrase, verb] : [verb];
+  for (const word of attempts) {
+    const senses = await fetchWiktionarySenses(word);
+    const sense = pickSense(senses, { wantReflexive: isReflexive });
+    if (sense) return tidyGloss(sense.text);
+
+    // Page is only a pointer ("infinitive of acostar combined with se") —
+    // follow it, preferring the sense labelled (reflexive) on the base verb.
+    const target = senses.map((s) => formOfTarget(s.text)).find(Boolean)
+      || (isReflexive && word === verb ? verb.slice(0, -2) : null);
+    if (target && target !== word) {
+      const baseSense = pickSense(await fetchWiktionarySenses(target), { wantReflexive: isReflexive });
+      if (baseSense) return tidyGloss(baseSense.text);
+    }
+  }
+  return null;
+}
+
+// Last resort. Only trusts a candidate that already reads "to <verb>" and
+// isn't an -ing form — that's what filtered garbage used to slip through.
 async function fetchFromMyMemory(query) {
   try {
     const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(query)}&langpair=es|en`);
     const data = await res.json();
     const candidates = [data.responseData, ...(data.matches || [])]
-      .map((m) => cleanCandidate((m && (m.translatedText || m.translation) || "").trim()))
-      .filter(Boolean);
+      .map((m) => (m && (m.translatedText || m.translation) || "").trim().toLowerCase().replace(/[.!?]+$/, ""))
+      .filter((t) => /^to [a-z]+( [a-z]+){0,3}$/.test(t) && !/^to \w+ing\b/.test(t));
     return candidates[0] || null;
   } catch (err) {
     return null;
   }
 }
 
-// Auto-fetched instead of typed in by hand — the admin can still edit the
-// field afterward if the translation is off, but this is now the primary path.
 async function fetchMeaning(query) {
-  const raw = (await fetchFromLingva(query)) || (await fetchFromMyMemory(query));
-  if (!raw) return null;
-  const text = degerund(raw.toLowerCase().replace(/[.!?]+$/, ""));
-  return text.startsWith("to ") ? text : `to ${text}`;
+  const local = Conjugator.datasetMeaning(query);
+  if (local) return local;
+  return (await fetchFromWiktionary(query)) || (await fetchFromMyMemory(query));
 }
 
 // Tracked so saveVerbFromForm can await it — otherwise clicking "Save verb"

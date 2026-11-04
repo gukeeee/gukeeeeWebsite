@@ -401,10 +401,24 @@ const Conjugator = (function () {
     // so strip it back off here and let a native-reflexive dataset entry
     // flow through the exact same bare-verb pipeline as every other
     // reflexive verb, instead of special-casing (and subtly breaking) it.
-    const datasetHasReflexiveForm = !!(DATASET && DATASET[rawInf]);
+    // Only true for a reflexive infinitive ("graduarse") that has its own
+    // dataset entry — previously this was true for EVERY dataset verb
+    // (DATASET[rawInf] exists for plain "dormir" too), which nulled out the
+    // dataset's gerund below and fell back to the rule engine's naive
+    // "dormiendo"/"pidiendo"/"deciendo".
+    const datasetHasReflexiveForm = !!(isReflexive && DATASET && DATASET[rawInf]);
     function stripPronounPrefix(str, person) {
       const p = REFLEXIVE_PRONOUNS[person] + " ";
       return str.startsWith(p) ? str.slice(p.length) : str;
+    }
+    // "graduándose" -> "graduando": drop the attached "se" and the accent
+    // it forced (the bare form never carries one), preferring the bare
+    // verb's own dataset gerund when that exists.
+    function reflexiveGerundToBare(g) {
+      if (DATASET && DATASET[baseInfinitive] && DATASET[baseInfinitive].gerundio) return DATASET[baseInfinitive].gerundio;
+      if (!g || !g.endsWith("se")) return null;
+      const bare = g.slice(0, -2);
+      return bare.replace(/[áé](?=ndo$)/, (c) => ({ á: "a", é: "e" }[c]));
     }
     const rawDatasetEntry = DATASET && (DATASET[rawInf] || (isReflexive ? DATASET[baseInfinitive] : null));
     const datasetEntry = datasetHasReflexiveForm && rawDatasetEntry
@@ -435,7 +449,7 @@ const Conjugator = (function () {
           // (including the irregular commands like "ponte"/"detente"/"vete"
           // that the presente-derived fallback below can't reproduce), so
           // use those verbatim rather than re-deriving.
-          gerund: datasetHasReflexiveForm ? null : datasetEntry.gerundio,
+          gerund: datasetHasReflexiveForm ? reflexiveGerundToBare(rawDatasetEntry.gerundio) : datasetEntry.gerundio,
           imperativeTuAff: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.tuAff : datasetEntry.imperativo.tuAff,
           imperativeUd: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.ud : null,
           nosotrosMandato: datasetHasReflexiveForm ? rawDatasetEntry.imperativo.nosotros : datasetEntry.imperativo.nosotros,
@@ -611,5 +625,11 @@ const Conjugator = (function () {
     return result;
   }
 
-  return { conjugate, loadDataset, TENSES, PERSONS, IMPERATIVE_LABELS };
+  // Curated English gloss from the bundled dataset ("to sleep"), or null.
+  function datasetMeaning(infinitive) {
+    const e = DATASET && DATASET[infinitive.trim().toLowerCase()];
+    return (e && e.meaning) || null;
+  }
+
+  return { conjugate, loadDataset, datasetMeaning, TENSES, PERSONS, IMPERATIVE_LABELS };
 })();

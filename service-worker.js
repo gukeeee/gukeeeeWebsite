@@ -5,7 +5,7 @@
    static site, no per-file versioning needed.
    ========================================================================== */
 
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE_NAME = `gukeeee-${VERSION}`;
 
 // Cloudflare Pages redirects "*.html" URLs to their clean equivalent
