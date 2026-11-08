@@ -384,12 +384,36 @@ const Conjugator = (function () {
     };
   }
 
+  // -ír verbs (reír, freír, oír, sonreír) are written with an accent but
+  // conjugate as plain -ir. Lookups accept either spelling ("reir"/"reír");
+  // the rule engine always works on the unaccented form.
+  const toPlainIr = (w) => w.replace(/ír(se)?$/, "ir$1");
+  const toAccentedIr = (w) => w.replace(/([aeo])ir(se)?$/, "$1ír$2");
+  function ds(key) {
+    if (!DATASET || !key) return null;
+    return DATASET[key] || DATASET[toAccentedIr(key)] || DATASET[toPlainIr(key)] || null;
+  }
+
+  // The spelling to store/display: the dataset's own (accented) key when it
+  // has one, otherwise whatever was typed.
+  function canonicalInfinitive(infinitive) {
+    const w = infinitive.trim().toLowerCase();
+    if (DATASET) {
+      if (DATASET[w]) return w;
+      if (DATASET[toAccentedIr(w)]) return toAccentedIr(w);
+      // "reirse": no reflexive entry, but the bare "reír" is accented.
+      const m = w.match(/^(.*)se$/);
+      if (m && DATASET[toAccentedIr(m[1])] && !DATASET[m[1]]) return toAccentedIr(m[1]) + "se";
+    }
+    return w;
+  }
+
   function conjugate(infinitive) {
-    const rawInf = infinitive.trim().toLowerCase();
-    const isReflexive = /^[a-záéíóúñ]*(ar|er|ir)se$/.test(rawInf);
+    const rawInf = canonicalInfinitive(infinitive);
+    const isReflexive = /^[a-záéíóúñ]*(ar|er|ir|ír)se$/.test(rawInf);
     const baseInfinitive = isReflexive ? rawInf.slice(0, -2) : rawInf;
 
-    const { stem, group, inf } = splitInfinitive(baseInfinitive);
+    const { stem, group, inf } = splitInfinitive(toPlainIr(baseInfinitive));
 
     // The dataset's own reflexive entry (if any) stores forms with the
     // pronoun already attached — prefix on indicative/subjunctive ("me
@@ -406,7 +430,7 @@ const Conjugator = (function () {
     // (DATASET[rawInf] exists for plain "dormir" too), which nulled out the
     // dataset's gerund below and fell back to the rule engine's naive
     // "dormiendo"/"pidiendo"/"deciendo".
-    const datasetHasReflexiveForm = !!(isReflexive && DATASET && DATASET[rawInf]);
+    const datasetHasReflexiveForm = !!(isReflexive && ds(rawInf));
     function stripPronounPrefix(str, person) {
       const p = REFLEXIVE_PRONOUNS[person] + " ";
       return str.startsWith(p) ? str.slice(p.length) : str;
@@ -415,12 +439,12 @@ const Conjugator = (function () {
     // it forced (the bare form never carries one), preferring the bare
     // verb's own dataset gerund when that exists.
     function reflexiveGerundToBare(g) {
-      if (DATASET && DATASET[baseInfinitive] && DATASET[baseInfinitive].gerundio) return DATASET[baseInfinitive].gerundio;
+      if (ds(baseInfinitive) && ds(baseInfinitive).gerundio) return ds(baseInfinitive).gerundio;
       if (!g || !g.endsWith("se")) return null;
       const bare = g.slice(0, -2);
       return bare.replace(/[áé](?=ndo$)/, (c) => ({ á: "a", é: "e" }[c]));
     }
-    const rawDatasetEntry = DATASET && (DATASET[rawInf] || (isReflexive ? DATASET[baseInfinitive] : null));
+    const rawDatasetEntry = ds(rawInf) || (isReflexive ? ds(baseInfinitive) : null);
     const datasetEntry = datasetHasReflexiveForm && rawDatasetEntry
       ? {
           forms: Object.keys(rawDatasetEntry.forms).reduce((acc, tenseKey) => {
@@ -627,9 +651,9 @@ const Conjugator = (function () {
 
   // Curated English gloss from the bundled dataset ("to sleep"), or null.
   function datasetMeaning(infinitive) {
-    const e = DATASET && DATASET[infinitive.trim().toLowerCase()];
+    const e = ds(infinitive.trim().toLowerCase());
     return (e && e.meaning) || null;
   }
 
-  return { conjugate, loadDataset, datasetMeaning, TENSES, PERSONS, IMPERATIVE_LABELS };
+  return { conjugate, loadDataset, datasetMeaning, canonicalInfinitive, TENSES, PERSONS, IMPERATIVE_LABELS };
 })();

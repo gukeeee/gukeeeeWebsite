@@ -61,8 +61,10 @@ function normalize(str) {
 function parseInfinitiveInput(raw) {
   const trimmed = raw.trim().toLowerCase();
   const spaceIdx = trimmed.indexOf(" ");
-  if (spaceIdx === -1) return { infinitive: trimmed, preposition: "" };
-  return { infinitive: trimmed.slice(0, spaceIdx), preposition: trimmed.slice(spaceIdx + 1).trim() };
+  // "reir" -> "reír": stored under the dataset's own spelling.
+  const canon = (w) => Conjugator.canonicalInfinitive(w);
+  if (spaceIdx === -1) return { infinitive: canon(trimmed), preposition: "" };
+  return { infinitive: canon(trimmed.slice(0, spaceIdx)), preposition: trimmed.slice(spaceIdx + 1).trim() };
 }
 
 function verbDisplayName(record) {
@@ -844,7 +846,7 @@ function fetchWiktionarySenses(word) {
 async function fetchFromWiktionary(query) {
   const phrase = query.trim().toLowerCase();
   const verb = phrase.split(/\s+/)[0];
-  const isReflexive = /(ar|er|ir)se$/.test(verb);
+  const isReflexive = /(ar|er|ir|ír)se$/.test(verb);
 
   // Exact phrase first ("darse cuenta", "acordarse de"), then the bare verb.
   const attempts = phrase !== verb ? [phrase, verb] : [verb];
@@ -898,7 +900,7 @@ function generateAdminPreview(existingRecord) {
     ? { infinitive: existingRecord.infinitive, preposition: existingRecord.preposition || "" }
     : parseInfinitiveInput(infinitiveInput.value);
 
-  if (!/^[a-záéíóúñ]*(ar|er|ir)(se)?$/.test(infinitive)) {
+  if (!/^[a-záéíóúñ]*(ar|er|ir|ír)(se)?$/.test(infinitive)) {
     alert("Enter a valid infinitive ending in -ar, -er, or -ir.");
     return;
   }
