@@ -1,6 +1,6 @@
 /* ==========================================================================
    gukeeee — shared site header
-   Renders into <div id="site-header" data-active="home|chequeo|sports|verbos">
+   Renders into <div id="site-header" data-active="home|chequeo|verbos">
    Requires auth.js to be loaded first.
    ========================================================================== */
 
@@ -13,7 +13,7 @@
   }
   window.navigateTo = navigateTo;
 
-  // Chequeo and Sports stay live at their URLs and are still linked from the
+  // Chequeo stays live at its URL and is still linked from the
   // homepage — just not in the global nav, to keep it focused.
   const NAV_LINKS = [
     { key: "home", label: "Home", path: "/" },

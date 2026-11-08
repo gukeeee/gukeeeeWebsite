@@ -69,11 +69,6 @@ body[data-theme="chequeo"] {
   --color-accent-dark: #2f6fe0;
   --color-accent-light: rgba(74, 140, 255, 0.16);
 }
-body[data-theme="sports"] {
-  --color-accent: #34d17a;
-  --color-accent-dark: #1fae61;
-  --color-accent-light: rgba(52, 209, 122, 0.16);
-}
 body[data-theme="verbos"] {
   --color-accent: #2dd4c8;
   --color-accent-dark: #17b0a5;

@@ -63,7 +63,7 @@
     <main class="hero">
       <div class="hero__eyebrow">Welcome</div>
       <h1 class="hero__title">gukeeee</h1>
-      <p class="hero__subtitle">One place for your Spanish checks, sports streams, and verb practice.</p>
+      <p class="hero__subtitle">One place for your Spanish checks and verb practice.</p>
       <button id="install-button" class="btn btn-primary">Install app</button>
 
       <div class="hero__cards">
@@ -80,16 +80,12 @@
     <script src="auth.js"></script>
     <script src="header.js"></script>
     <script>
-      // Check for redirects saved by 404.html for deep links that aren't the sports page
+      // Restore deep links saved by 404.html
       document.addEventListener('DOMContentLoaded', function () {
         const redirectPath = sessionStorage.getItem('redirectPath');
         if (redirectPath) {
           sessionStorage.removeItem('redirectPath');
-          if (redirectPath.includes('/sports')) {
-            window.location.href = `/sports${redirectPath.includes('/sports/') ? '?path=' + encodeURIComponent(redirectPath) : ''}`;
-          } else {
-            window.history.replaceState(null, '', redirectPath);
-          }
+          window.history.replaceState(null, '', redirectPath);
         }
       });
 

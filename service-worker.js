@@ -5,7 +5,7 @@
    static site, no per-file versioning needed.
    ========================================================================== */
 
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE_NAME = `gukeeee-${VERSION}`;
 
 // Cloudflare Pages redirects "*.html" URLs to their clean equivalent
@@ -13,8 +13,8 @@ const CACHE_NAME = `gukeeee-${VERSION}`;
 // not the ones that redirect (see the fetch handler below for why a
 // redirected response is actively dangerous to precache, not just wasteful).
 const APP_SHELL = [
-  "/", "/verbos", "/chequeo", "/sports",
-  "/theme.css", "/verbos.css", "/chequeo.css", "/sports.css",
+  "/", "/verbos", "/chequeo",
+  "/theme.css", "/verbos.css", "/chequeo.css",
   "/auth.js", "/header.js", "/settings.js", "/verbStore.js", "/conjugator.js", "/verbos.js", "/chequeo.js",
   "/verbDataset.json",
   "/manifest.json",
